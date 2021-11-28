@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31702.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roguelike", "Roguelike\Roguelike.csproj", "{28F50FE8-3AE8-4444-87DA-D9316189A157}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Roguelike.GameConfig", "Roguelike.GameConfig\Roguelike.GameConfig.csproj", "{F9575FCD-1B51-4320-B7C3-95ED0EEE3ECF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Roguelike.Engine", "Roguelike.Engine\Roguelike.Engine.csproj", "{80A5C792-63BF-4CC0-BD8A-9089BB4E9EB4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{28F50FE8-3AE8-4444-87DA-D9316189A157}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28F50FE8-3AE8-4444-87DA-D9316189A157}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28F50FE8-3AE8-4444-87DA-D9316189A157}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28F50FE8-3AE8-4444-87DA-D9316189A157}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9575FCD-1B51-4320-B7C3-95ED0EEE3ECF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9575FCD-1B51-4320-B7C3-95ED0EEE3ECF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9575FCD-1B51-4320-B7C3-95ED0EEE3ECF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9575FCD-1B51-4320-B7C3-95ED0EEE3ECF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80A5C792-63BF-4CC0-BD8A-9089BB4E9EB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80A5C792-63BF-4CC0-BD8A-9089BB4E9EB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80A5C792-63BF-4CC0-BD8A-9089BB4E9EB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80A5C792-63BF-4CC0-BD8A-9089BB4E9EB4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A56BC500-6339-4EE7-B677-AD63F2CFC1EF}
+	EndGlobalSection
+EndGlobal
