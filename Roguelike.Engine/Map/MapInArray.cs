@@ -2,19 +2,19 @@
 {
     class MapInArray : Map
     {
-        private IObjectOnMap[,] _objectsOnMap;
+        private ObjectOnMap[,] _objectsOnMap;
 
-        public MapInArray(int width, int height, IObjectOnMap[,] objectsOnMap) : base(width, height)
+        public MapInArray(int height, int width, ObjectOnMap[,] objectsOnMap) : base(height, width)
         {
             _objectsOnMap = objectsOnMap;
         }
 
-        public override IObjectOnMap GetObjWithCoord(int x, int y)
+        public override ObjectOnMap GetObjWithCoord(int x, int y)
         {
             return _objectsOnMap[x, y];
         }
 
-        public override void SetObjWithCoord(int x, int y, IObjectOnMap obj)
+        public override void SetObjWithCoord(int x, int y, ObjectOnMap obj)
         {
             _objectsOnMap[x, y] = obj;
         }

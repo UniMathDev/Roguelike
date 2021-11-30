@@ -2,16 +2,16 @@
 {
     abstract class Map
     {
-        public int Width { get; }
         public int Height { get; }
-
-        protected Map(int width, int height)
+        public int Width { get; }
+        
+        protected Map(int height, int width)
         {
-            Width = width;
             Height = height;
+            Width = width;
         }
 
-        public abstract IObjectOnMap GetObjWithCoord(int x, int y);
-        public abstract void SetObjWithCoord(int x, int y, IObjectOnMap obj);
+        public abstract ObjectOnMap GetObjWithCoord(int x, int y);
+        public abstract void SetObjWithCoord(int x, int y, ObjectOnMap obj);
     }
 }
