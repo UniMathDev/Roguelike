@@ -1,4 +1,6 @@
-﻿namespace Roguelike.Engine.Map
+﻿using Roguelike.Engine.ObjectsOnMap;
+
+namespace Roguelike.Engine.Map
 {
     abstract class Map
     {

@@ -1,4 +1,6 @@
-﻿namespace Roguelike.Engine.Map
+﻿using Roguelike.Engine.ObjectsOnMap;
+
+namespace Roguelike.Engine.Map
 {
     class MapInArray : Map
     {

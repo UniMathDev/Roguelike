@@ -1,6 +1,4 @@
-﻿using Roguelike.Engine.Map.ObjectsOnMap;
-
-namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
+﻿namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
 {
     class Floor : FixedObject
     {

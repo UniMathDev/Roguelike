@@ -1,4 +1,4 @@
-﻿using Roguelike.Engine.ObjectsOnMap.FixedObjects;
+﻿using Roguelike.Engine.ObjectsOnMap;
 using System.IO;
 using System.Text;
 
@@ -9,7 +9,7 @@ namespace Roguelike.Engine.Map
         public Map ConvertToMap(string pathToFileWithMap, int height, int width)
         {
             var objectsOnMap = new ObjectOnMap[height, width];
-            FixedObjectFactory factory = new();
+            var availableCharsOfObjs = new CharsOfObjects();
 
             using var streamReader = new StreamReader(pathToFileWithMap, Encoding.UTF8);
 
@@ -20,7 +20,7 @@ namespace Roguelike.Engine.Map
                 for(int x = 0; x < width; x++)
                 {
                     char objSymbol = objSymbols[x];
-                    objectsOnMap[x, y] = factory.GetFixedObject(objSymbol);
+                    objectsOnMap[x, y] = availableCharsOfObjs.GetObjForChar(objSymbol);
                 }
             }
 

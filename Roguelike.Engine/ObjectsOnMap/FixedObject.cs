@@ -1,4 +1,4 @@
-﻿namespace Roguelike.Engine.Map.ObjectsOnMap
+﻿namespace Roguelike.Engine.ObjectsOnMap
 {
     abstract class FixedObject : ObjectOnMap
     {
