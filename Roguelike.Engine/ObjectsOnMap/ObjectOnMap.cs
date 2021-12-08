@@ -1,6 +1,6 @@
 ﻿namespace Roguelike.Engine.ObjectsOnMap
 {
-    abstract class ObjectOnMap
+    public abstract class ObjectOnMap
     {
         public char Сharacter { get; }
 

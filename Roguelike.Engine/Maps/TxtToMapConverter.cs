@@ -2,11 +2,11 @@
 using System.IO;
 using System.Text;
 
-namespace Roguelike.Engine.Map
+namespace Roguelike.Engine.Maps
 {
-    class TxtToMapConverter : IMapConverter
+    public static class TxtToMapConverter
     {
-        public Map ConvertToMap(string pathToFileWithMap, int height, int width)
+        public static Map ConvertToArrayMap(string pathToFileWithMap, int height, int width)
         {
             var objectsOnMap = new ObjectOnMap[height, width];
             var availableCharsOfObjs = new CharsOfObjects();
@@ -20,7 +20,7 @@ namespace Roguelike.Engine.Map
                 for(int x = 0; x < width; x++)
                 {
                     char objSymbol = objSymbols[x];
-                    objectsOnMap[x, y] = availableCharsOfObjs.GetObjForChar(objSymbol);
+                    objectsOnMap[y, x] = availableCharsOfObjs.GetObjForChar(objSymbol);
                 }
             }
 

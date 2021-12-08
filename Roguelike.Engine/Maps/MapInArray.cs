@@ -1,6 +1,7 @@
 ﻿using Roguelike.Engine.ObjectsOnMap;
+using Roguelike.Engine.ObjectsOnMap.FixedObjects;
 
-namespace Roguelike.Engine.Map
+namespace Roguelike.Engine.Maps
 {
     class MapInArray : Map
     {
@@ -13,12 +14,22 @@ namespace Roguelike.Engine.Map
 
         public override ObjectOnMap GetObjWithCoord(int x, int y)
         {
-            return _objectsOnMap[x, y];
+            return _objectsOnMap[y, x];
         }
 
         public override void SetObjWithCoord(int x, int y, ObjectOnMap obj)
         {
-            _objectsOnMap[x, y] = obj;
+            _objectsOnMap[y, x] = obj;
+        }
+
+        public override char GetCharWithCoord(int x, int y)
+        {
+            return _objectsOnMap[y, x].Сharacter;
+        }
+
+        public override bool IsPossibleToMove(int x, int y)
+        {
+            return _objectsOnMap[y, x] is Floor;
         }
     }
 }
