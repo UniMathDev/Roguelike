@@ -2,7 +2,7 @@
 {
     struct MapSize
     {
-        const int Width = 45;
-        const int Height = 13;
+        public const int Width = 44;
+        public const int Height = 13;
     }
 }
