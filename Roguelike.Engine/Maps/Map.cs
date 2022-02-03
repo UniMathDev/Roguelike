@@ -21,18 +21,24 @@ namespace Roguelike.Engine.Maps
 
         public abstract bool IsPossibleToMove(int x, int y);
 
-        public override string ToString()
+        public string[] ToStringArray(int xPosMap, int yPosMap, int width, int height)
         {
-            StringBuilder mapInString = new();
-            for (int y = 0; y < Height; y++)
+            var mapInStringArray = new string[Height];
+            StringBuilder mapLine = new();
+            int y0 = (yPosMap > 0 ? yPosMap : 0);
+            y0 = (yPosMap > (Height - height) ? (Height - height) : y0);
+            int x0 = (xPosMap > 0 ? xPosMap : 0);
+            x0 = (xPosMap > (Width - width) ? (Width - width) : x0);
+            for (int y = y0; y < (height + y0); y++)
             {
-                for (int x = 0; x < Width; x++)
+                for (int x = x0; x < (width + x0); x++)
                 {
-                    mapInString.Append(this.GetCharWithCoord(x, y));
+                    mapLine.Append(this.GetCharWithCoord(x, y));
                 }
-                mapInString.Append('\n');
+                mapInStringArray[y - y0] = mapLine.ToString();
+                mapLine.Clear();
             }
-            return mapInString.ToString();
+            return mapInStringArray;
         }
     }
 }

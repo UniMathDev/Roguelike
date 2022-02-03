@@ -29,7 +29,7 @@ namespace Roguelike.Engine.Maps
 
         public override bool IsPossibleToMove(int x, int y)
         {
-            return _objectsOnMap[y, x] is Floor;
+            return ((_objectsOnMap[y, x] is Floor) || (_objectsOnMap[y, x] is Door));
         }
     }
 }

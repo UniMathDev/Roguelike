@@ -2,7 +2,7 @@
 {
     struct PlayerInitCoords
     {
-        public const int X = 2;
-        public const int Y = 11;
+        public const int X = 10;
+        public const int Y = 5;
     }
 }

@@ -12,7 +12,6 @@ namespace Roguelike.Client
     {
         private readonly Dictionary<ConsoleKey, GameMenuItem> _menu;
         private readonly Game _game;
-        private Stack<MapDiff> _mapDiffs;
 
         public GameConsoleClient()
         {
@@ -30,13 +29,11 @@ namespace Roguelike.Client
 
         public void Start()
         {
-            _mapDiffs = new();
-            _mapDiffs.Push(_game.InitPlayer());
-
             Console.CursorVisible = false;
-            Console.WriteLine(_game.MapInString);
+            PrintAMove();
             ConsoleKey key = ConsoleKey.F24;
             bool inGame = true;
+            
             while (inGame)
             {
                 if (Console.KeyAvailable)
@@ -47,44 +44,75 @@ namespace Roguelike.Client
                 if (_menu.ContainsKey(key))
                 {
                     _menu[key].Action();
-                }
+                }                
 
-                while (_mapDiffs.Count > 0)
-                {
-                    MapDiff mapDiff = _mapDiffs.Pop();
-                    Console.SetCursorPosition(mapDiff.X, mapDiff.Y);
-                    Console.Write(mapDiff.Character);
-                }
                 key = ConsoleKey.F24;
                 Thread.Sleep(16);
             }
         }
 
 
-        private void MoveUp() =>
-            PushToMapDiffs(Directions.Up);
+        private void MoveUp()
+        {
+            _game.Move(Directions.Up);
+            PrintAMove();
+        }
 
-        private void MoveDown() =>
-            PushToMapDiffs(Directions.Down);
+        private void MoveDown()
+        {
+            _game.Move(Directions.Down);
+            PrintAMove();
+        }
 
-        private void MoveRight() =>
-            PushToMapDiffs(Directions.Right);
+        private void MoveRight()
+        {
+            _game.Move(Directions.Right);
+            PrintAMove();
+        }
 
-        private void MoveLeft() =>
-            PushToMapDiffs(Directions.Left);
+        private void MoveLeft()
+        {
+             _game.Move(Directions.Left);
+            PrintAMove();
+        }
+
+        private void PrintAMove()
+        {
+            int xPosMap = _game.player.X - PlayerInitCoords.X;
+            int yPosMap = _game.player.Y - PlayerInitCoords.Y;
+            string[] mapInStringArray =
+                _game.GetMapInStringArray(xPosMap, yPosMap, GameFieldSize.Width, GameFieldSize.Height);
+            for (int i = 0; i < mapInStringArray.Length; i++)
+            {
+                Console.SetCursorPosition(GameFieldPosition.TopLeftPosX,
+                    GameFieldPosition.TopLeftPosY + i);
+                Console.Write(mapInStringArray[i]);
+            }
+            
+            int playerX = ((_game.player.X < PlayerInitCoords.X) ?
+                _game.player.X : PlayerInitCoords.X);
+            playerX = (_game.player.X >
+                (MapSize.Width - (GameFieldSize.Width - PlayerInitCoords.X)) ?
+                (PlayerInitCoords.X + _game.player.X - 
+                (MapSize.Width - (GameFieldSize.Width - PlayerInitCoords.X))) :
+                playerX);
+            int playerY = ((_game.player.Y < PlayerInitCoords.Y) ?
+                _game.player.Y : PlayerInitCoords.Y);
+            playerY = (_game.player.Y >
+                (MapSize.Height - (GameFieldSize.Height - PlayerInitCoords.Y)) ?
+                (PlayerInitCoords.Y + _game.player.Y -
+                (MapSize.Height - (GameFieldSize.Height - PlayerInitCoords.Y))) :
+                playerY);
+            Console.SetCursorPosition(playerX + GameFieldPosition.TopLeftPosX,
+                playerY + GameFieldPosition.TopLeftPosY);
+            Console.Write(_game.player.Character);
+
+        }
 
         private void Exit()
         {
             Console.Clear();
             Environment.Exit(0);
-        }
-
-        private void PushToMapDiffs(Directions direction)
-        {
-            foreach (var mapDiff in _game.Move(direction))
-            {
-                _mapDiffs.Push(mapDiff);
-            }
         }
 
     }

@@ -1,64 +1,52 @@
 ﻿using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
+using System.Collections.Generic;
 
 namespace Roguelike.Engine
 {
     public class Game
     {
         private Map _map;
-        private Player _player;
 
+        public Player player { get; }
 
         public Game(Map map, Player player)
         {
             _map = map;
-            _player = player;
+            this.player = player;
         }
 
 
-        public string MapInString
+        public string[] GetMapInStringArray(int xPos, int yPos, int width, int height)
         {
-            get { return _map.ToString(); }
+            return _map.ToStringArray(xPos, yPos, width, height);
         }
 
         public MapDiff InitPlayer()
         {
-            return new MapDiff(_player.X, _player.Y, _player.Character);
+            return new MapDiff(player.X, player.Y, player.Character);
         }
 
-        public MapDiff[] Move(Directions direction)
+        public void Move(Directions direction)
         {
-            if (_player.CanMove(direction, _map))
+            if (player.CanMove(direction, _map))
             {
-                int x = _player.X;
-                int y = _player.Y;
-                int newPlayerX = x;
-                int newPlayerY = y;
                 switch (direction)
                 {
                     case Directions.Up:
-                        newPlayerY = --_player.Y;
+                        --player.Y;
                         break;
                     case Directions.Down:
-                        newPlayerY = ++_player.Y;
+                        ++player.Y;
                         break;
                     case Directions.Right:
-                        newPlayerX = ++_player.X;
+                        ++player.X;
                         break;
                     case Directions.Left:
-                        newPlayerX = --_player.X;
+                        --player.X;
                         break;
                 }
-                return new MapDiff[]
-                {
-                    new MapDiff(x, y, _map.GetCharWithCoord(x, y)),
-                    new MapDiff(newPlayerX, newPlayerY, _player.Character)
-                };
-
             }
-            return new MapDiff[0];
         }
-
-
     }
 }
