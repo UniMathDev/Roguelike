@@ -6,7 +6,7 @@ namespace Roguelike.Engine
 {
     public class Game
     {
-        private Map _map;
+        public Map _map { get; }
 
         public Player player { get; }
 
