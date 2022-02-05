@@ -2,7 +2,7 @@
 {
     abstract class MovableObject : ObjectOnMap
     {
-        protected MovableObject(char сharacter) : base(сharacter)
+        protected MovableObject(char сharacter, string description) : base(сharacter, description)
         {
         }
     }

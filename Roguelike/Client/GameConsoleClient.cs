@@ -72,9 +72,9 @@ namespace Roguelike.Client
             _GUI.PrintAMove();
         }
 
-        private void PrintAMove()
+        private void Examine(MOUSE_PRESS_INFO m)
         {
-            //PrintCellDescription(m.X,m.Y);
+            _GUI.PrintCellDescription(m.X,m.Y);
         }
 
         private void Use(MOUSE_PRESS_INFO m)

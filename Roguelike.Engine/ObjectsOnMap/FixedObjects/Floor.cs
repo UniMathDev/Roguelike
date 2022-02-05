@@ -2,7 +2,8 @@
 {
     class Floor : FixedObject
     {
-        public Floor() : base('.')
+
+        public Floor() : base('.',"Floor: it's floor.")
         {
         }
     }
