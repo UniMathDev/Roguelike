@@ -59,19 +59,21 @@ namespace Roguelike.Client
         public void PrintCellDescription(int X, int Y)
         {
             Point absolutePoint = BufferToMapCoord(X, Y);
-            string description = _game._map.GetObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;
-            int XOffset = DescriptionBox.String[0].Length / 2;
-            int GameFieldCenterX = GameFieldPosition.TopLeftPosX + GameFieldSize.Width / 2;
+            if (_game._map.WithinBounds(absolutePoint.X, absolutePoint.Y))
+            {
+                string description = _game._map.GetObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;
+                int XOffset = DescriptionBox.String[0].Length / 2;
+                int GameFieldCenterX = GameFieldPosition.TopLeftPosX + GameFieldSize.Width / 2;
 
-            int DescriptionBoxX = GameFieldCenterX - XOffset;
-            int DescriptionBoxY = 4;
+                int DescriptionBoxX = GameFieldCenterX - XOffset;
+                int DescriptionBoxY = 4;
 
-            PrintGUIElement(DescriptionBox.String, DescriptionBoxX, DescriptionBoxY);
+                PrintGUIElement(DescriptionBox.String, DescriptionBoxX, DescriptionBoxY);
 
-            string[] SnippedDesc = ChunksOf(description, DescriptionBox.textWidth);
-            PrintGUIElement(SnippedDesc, DescriptionBoxX + DescriptionBox.textStartOffsetX,
-                DescriptionBoxY + DescriptionBox.textStartOffsetY);
-            
+                string[] SnippedDesc = ChunksOf(description, DescriptionBox.textWidth);
+                PrintGUIElement(SnippedDesc, DescriptionBoxX + DescriptionBox.textStartOffsetX,
+                    DescriptionBoxY + DescriptionBox.textStartOffsetY);
+            }
             //Console.Write(description);
         }
         ///<summary>
