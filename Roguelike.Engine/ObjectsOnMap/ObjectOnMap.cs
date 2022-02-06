@@ -4,9 +4,12 @@
     {
         public char Сharacter { get; }
 
-        protected ObjectOnMap(char сharacter)
+        public string Description { get; }
+
+        protected ObjectOnMap(char сharacter, string description)
         {
             Сharacter = сharacter;
+            Description = description;
         }
     }
 }

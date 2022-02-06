@@ -40,5 +40,18 @@ namespace Roguelike.Engine.Maps
             }
             return mapInStringArray;
         }
+
+        public bool WithinBounds(int X, int Y)
+        {
+            if (X < 0 || Y < 0)
+            {
+                return false;
+            }
+            if (X >= Width|| Y >= Height)
+            {
+                return false;
+            }
+            return true;
+        }
     }
 }

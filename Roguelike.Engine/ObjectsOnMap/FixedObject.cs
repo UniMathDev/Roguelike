@@ -1,8 +1,8 @@
 ﻿namespace Roguelike.Engine.ObjectsOnMap
 {
-    abstract class FixedObject : ObjectOnMap
+    public abstract class FixedObject : ObjectOnMap
     {
-        protected FixedObject(char сharacter) : base(сharacter)
+        protected FixedObject(char сharacter, string description) : base(сharacter, description)
         {
         }
     }

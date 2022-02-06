@@ -2,7 +2,7 @@
 {
     class Window : FixedObject
     {
-        public Window() : base('I')
+        public Window() : base('I', "Window: hello, world!")
         {
         }
     }

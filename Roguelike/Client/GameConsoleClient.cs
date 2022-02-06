@@ -5,115 +5,126 @@ using Roguelike.GameConfig;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Input;
+using ConsoleLib;
 
 namespace Roguelike.Client
 {
     class GameConsoleClient
     {
-        private readonly Dictionary<ConsoleKey, GameMenuItem> _menu;
+        private readonly Dictionary<ConsoleKey, GameMenuItem> _keyboardMenu;
         private readonly Game _game;
+        private readonly GUI _GUI;
+
+        private bool interceptNextInput;
 
         public GameConsoleClient()
         {
             Map map = TxtToMapConverter.ConvertToArrayMap(@"..\..\..\..\Maps\TestMap1.txt", MapSize.Height, MapSize.Width);
             Player player = new(PlayerInitCoords.X, PlayerInitCoords.Y);
             _game = new(map, player);
+            _GUI = new(_game);
 
-            _menu = new Dictionary<ConsoleKey, GameMenuItem>();
-            _menu.Add(ConsoleKey.Escape, new GameMenuItem(Exit));
-            _menu.Add(ConsoleKey.UpArrow, new GameMenuItem(MoveUp));
-            _menu.Add(ConsoleKey.DownArrow, new GameMenuItem(MoveDown));
-            _menu.Add(ConsoleKey.RightArrow, new GameMenuItem(MoveRight));
-            _menu.Add(ConsoleKey.LeftArrow, new GameMenuItem(MoveLeft));
+            InputManager.Start();
+            InputManager.KeyPress += OnKeyPress;
+            _keyboardMenu = new Dictionary<ConsoleKey, GameMenuItem>();
+            _keyboardMenu.Add(ConsoleKey.Escape, new GameMenuItem(Exit));
+            _keyboardMenu.Add(ConsoleKey.UpArrow, new GameMenuItem(MoveUp));
+            _keyboardMenu.Add(ConsoleKey.DownArrow, new GameMenuItem(MoveDown));
+            _keyboardMenu.Add(ConsoleKey.RightArrow, new GameMenuItem(MoveRight));
+            _keyboardMenu.Add(ConsoleKey.LeftArrow, new GameMenuItem(MoveLeft));
+            InputManager.RMousePress += Examine;
+            InputManager.LMousePress += Use;
+
+            OnInputIntercept += ClearIntercept;
         }
 
         public void Start()
         {
-            Console.CursorVisible = false;
-            PrintAMove();
-            ConsoleKey key = ConsoleKey.F24;
-            bool inGame = true;
-            
-            while (inGame)
+            _GUI.PrintAMove();
+        }
+        void OnKeyPress(KEY_PRESS_INFO k)
+        {
+            if (interceptNextInput)
             {
-                if (Console.KeyAvailable)
-                {
-                    key = Console.ReadKey(true).Key;
-                }
+                interceptNextInput = false;
+                OnInputIntercept.Invoke();
+                return;
+            }
 
-                if (_menu.ContainsKey(key))
-                {
-                    _menu[key].Action();
-                }                
-
-                key = ConsoleKey.F24;
-                Thread.Sleep(16);
+            if (_keyboardMenu.ContainsKey(k.key))
+            {
+                _keyboardMenu[k.key].Action();
             }
         }
-
 
         private void MoveUp()
         {
             _game.Move(Directions.Up);
-            PrintAMove();
+            _GUI.PrintAMove();
         }
 
         private void MoveDown()
         {
             _game.Move(Directions.Down);
-            PrintAMove();
+            _GUI.PrintAMove();
         }
 
         private void MoveRight()
         {
             _game.Move(Directions.Right);
-            PrintAMove();
+            _GUI.PrintAMove();
         }
 
         private void MoveLeft()
         {
-             _game.Move(Directions.Left);
-            PrintAMove();
+            _game.Move(Directions.Left);
+            _GUI.PrintAMove();
         }
 
-        private void PrintAMove()
+
+
+        private void Use(MOUSE_PRESS_INFO m)
         {
-            int xPosMap = _game.player.X - PlayerInitCoords.X;
-            int yPosMap = _game.player.Y - PlayerInitCoords.Y;
-            string[] mapInStringArray =
-                _game.GetMapInStringArray(xPosMap, yPosMap, GameFieldSize.Width, GameFieldSize.Height);
-            for (int i = 0; i < mapInStringArray.Length; i++)
+            if (interceptNextInput)
             {
-                Console.SetCursorPosition(GameFieldPosition.TopLeftPosX,
-                    GameFieldPosition.TopLeftPosY + i);
-                Console.Write(mapInStringArray[i]);
+                interceptNextInput = false;
+                OnInputIntercept.Invoke();
+                return;
             }
-            
-            int playerX = ((_game.player.X < PlayerInitCoords.X) ?
-                _game.player.X : PlayerInitCoords.X);
-            playerX = (_game.player.X >
-                (MapSize.Width - (GameFieldSize.Width - PlayerInitCoords.X)) ?
-                (PlayerInitCoords.X + _game.player.X - 
-                (MapSize.Width - (GameFieldSize.Width - PlayerInitCoords.X))) :
-                playerX);
-            int playerY = ((_game.player.Y < PlayerInitCoords.Y) ?
-                _game.player.Y : PlayerInitCoords.Y);
-            playerY = (_game.player.Y >
-                (MapSize.Height - (GameFieldSize.Height - PlayerInitCoords.Y)) ?
-                (PlayerInitCoords.Y + _game.player.Y -
-                (MapSize.Height - (GameFieldSize.Height - PlayerInitCoords.Y))) :
-                playerY);
-            Console.SetCursorPosition(playerX + GameFieldPosition.TopLeftPosX,
-                playerY + GameFieldPosition.TopLeftPosY);
-            Console.Write(_game.player.Character);
-
+            //_game.Use(m.X,m.Y);
+            _GUI.PrintAMove();
         }
+        private void Examine(MOUSE_PRESS_INFO m)
+        {
+            if (interceptNextInput)
+            {
+                interceptNextInput = false;
+                OnInputIntercept.Invoke();
+                return;
+            }
+            _GUI.PrintCellDescription(m.X, m.Y);
+            interceptNextInput = true;
+            OnInputIntercept += _GUI.PrintAMove;
+        }
+
+        /// <summary>
+        /// Note: Удаляет все функции из списка подписанных после каждого вызова.
+        /// </summary>
+        private static event Action OnInputIntercept;
+        private void ClearIntercept ()
+        {
+            if (OnInputIntercept != null)
+                foreach (var d in OnInputIntercept.GetInvocationList())
+                    OnInputIntercept -= (d as Action);
+            OnInputIntercept += ClearIntercept;
+        }
+
 
         private void Exit()
         {
             Console.Clear();
             Environment.Exit(0);
         }
-
     }
 }

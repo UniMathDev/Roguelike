@@ -2,7 +2,8 @@
 {
     struct GameFieldSize
     {
-        public const int Width = 20;
-        public const int Height = 10;
+        // Должны быть нечётными чтобы персонаж был ровно по центру и не больше MapSize.
+        public const int Width = 33;
+        public const int Height = 11;
     }
 }

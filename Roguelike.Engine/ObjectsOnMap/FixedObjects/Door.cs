@@ -2,7 +2,7 @@
 {
     class Door : FixedObject
     {
-        public Door() : base('/')
+        public Door() : base('/', "Door: a white office door. ")
         {
         }
     }
