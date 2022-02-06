@@ -1,7 +1,7 @@
 ﻿using System;
 using ConsoleLib;
 using static ConsoleLib.NativeMethods;
-namespace MouseInput
+namespace Input
 {
     public static class InputManager
     {
