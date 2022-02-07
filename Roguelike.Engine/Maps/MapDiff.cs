@@ -1,4 +1,5 @@
-﻿namespace Roguelike.Engine.Maps
+﻿/*
+namespace Roguelike.Engine.Maps
 {
     public struct MapDiff
     {
@@ -16,3 +17,4 @@
 
     }
 }
+*/

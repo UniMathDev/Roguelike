@@ -18,19 +18,8 @@ namespace Roguelike.Engine
 
         public bool CanMove(Directions direction, Map map)
         {
-            switch (direction)
-            {
-                case Directions.Up:
-                    return map.IsPossibleToMove(X, Y - 1);
-                case Directions.Down:
-                    return map.IsPossibleToMove(X, Y + 1);
-                case Directions.Right:
-                    return map.IsPossibleToMove(X + 1, Y);
-                case Directions.Left:
-                    return map.IsPossibleToMove(X - 1, Y);
-                default:
-                    return false;
-            }
+            System.Drawing.Point coordDiff = GameMath.DirectionToCoordDiff(direction);
+            return map.IsPossibleToMove(X + coordDiff.X, Y + coordDiff.Y);
         }
     }
 }

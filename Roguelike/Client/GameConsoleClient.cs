@@ -13,6 +13,7 @@ namespace Roguelike.Client
     class GameConsoleClient
     {
         private readonly Dictionary<ConsoleKey, GameMenuItem> _keyboardMenu;
+        private readonly Dictionary<ConsoleKey, Directions> _directionKeys;
         private readonly Game _game;
         private readonly GUI _GUI;
 
@@ -29,10 +30,24 @@ namespace Roguelike.Client
             InputManager.KeyPress += OnKeyPress;
             _keyboardMenu = new Dictionary<ConsoleKey, GameMenuItem>();
             _keyboardMenu.Add(ConsoleKey.Escape, new GameMenuItem(Exit));
-            _keyboardMenu.Add(ConsoleKey.UpArrow, new GameMenuItem(MoveUp));
-            _keyboardMenu.Add(ConsoleKey.DownArrow, new GameMenuItem(MoveDown));
-            _keyboardMenu.Add(ConsoleKey.RightArrow, new GameMenuItem(MoveRight));
-            _keyboardMenu.Add(ConsoleKey.LeftArrow, new GameMenuItem(MoveLeft));
+
+            #region _directionKeys assignment
+            _directionKeys = new Dictionary<ConsoleKey, Directions>();
+            _directionKeys.Add(ConsoleKey.UpArrow, Directions.Up);
+            _directionKeys.Add(ConsoleKey.DownArrow, Directions.Down);
+            _directionKeys.Add(ConsoleKey.LeftArrow, Directions.Left);
+            _directionKeys.Add(ConsoleKey.RightArrow, Directions.Right);
+
+            _directionKeys.Add(ConsoleKey.NumPad8, Directions.Up);
+            _directionKeys.Add(ConsoleKey.NumPad9, Directions.RightUp);
+            _directionKeys.Add(ConsoleKey.NumPad6, Directions.Right);
+            _directionKeys.Add(ConsoleKey.NumPad3, Directions.RightDown);
+            _directionKeys.Add(ConsoleKey.NumPad2, Directions.Down);
+            _directionKeys.Add(ConsoleKey.NumPad1, Directions.LeftDown);
+            _directionKeys.Add(ConsoleKey.NumPad4, Directions.Left);
+            _directionKeys.Add(ConsoleKey.NumPad7, Directions.LeftUp);
+            #endregion
+
             InputManager.RMousePress += Examine;
             InputManager.LMousePress += Use;
 
@@ -56,33 +71,19 @@ namespace Roguelike.Client
             {
                 _keyboardMenu[k.key].Action();
             }
+
+            if (_directionKeys.ContainsKey(k.key))
+            {
+                Move(_directionKeys[k.key]);
+            }
+
         }
 
-        private void MoveUp()
+        private void Move(Directions direction)
         {
-            _game.Move(Directions.Up);
+            _game.Move(direction);
             _GUI.PrintAMove();
         }
-
-        private void MoveDown()
-        {
-            _game.Move(Directions.Down);
-            _GUI.PrintAMove();
-        }
-
-        private void MoveRight()
-        {
-            _game.Move(Directions.Right);
-            _GUI.PrintAMove();
-        }
-
-        private void MoveLeft()
-        {
-            _game.Move(Directions.Left);
-            _GUI.PrintAMove();
-        }
-
-
 
         private void Use(MOUSE_PRESS_INFO m)
         {
