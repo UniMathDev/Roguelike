@@ -2,6 +2,7 @@
 using Roguelike.Engine;
 using Roguelike.GameConfig;
 using Roguelike.GameConfig.GUIElements;
+using Roguelike.Engine.Monsters;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Text;
@@ -20,6 +21,7 @@ namespace Roguelike.Client
 
         public void PrintAMove()
         {
+            //FIXEDOBJECTS
             Point CameraCenterOffset = new Point(GameFieldSize.Width / 2, GameFieldSize.Height / 2);
            
             string[] mapInStringArray =
@@ -45,11 +47,20 @@ namespace Roguelike.Client
                 (CameraCenterOffset.Y + _game.player.Y -
                 (MapSize.Height - (GameFieldSize.Height - CameraCenterOffset.Y))) :
                 playerY);
+            //PLAYER
             Console.SetCursorPosition(playerX + GameFieldPosition.TopLeftPosX,
                 playerY + GameFieldPosition.TopLeftPosY);
             Console.Write(_game.player.Character);
 
-            //TEMP
+            //MONSTERS
+            foreach (Monster monster in _game._map.monsterList)
+            {
+                Point CursorPos = MapToBufferPos(monster.X, monster.Y);
+                Console.SetCursorPosition(CursorPos.X, CursorPos.Y);
+                Console.Write(monster.Character);
+            }
+
+
             Console.SetCursorPosition(0,0);
             Console.Write(GetCameraPos());
         }
@@ -92,6 +103,21 @@ namespace Roguelike.Client
             Point output = new();
             output.X = X - GameFieldPosition.TopLeftPosX;
             output.Y = Y - GameFieldPosition.TopLeftPosY;
+            return output;
+        }
+        //
+        private Point MapToBufferPos(int X, int Y)
+        {
+            X -= GetCameraPos().X;
+            Y -= GetCameraPos().Y;
+            Point output = CameraToBufferPos(X, Y);
+            return output;
+        }
+        private Point CameraToBufferPos(int X, int Y)
+        {
+            Point output = new Point();
+            output.X = X + GameFieldPosition.TopLeftPosX;
+            output.Y = Y + GameFieldPosition.TopLeftPosY;
             return output;
         }
         private Point GetCameraPos()

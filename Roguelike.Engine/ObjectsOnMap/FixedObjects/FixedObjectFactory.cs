@@ -12,6 +12,7 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
             _fixedObjects.Add('|', new VerticalWall());
             _fixedObjects.Add('_', new HorizontalWall());
             _fixedObjects.Add('I', new Window());
+            _fixedObjects.Add('o', new Egg());
         }
         public override ObjectOnMap CreateObjectOnMap(char character)
         {

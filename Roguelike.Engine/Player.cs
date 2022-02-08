@@ -3,23 +3,11 @@ using Roguelike.Engine.Maps;
 
 namespace Roguelike.Engine
 {
-    public class Player
+    public class Player : AnimatedObject
     {
-        public char Character { get; }
-        public int X { get; set; }
-        public int Y { get; set; }
-
-        public Player(int x, int y)
+        public Player(int x, int y) : base('@', x, y)
         {
-            Character = '@';
-            X = x;
-            Y = y;
-        }
-
-        public bool CanMove(Directions direction, Map map)
-        {
-            System.Drawing.Point coordDiff = GameMath.DirectionToCoordDiff(direction);
-            return map.IsPossibleToMove(X + coordDiff.X, Y + coordDiff.Y);
+            health = 100;
         }
     }
 }

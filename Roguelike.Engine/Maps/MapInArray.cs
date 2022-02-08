@@ -1,5 +1,8 @@
 ﻿using Roguelike.Engine.ObjectsOnMap;
 using Roguelike.Engine.ObjectsOnMap.FixedObjects;
+using Roguelike.Engine.Monsters;
+using System.Collections.Generic;
+
 
 namespace Roguelike.Engine.Maps
 {
@@ -7,9 +10,11 @@ namespace Roguelike.Engine.Maps
     {
         private ObjectOnMap[,] _objectsOnMap;
 
-        public MapInArray(int height, int width, ObjectOnMap[,] objectsOnMap) : base(height, width)
+        public MapInArray(int height, int width, ObjectOnMap[,] objectsOnMap, List<Egg> eggList) : base(height, width)
         {
             _objectsOnMap = objectsOnMap;
+            this.eggList = eggList;
+            monsterList = new List<Monster>();
         }
 
         public override ObjectOnMap GetObjWithCoord(int x, int y)
@@ -31,5 +36,6 @@ namespace Roguelike.Engine.Maps
         {
             return ((_objectsOnMap[y, x] is Floor) || (_objectsOnMap[y, x] is Door));
         }
+
     }
 }
