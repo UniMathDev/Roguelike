@@ -15,7 +15,7 @@ namespace Roguelike.Engine.Monsters
             _map = map;
         }
         //пока что никакого пасфайндинга нет, просто идём по прямой. Если знаете как легко оформить красивее, пишите)
-        public Directions FindWay(Point origin, Point destination)
+        public Direction FindWay(Point origin, Point destination)
         {
             Point result = new();
             if (origin.X > destination.X)

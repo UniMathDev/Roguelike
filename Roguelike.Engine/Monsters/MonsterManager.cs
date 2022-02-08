@@ -31,7 +31,7 @@ namespace Roguelike.Engine.Monsters
             {
                 foreach (Monster monster in monsterList)
                 {
-                    Directions moveDirection = _pathfinder.FindWay(monster.coordinates, _player.coordinates);
+                    Direction moveDirection = _pathfinder.FindWay(monster.coordinates, _player.coordinates);
                     if (monster.CanMove(moveDirection, _map))
                     {
                         Point coordDiff = GameMath.DirectionToCoordDiff(moveDirection);

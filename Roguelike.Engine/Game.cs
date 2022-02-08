@@ -28,7 +28,7 @@ namespace Roguelike.Engine
             return _map.ToStringArray(xPos, yPos, width, height);
         }
 
-        public void Move(Directions direction)
+        public void Move(Direction direction)
         {
             if (player.CanMove(direction, _map))
             {

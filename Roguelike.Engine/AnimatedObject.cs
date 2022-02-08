@@ -25,7 +25,7 @@ namespace Roguelike.Engine
             Y = y;
         }
 
-        public bool CanMove(Directions direction, Map map)
+        public bool CanMove(Direction direction, Map map)
         {
             System.Drawing.Point coordDiff = GameMath.DirectionToCoordDiff(direction);
             return map.IsPossibleToMove(X + coordDiff.X, Y + coordDiff.Y);

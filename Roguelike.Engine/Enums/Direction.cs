@@ -1,6 +1,6 @@
 ﻿namespace Roguelike.Engine.Enums
 {
-    public enum Directions
+    public enum Direction
     {
         Up,
         RightUp,
