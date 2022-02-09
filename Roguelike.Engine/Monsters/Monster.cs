@@ -3,7 +3,7 @@ using Roguelike.Engine.Maps;
 
 namespace Roguelike.Engine.Monsters
 {
-    public class Monster : AnimatedObject
+    public class Monster : LivingObject
     {
         public Monster(int x, int y) : base('Σ', x, y)
         {

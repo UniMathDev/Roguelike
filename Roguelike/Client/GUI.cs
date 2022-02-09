@@ -13,6 +13,8 @@ namespace Roguelike.Client
     {
         private readonly Game _game;
 
+        private Point CameraCenterOffset = new Point(GameFieldSize.Width / 2, GameFieldSize.Height / 2);
+
         public GUI(Game game)
         {
             _game = game;
@@ -21,18 +23,26 @@ namespace Roguelike.Client
 
         public void PrintAMove()
         {
-            //FIXEDOBJECTS
-            Point CameraCenterOffset = new Point(GameFieldSize.Width / 2, GameFieldSize.Height / 2);
-           
-            string[] mapInStringArray =
-                _game.GetMapInStringArray(_game.player.X - GameFieldSize.Width / 2, _game.player.Y - GameFieldSize.Height / 2, GameFieldSize.Width, GameFieldSize.Height);
-            for (int i = 0; i < mapInStringArray.Length; i++)
-            {
-                Console.SetCursorPosition(GameFieldPosition.TopLeftPosX,
-                    GameFieldPosition.TopLeftPosY + i);
-                Console.Write(mapInStringArray[i]);
-            }
+            PrintFixedObjects();
+            PrintPlayer();
+            PrintMonsters();
 
+            Console.SetCursorPosition(0, 0);
+            Console.Write(GetCameraPos());
+        }
+
+        private void PrintMonsters()
+        {
+            foreach (Monster monster in _game._monsterManager.monsterList)
+            {
+                Point CursorPos = MapToBufferPos(monster.X, monster.Y);
+                Console.SetCursorPosition(CursorPos.X, CursorPos.Y);
+                Console.Write(monster.Character);
+            }
+        }
+
+        private void PrintPlayer()
+        {
             int playerX = ((_game.player.X < CameraCenterOffset.X) ?
                 _game.player.X : CameraCenterOffset.X);
             playerX = (_game.player.X >
@@ -47,23 +57,24 @@ namespace Roguelike.Client
                 (CameraCenterOffset.Y + _game.player.Y -
                 (MapSize.Height - (GameFieldSize.Height - CameraCenterOffset.Y))) :
                 playerY);
-            //PLAYER
+
             Console.SetCursorPosition(playerX + GameFieldPosition.TopLeftPosX,
                 playerY + GameFieldPosition.TopLeftPosY);
             Console.Write(_game.player.Character);
-
-            //MONSTERS
-            foreach (Monster monster in _game._map.monsterList)
-            {
-                Point CursorPos = MapToBufferPos(monster.X, monster.Y);
-                Console.SetCursorPosition(CursorPos.X, CursorPos.Y);
-                Console.Write(monster.Character);
-            }
-
-
-            Console.SetCursorPosition(0,0);
-            Console.Write(GetCameraPos());
         }
+
+        private void PrintFixedObjects()
+        {
+            string[] mapInStringArray =
+                _game.GetMapInStringArray(_game.player.X - GameFieldSize.Width / 2, _game.player.Y - GameFieldSize.Height / 2, GameFieldSize.Width, GameFieldSize.Height);
+            for (int i = 0; i < mapInStringArray.Length; i++)
+            {
+                Console.SetCursorPosition(GameFieldPosition.TopLeftPosX,
+                    GameFieldPosition.TopLeftPosY + i);
+                Console.Write(mapInStringArray[i]);
+            }
+        }
+
         ///<summary>
         ///принимает координаты относительно буфера
         ///</summary>
@@ -81,7 +92,7 @@ namespace Roguelike.Client
 
                 PrintGUIElement(DescriptionBox.String, DescriptionBoxX, DescriptionBoxY);
 
-                string[] SnippedDesc = ChunksOf(description, DescriptionBox.textWidth);
+                string[] SnippedDesc = GameMath.ChunksOf(description, DescriptionBox.textWidth);
                 PrintGUIElement(SnippedDesc, DescriptionBoxX + DescriptionBox.textStartOffsetX,
                     DescriptionBoxY + DescriptionBox.textStartOffsetY);
             }
@@ -144,16 +155,6 @@ namespace Roguelike.Client
                 Console.Write(row);
                 offset++;
             }
-        }
-        private string[] ChunksOf(string input, int chunkSize)
-        {
-            StringBuilder builder = new StringBuilder(input);
-            List<string> list = new List<string>();
-            for (int i = 0; i < input.Length; i+=chunkSize)
-            {
-                list.Add(builder.ToString(i, Math.Min(input.Length - i - 1,chunkSize)));
-            }
-            return list.ToArray();
         }
     }
 }

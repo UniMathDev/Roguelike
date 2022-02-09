@@ -14,8 +14,6 @@ namespace Roguelike.Engine
 
         public MonsterManager _monsterManager { get; }
 
-        public bool playerTurn { get; private set; } = true;
-
         public Game(Map map, Player player)
         {
             _map = map;
@@ -37,6 +35,11 @@ namespace Roguelike.Engine
                 player.Y += coordDiff.Y;
                 _monsterManager.OnPlayerTurnEnded();
             }
+        }
+
+        public void Wait()
+        {
+            _monsterManager.OnPlayerTurnEnded();
         }
     }
 }

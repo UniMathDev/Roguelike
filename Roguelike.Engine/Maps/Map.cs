@@ -11,15 +11,12 @@ namespace Roguelike.Engine.Maps
         public int Height { get; }
         public int Width { get; }
 
-        public List<Monster> monsterList;
-
-        public List<Egg> eggList;
+        protected List<Egg> eggList;
 
         protected Map(int height, int width)
         {
             Height = height;
             Width = width;
-            monsterList = new List<Monster>();
         }
 
         public abstract ObjectOnMap GetObjWithCoord(int x, int y);
@@ -60,6 +57,11 @@ namespace Roguelike.Engine.Maps
                 return false;
             }
             return true;
+        }
+
+        public List<Egg> GetEggList()
+        {
+            return eggList;
         }
     }
 }

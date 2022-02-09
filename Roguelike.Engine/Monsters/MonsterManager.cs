@@ -8,8 +8,9 @@ namespace Roguelike.Engine.Monsters
 {
     public class MonsterManager
     {
-        private List<Monster> monsterList;
-        private List<Egg> eggList;
+        public readonly List<Monster> monsterList;
+
+        public readonly List<Egg> eggList;
 
         private Map _map;
 
@@ -20,12 +21,17 @@ namespace Roguelike.Engine.Monsters
         {
             _player = player;
             _map = map;
-            monsterList = _map.monsterList;
-            eggList = _map.eggList;
+            monsterList = new List<Monster>();
+            eggList = _map.GetEggList();
             _pathfinder = new Pathfinder(map);
         }
         
         public void OnPlayerTurnEnded()
+        {
+            MoveMonsters();
+            GrowEggs();
+        }
+        private void MoveMonsters()
         {
             if (monsterList.Count != 0)
             {
@@ -40,18 +46,20 @@ namespace Roguelike.Engine.Monsters
                     }
                 }
             }
-
+        }
+        private void GrowEggs()
+        {
             if (eggList.Count != 0)
             {
                 List<Egg> eggsToBeRemoved = new List<Egg>();
                 foreach (Egg egg in eggList)
                 {
                     egg.Timer--;
-                    if(egg.Timer == 0)
+                    if (egg.Timer == 0)
                     {
                         eggsToBeRemoved.Add(egg);
                         _map.SetObjWithCoord(egg.X, egg.Y, new Floor());
-                        monsterList.Add(new Monster(egg.X,egg.Y));
+                        monsterList.Add(new Monster(egg.X, egg.Y));
                     }
                 }
                 foreach (Egg eggToBeRemoved in eggsToBeRemoved)
@@ -60,6 +68,5 @@ namespace Roguelike.Engine.Monsters
                 }
             }
         }
-       
     }
 }

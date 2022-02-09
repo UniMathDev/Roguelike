@@ -10,11 +10,10 @@ namespace Roguelike.Engine.Maps
     {
         private ObjectOnMap[,] _objectsOnMap;
 
-        public MapInArray(int height, int width, ObjectOnMap[,] objectsOnMap, List<Egg> eggList) : base(height, width)
+        public MapInArray(int height, int width, ObjectOnMap[,] objectsOnMap, List<Egg> bruh) : base(height, width)
         {
             _objectsOnMap = objectsOnMap;
-            this.eggList = eggList;
-            monsterList = new List<Monster>();
+            eggList = bruh;
         }
 
         public override ObjectOnMap GetObjWithCoord(int x, int y)

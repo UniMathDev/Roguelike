@@ -30,6 +30,7 @@ namespace Roguelike.Client
             InputManager.KeyPress += OnKeyPress;
             _keyboardMenu = new Dictionary<ConsoleKey, GameMenuItem>();
             _keyboardMenu.Add(ConsoleKey.Escape, new GameMenuItem(Exit));
+            _keyboardMenu.Add(ConsoleKey.NumPad0, new GameMenuItem(Wait));
 
             #region _directionKeys assignment
             _directionKeys = new Dictionary<ConsoleKey, Direction>();
@@ -82,6 +83,12 @@ namespace Roguelike.Client
         private void Move(Direction direction)
         {
             _game.Move(direction);
+            _GUI.PrintAMove();
+        }
+
+        private void Wait()
+        {
+            _game.Wait();
             _GUI.PrintAMove();
         }
 

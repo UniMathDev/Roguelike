@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace Roguelike.Engine
 {
-    public abstract class AnimatedObject
+    public abstract class LivingObject
     {
         public char Character { get; }
         public int X { get; set; }
@@ -18,7 +18,7 @@ namespace Roguelike.Engine
         }
         public float health { get; set; }
 
-        public AnimatedObject(char character, int x, int y)
+        public LivingObject(char character, int x, int y)
         {
             Character = character;
             X = x;
@@ -27,7 +27,7 @@ namespace Roguelike.Engine
 
         public bool CanMove(Direction direction, Map map)
         {
-            System.Drawing.Point coordDiff = GameMath.DirectionToCoordDiff(direction);
+            Point coordDiff = GameMath.DirectionToCoordDiff(direction);
             return map.IsPossibleToMove(X + coordDiff.X, Y + coordDiff.Y);
         }
 
