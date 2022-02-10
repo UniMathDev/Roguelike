@@ -6,9 +6,10 @@ namespace Roguelike.Engine
 {
     public abstract class LivingObject
     {
-        public char Character { get; }
+        public char Character { get; protected set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public string Description { get; protected set; }
         public Point coordinates
         {
             get
@@ -16,15 +17,7 @@ namespace Roguelike.Engine
                 return new Point(X, Y);
             }
         }
-        public float health { get; set; }
-
-        public LivingObject(char character, int x, int y)
-        {
-            Character = character;
-            X = x;
-            Y = y;
-        }
-
+        public float health { get; protected set; }
         public bool CanMove(Direction direction, Map map)
         {
             Point coordDiff = GameMath.DirectionToCoordDiff(direction);

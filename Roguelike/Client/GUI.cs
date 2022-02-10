@@ -19,6 +19,7 @@ namespace Roguelike.Client
         {
             _game = game;
             Console.CursorVisible = false;
+            Console.OutputEncoding = Encoding.Unicode;
         }
 
         public void PrintAMove()
@@ -81,9 +82,19 @@ namespace Roguelike.Client
         public void PrintCellDescription(int X, int Y)
         {
             Point absolutePoint = BufferToMapCoord(X, Y);
+            string description = string.Empty;
+
             if (_game._map.WithinBounds(absolutePoint.X, absolutePoint.Y))
             {
-                string description = _game._map.GetObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;
+                foreach (Monster monster in _game._monsterManager.monsterList)
+                {
+                    if (monster.coordinates == absolutePoint)
+                    {
+                        description = monster.Description;
+                    }
+                }
+                if(description == string.Empty)
+                description = _game._map.GetObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;
                 int XOffset = DescriptionBox.String[0].Length / 2;
                 int GameFieldCenterX = GameFieldPosition.TopLeftPosX + GameFieldSize.Width / 2;
 
@@ -101,7 +112,7 @@ namespace Roguelike.Client
         ///<summary>
         ///Переводит координаты относительно буфера в абсолютные координаты карты.
         ///</summary>
-        private Point BufferToMapCoord(int X, int Y)
+        public Point BufferToMapCoord(int X, int Y)
         {
             Point output = new Point();
             output = BufferToCameraPos(X,Y);
@@ -109,7 +120,7 @@ namespace Roguelike.Client
             output.Y += GetCameraPos().Y;
             return output;
         }
-        private Point BufferToCameraPos(int X, int Y)
+        public Point BufferToCameraPos(int X, int Y)
         {
             Point output = new();
             output.X = X - GameFieldPosition.TopLeftPosX;
@@ -117,21 +128,21 @@ namespace Roguelike.Client
             return output;
         }
         //
-        private Point MapToBufferPos(int X, int Y)
+        public Point MapToBufferPos(int X, int Y)
         {
             X -= GetCameraPos().X;
             Y -= GetCameraPos().Y;
             Point output = CameraToBufferPos(X, Y);
             return output;
         }
-        private Point CameraToBufferPos(int X, int Y)
+        public Point CameraToBufferPos(int X, int Y)
         {
             Point output = new Point();
             output.X = X + GameFieldPosition.TopLeftPosX;
             output.Y = Y + GameFieldPosition.TopLeftPosY;
             return output;
         }
-        private Point GetCameraPos()
+        public Point GetCameraPos()
         {
             Point cameraPos = new();
             cameraPos.X = _game.player.X - GameFieldSize.Width / 2;

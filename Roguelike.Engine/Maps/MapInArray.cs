@@ -28,12 +28,12 @@ namespace Roguelike.Engine.Maps
 
         public override char GetCharWithCoord(int x, int y)
         {
-            return _objectsOnMap[y, x].Сharacter;
+            return _objectsOnMap[y, x].Character;
         }
 
         public override bool IsPossibleToMove(int x, int y)
         {
-            return ((_objectsOnMap[y, x] is Floor) || (_objectsOnMap[y, x] is Door));
+            return ((_objectsOnMap[y, x] is Floor) || ((_objectsOnMap[y, x] is Door && (_objectsOnMap[y, x] as Door).isOpen)));
         }
 
     }

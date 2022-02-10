@@ -5,11 +5,14 @@ namespace Roguelike.Engine.Monsters
 {
     public class Monster : LivingObject
     {
-        public Monster(int x, int y) : base('Σ', x, y)
+        public Monster(int x, int y)
         {
-
+            Character = 'Σ';
+            Description = "Thing: A scary looking thing. ";
+            health = 100;
+            X = x;
+            Y = y;
         }
-
     }
 }
 

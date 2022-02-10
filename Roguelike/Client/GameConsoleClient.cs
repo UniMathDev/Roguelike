@@ -2,11 +2,10 @@
 using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
 using Roguelike.GameConfig;
+using Roguelike.Input;
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using Input;
-using ConsoleLib;
+using System.Drawing;
 
 namespace Roguelike.Client
 {
@@ -94,14 +93,18 @@ namespace Roguelike.Client
 
         private void Use(MOUSE_PRESS_INFO m)
         {
-            if (interceptNextInput)
+            if (_game._map.WithinBounds(m.X, m.Y))
             {
-                interceptNextInput = false;
-                OnInputIntercept.Invoke();
-                return;
+                if (interceptNextInput)
+                {
+                    interceptNextInput = false;
+                    OnInputIntercept.Invoke();
+                    return;
+                }
+                Point OnMap = _GUI.BufferToMapCoord(m.X, m.Y);
+                _game.Use(OnMap.X, OnMap.Y, null);
+                _GUI.PrintAMove();
             }
-            //_game.Use(m.X,m.Y);
-            _GUI.PrintAMove();
         }
         private void Examine(MOUSE_PRESS_INFO m)
         {

@@ -2,8 +2,11 @@
 {
     class Window : FixedObject
     {
-        public Window() : base('I', "Window: hello, world!")
+        public Window()
         {
+            Character = 'I';
+            Description = "Window: hello, world!";
+            Seethrough = true;
         }
     }
 }

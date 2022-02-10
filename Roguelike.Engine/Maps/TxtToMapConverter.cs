@@ -14,7 +14,7 @@ namespace Roguelike.Engine.Maps
             var availableCharsOfObjs = new CharsOfObjects();
             List<Egg> eggList = new List<Egg>();
 
-            using var streamReader = new StreamReader(pathToFileWithMap, Encoding.UTF8);
+            using var streamReader = new StreamReader(pathToFileWithMap, Encoding.ASCII);
 
             string[] mapInStrings = streamReader.ReadToEnd().Split('\n');
             for (int y = 0; y < height; y++)

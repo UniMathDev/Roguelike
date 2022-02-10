@@ -1,7 +1,6 @@
 ﻿using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
 using Roguelike.Engine.Monsters;
-using System.Collections.Generic;
 using System.Drawing;
 
 namespace Roguelike.Engine
@@ -36,7 +35,11 @@ namespace Roguelike.Engine
                 _monsterManager.OnPlayerTurnEnded();
             }
         }
-
+        public void Use(int X, int Y, object useWith)
+        {
+            _map.GetObjWithCoord(X, Y).Use(useWith);
+            _monsterManager.OnPlayerTurnEnded();
+        }
         public void Wait()
         {
             _monsterManager.OnPlayerTurnEnded();

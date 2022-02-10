@@ -2,9 +2,11 @@
 {
     class Floor : FixedObject
     {
-
-        public Floor() : base('.',"Floor: it's floor.")
+        public Floor()
         {
+            Character = '.';
+            Description = "Floor: it's floor. ";
+            Seethrough = true;
         }
     }
 }
