@@ -1,5 +1,6 @@
 ﻿using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
+using System;
 
 namespace Roguelike.Engine
 {
@@ -13,5 +14,6 @@ namespace Roguelike.Engine
             X = x;
             Y = y;
         }
+
     }
 }

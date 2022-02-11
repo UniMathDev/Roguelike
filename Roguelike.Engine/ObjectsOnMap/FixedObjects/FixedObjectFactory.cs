@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 
 namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
 {
@@ -7,16 +8,25 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
         private Dictionary<char, FixedObject> _fixedObjects = new();
         public FixedObjectFactory()
         {
-            _fixedObjects.Add('/', new Door());
+            
             _fixedObjects.Add('.', new Floor());
             _fixedObjects.Add('|', new VerticalWall());
             _fixedObjects.Add('_', new HorizontalWall());
             _fixedObjects.Add('I', new Window());
             _fixedObjects.Add('o', new Egg());
+            _fixedObjects.Add('/', new Door());
         }
         public override ObjectOnMap CreateObjectOnMap(char character)
         {
-            return _fixedObjects[character] as ObjectOnMap;
+            FixedObject fixedObject = _fixedObjects[character];
+            if (fixedObject is VariableFixedObject)
+            {
+                return Activator.CreateInstance(fixedObject.GetType()) as ObjectOnMap;
+            }
+            else
+            {
+                return _fixedObjects[character] as ObjectOnMap;
+            }
         }
     }
 }

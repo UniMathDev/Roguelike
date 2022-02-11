@@ -1,7 +1,7 @@
 ﻿
 namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
 {
-    public class Egg : FixedObject
+    public class Egg : VariableFixedObject
     {
         public int Timer;
 

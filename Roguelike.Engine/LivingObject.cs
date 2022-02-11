@@ -1,6 +1,7 @@
 ﻿using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
 using System.Drawing;
+using System;
 
 namespace Roguelike.Engine
 {
@@ -22,6 +23,15 @@ namespace Roguelike.Engine
         {
             Point coordDiff = GameMath.DirectionToCoordDiff(direction);
             return map.IsPossibleToMove(X + coordDiff.X, Y + coordDiff.Y);
+        }
+
+        public bool NextTo(int X, int Y)
+        {
+            if (Math.Abs(this.X - X) <= 1 && Math.Abs(this.Y - Y) <= 1)
+            {
+                return true;
+            }
+            return false;
         }
 
         public void Damage(float amount)

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
 {
-    public class Door : FixedObject
+    public class Door : VariableFixedObject
     {
         private char openedChar = ' ';
 

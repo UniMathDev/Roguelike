@@ -2,6 +2,7 @@
 using Roguelike.Engine.Maps;
 using Roguelike.Engine.Monsters;
 using System.Drawing;
+using System;
 
 namespace Roguelike.Engine
 {
@@ -37,12 +38,16 @@ namespace Roguelike.Engine
         }
         public void Use(int X, int Y, object useWith)
         {
-            _map.GetObjWithCoord(X, Y).Use(useWith);
-            _monsterManager.OnPlayerTurnEnded();
+            if (player.NextTo(X,Y)) 
+            {
+                _map.GetObjWithCoord(X, Y).Use(useWith);
+                _monsterManager.OnPlayerTurnEnded();
+            }
         }
         public void Wait()
         {
             _monsterManager.OnPlayerTurnEnded();
         }
+
     }
 }
