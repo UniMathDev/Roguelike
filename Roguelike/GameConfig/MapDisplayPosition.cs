@@ -1,6 +1,6 @@
 ﻿namespace Roguelike.GameConfig
 {
-    public struct GameFieldPosition
+    public struct MapDisplayPosition
     {
         public const int TopLeftPosX = 10;
         public const int TopLeftPosY = 3;

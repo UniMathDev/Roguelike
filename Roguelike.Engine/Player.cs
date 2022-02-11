@@ -1,5 +1,7 @@
 ﻿using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
+using Roguelike.Engine.Monsters;
+using System.Collections.Generic;
 using System;
 
 namespace Roguelike.Engine
@@ -14,6 +16,9 @@ namespace Roguelike.Engine
             X = x;
             Y = y;
         }
-
+        public bool CanMove(Direction direction, Map map, List<Monster> monsters)
+        {
+            return base.CanMove(direction, map, monsters, this);
+        }
     }
 }

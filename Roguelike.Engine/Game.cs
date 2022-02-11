@@ -28,11 +28,10 @@ namespace Roguelike.Engine
 
         public void Move(Direction direction)
         {
-            if (player.CanMove(direction, _map))
+            if (player.CanMove(direction, _map, _monsterManager.monsterList))
             {
                 Point coordDiff = GameMath.DirectionToCoordDiff(direction);
-                player.X += coordDiff.X;
-                player.Y += coordDiff.Y;
+                player.MoveBy(coordDiff.X, coordDiff.Y);
                 _monsterManager.OnPlayerTurnEnded();
             }
         }

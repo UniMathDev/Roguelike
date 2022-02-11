@@ -28,24 +28,28 @@ namespace Roguelike.Engine.Monsters
         
         public void OnPlayerTurnEnded()
         {
-            MoveMonsters();
+            ActWithMonsters();
             GrowEggs();
         }
-        private void MoveMonsters()
+        private void ActWithMonsters()
         {
-            if (monsterList.Count != 0)
+            if (monsterList.Count == 0)
             {
-                foreach (Monster monster in monsterList)
+                return;
+            }
+
+            foreach (Monster monster in monsterList)
+            {
+                if (monster.NextTo(_player.X, _player.Y))
                 {
-                    Direction moveDirection = _pathfinder.FindWay(monster.coordinates, _player.coordinates);
-                    if (monster.CanMove(moveDirection, _map))
-                    {
-                        Point coordDiff = GameMath.DirectionToCoordDiff(moveDirection);
-                        monster.X += coordDiff.X;
-                        monster.Y += coordDiff.Y;
-                    }
+                    _player.Damage(10f);
+                }
+                else
+                {
+                    MoveTowardPlayer(monster);
                 }
             }
+
         }
         private void GrowEggs()
         {
@@ -66,6 +70,15 @@ namespace Roguelike.Engine.Monsters
                 {
                     eggList.Remove(eggToBeRemoved);
                 }
+            }
+        }
+        private void MoveTowardPlayer(Monster monster)
+        {
+            Direction moveDirection = _pathfinder.FindWay(monster.coordinates, _player.coordinates);
+            if (monster.CanMove(moveDirection, _map, monsterList, _player))
+            {
+                Point coordDiff = GameMath.DirectionToCoordDiff(moveDirection);
+                monster.MoveBy(coordDiff.X, coordDiff.Y);
             }
         }
     }

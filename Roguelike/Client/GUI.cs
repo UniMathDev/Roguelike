@@ -13,7 +13,7 @@ namespace Roguelike.Client
     {
         private readonly Game _game;
 
-        private Point CameraCenterOffset = new Point(GameFieldSize.Width / 2, GameFieldSize.Height / 2);
+        private Point CameraCenterOffset = new Point(MapDisplaySize.Width / 2, MapDisplaySize.Height / 2);
 
         public GUI(Game game)
         {
@@ -22,23 +22,26 @@ namespace Roguelike.Client
             Console.OutputEncoding = Encoding.Unicode;
         }
 
-        public void PrintAMove()
+        public void PrintGame()
         {
             PrintFixedObjects();
             PrintPlayer();
             PrintMonsters();
 
             Console.SetCursorPosition(0, 0);
-            Console.Write(GetCameraPos());
+            Console.Write(_game.player.health);
         }
 
         private void PrintMonsters()
         {
             foreach (Monster monster in _game._monsterManager.monsterList)
             {
-                Point CursorPos = MapToBufferPos(monster.X, monster.Y);
-                Console.SetCursorPosition(CursorPos.X, CursorPos.Y);
-                Console.Write(monster.Character);
+                //if (InsideMapDisplayArea(monster.X,monster.Y)) 
+                {
+                    Point CursorPos = MapToBufferPos(monster.X, monster.Y);
+                    Console.SetCursorPosition(CursorPos.X, CursorPos.Y);
+                    Console.Write(monster.Character);
+                }
             }
         }
 
@@ -47,31 +50,31 @@ namespace Roguelike.Client
             int playerX = ((_game.player.X < CameraCenterOffset.X) ?
                 _game.player.X : CameraCenterOffset.X);
             playerX = (_game.player.X >
-                (MapSize.Width - (GameFieldSize.Width - CameraCenterOffset.X)) ?
+                (MapSize.Width - (MapDisplaySize.Width - CameraCenterOffset.X)) ?
                 (CameraCenterOffset.X + _game.player.X -
-                (MapSize.Width - (GameFieldSize.Width - CameraCenterOffset.X))) :
+                (MapSize.Width - (MapDisplaySize.Width - CameraCenterOffset.X))) :
                 playerX);
             int playerY = ((_game.player.Y < CameraCenterOffset.Y) ?
                 _game.player.Y : CameraCenterOffset.Y);
             playerY = (_game.player.Y >
-                (MapSize.Height - (GameFieldSize.Height - CameraCenterOffset.Y)) ?
+                (MapSize.Height - (MapDisplaySize.Height - CameraCenterOffset.Y)) ?
                 (CameraCenterOffset.Y + _game.player.Y -
-                (MapSize.Height - (GameFieldSize.Height - CameraCenterOffset.Y))) :
+                (MapSize.Height - (MapDisplaySize.Height - CameraCenterOffset.Y))) :
                 playerY);
 
-            Console.SetCursorPosition(playerX + GameFieldPosition.TopLeftPosX,
-                playerY + GameFieldPosition.TopLeftPosY);
+            Console.SetCursorPosition(playerX + MapDisplayPosition.TopLeftPosX,
+                playerY + MapDisplayPosition.TopLeftPosY);
             Console.Write(_game.player.Character);
         }
 
         private void PrintFixedObjects()
         {
             string[] mapInStringArray =
-                _game.GetMapInStringArray(_game.player.X - GameFieldSize.Width / 2, _game.player.Y - GameFieldSize.Height / 2, GameFieldSize.Width, GameFieldSize.Height);
+                _game.GetMapInStringArray(_game.player.X - MapDisplaySize.Width / 2, _game.player.Y - MapDisplaySize.Height / 2, MapDisplaySize.Width, MapDisplaySize.Height);
             for (int i = 0; i < mapInStringArray.Length; i++)
             {
-                Console.SetCursorPosition(GameFieldPosition.TopLeftPosX,
-                    GameFieldPosition.TopLeftPosY + i);
+                Console.SetCursorPosition(MapDisplayPosition.TopLeftPosX,
+                    MapDisplayPosition.TopLeftPosY + i);
                 Console.Write(mapInStringArray[i]);
             }
         }
@@ -96,7 +99,7 @@ namespace Roguelike.Client
                 if(description == string.Empty)
                 description = _game._map.GetObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;
                 int XOffset = DescriptionBox.String[0].Length / 2;
-                int GameFieldCenterX = GameFieldPosition.TopLeftPosX + GameFieldSize.Width / 2;
+                int GameFieldCenterX = MapDisplayPosition.TopLeftPosX + MapDisplaySize.Width / 2;
 
                 int DescriptionBoxX = GameFieldCenterX - XOffset;
                 int DescriptionBoxY = 4;
@@ -123,8 +126,8 @@ namespace Roguelike.Client
         public Point BufferToCameraPos(int X, int Y)
         {
             Point output = new();
-            output.X = X - GameFieldPosition.TopLeftPosX;
-            output.Y = Y - GameFieldPosition.TopLeftPosY;
+            output.X = X - MapDisplayPosition.TopLeftPosX;
+            output.Y = Y - MapDisplayPosition.TopLeftPosY;
             return output;
         }
         //
@@ -138,21 +141,21 @@ namespace Roguelike.Client
         public Point CameraToBufferPos(int X, int Y)
         {
             Point output = new Point();
-            output.X = X + GameFieldPosition.TopLeftPosX;
-            output.Y = Y + GameFieldPosition.TopLeftPosY;
+            output.X = X + MapDisplayPosition.TopLeftPosX;
+            output.Y = Y + MapDisplayPosition.TopLeftPosY;
             return output;
         }
         public Point GetCameraPos()
         {
             Point cameraPos = new();
-            cameraPos.X = _game.player.X - GameFieldSize.Width / 2;
-            cameraPos.Y  = _game.player.Y - GameFieldSize.Height / 2;
+            cameraPos.X = _game.player.X - MapDisplaySize.Width / 2;
+            cameraPos.Y  = _game.player.Y - MapDisplaySize.Height / 2;
 
             cameraPos.X = Math.Max(0, cameraPos.X);
             cameraPos.Y = Math.Max(0, cameraPos.Y); 
 
-            cameraPos.X = Math.Min(MapSize.Width - GameFieldSize.Width, cameraPos.X);
-            cameraPos.Y = Math.Min(MapSize.Height - GameFieldSize.Height, cameraPos.Y);
+            cameraPos.X = Math.Min(MapSize.Width - MapDisplaySize.Width, cameraPos.X);
+            cameraPos.Y = Math.Min(MapSize.Height - MapDisplaySize.Height, cameraPos.Y);
 
             return cameraPos;
         }

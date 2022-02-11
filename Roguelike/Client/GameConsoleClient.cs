@@ -56,7 +56,7 @@ namespace Roguelike.Client
 
         public void Start()
         {
-            _GUI.PrintAMove();
+            _GUI.PrintGame();
         }
         void OnKeyPress(KEY_PRESS_INFO k)
         {
@@ -82,13 +82,13 @@ namespace Roguelike.Client
         private void Move(Direction direction)
         {
             _game.Move(direction);
-            _GUI.PrintAMove();
+            _GUI.PrintGame();
         }
 
         private void Wait()
         {
             _game.Wait();
-            _GUI.PrintAMove();
+            _GUI.PrintGame();
         }
 
         private void Use(MOUSE_PRESS_INFO m)
@@ -103,7 +103,7 @@ namespace Roguelike.Client
                 }
                 Point OnMap = _GUI.BufferToMapCoord(m.X, m.Y);
                 _game.Use(OnMap.X, OnMap.Y, null);
-                _GUI.PrintAMove();
+                _GUI.PrintGame();
             }
         }
         private void Examine(MOUSE_PRESS_INFO m)
@@ -116,7 +116,7 @@ namespace Roguelike.Client
             }
             _GUI.PrintCellDescription(m.X, m.Y);
             interceptNextInput = true;
-            OnInputIntercept += _GUI.PrintAMove;
+            OnInputIntercept += _GUI.PrintGame;
         }
 
         /// <summary>

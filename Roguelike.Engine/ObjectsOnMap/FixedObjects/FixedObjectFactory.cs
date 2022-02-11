@@ -23,10 +23,7 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
             {
                 return Activator.CreateInstance(fixedObject.GetType()) as ObjectOnMap;
             }
-            else
-            {
-                return _fixedObjects[character] as ObjectOnMap;
-            }
+            return _fixedObjects[character] as ObjectOnMap;
         }
     }
 }

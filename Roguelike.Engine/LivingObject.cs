@@ -1,7 +1,10 @@
 ﻿using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
-using System.Drawing;
+using Roguelike.Engine.Monsters;
 using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 
 namespace Roguelike.Engine
 {
@@ -19,10 +22,27 @@ namespace Roguelike.Engine
             }
         }
         public float health { get; protected set; }
-        public bool CanMove(Direction direction, Map map)
+        public bool CanMove(Direction direction, Map map, List<LivingObject> livingObjects)
         {
             Point coordDiff = GameMath.DirectionToCoordDiff(direction);
-            return map.IsPossibleToMove(X + coordDiff.X, Y + coordDiff.Y);
+            Point movingTo = new(this.X + coordDiff.X, this.Y + coordDiff.Y);
+
+            foreach (LivingObject lObject in livingObjects)
+            {
+                if (lObject.coordinates == movingTo)
+                {
+                    return false;
+                }
+            }
+            return map.IsPossibleToMove(movingTo.X,movingTo.Y);
+        }
+        //Преобразует monsters и player в один List<LivingObject> и передаёт в функцию выше
+        public bool CanMove(Direction direction, Map map, List<Monster> monsters, Player player)
+        {
+            List<LivingObject> livingObjects = new List<LivingObject>();
+            livingObjects.AddRange(monsters.Cast<LivingObject>().ToList());
+            livingObjects.Add(player as LivingObject);
+            return CanMove(direction, map, livingObjects);
         }
 
         public bool NextTo(int X, int Y)
@@ -34,6 +54,11 @@ namespace Roguelike.Engine
             return false;
         }
 
+        public void MoveBy(int X, int Y)
+        {
+            this.X += X;
+            this.Y += Y;
+        }
         public void Damage(float amount)
         {
             health -= amount;

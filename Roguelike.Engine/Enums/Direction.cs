@@ -9,6 +9,7 @@
         Down,
         LeftDown,
         Left,
-        LeftUp
+        LeftUp,
+        Null
     }
 }
