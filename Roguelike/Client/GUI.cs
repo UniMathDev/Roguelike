@@ -2,6 +2,7 @@
 using Roguelike.Engine;
 using Roguelike.GameConfig;
 using Roguelike.GameConfig.GUIElements;
+using Roguelike.Engine.Monsters;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Text;
@@ -12,25 +13,37 @@ namespace Roguelike.Client
     {
         private readonly Game _game;
 
+        private Point CameraCenterOffset = new Point(GameFieldSize.Width / 2, GameFieldSize.Height / 2);
+
         public GUI(Game game)
         {
             _game = game;
             Console.CursorVisible = false;
+            Console.OutputEncoding = Encoding.Unicode;
         }
 
         public void PrintAMove()
         {
-            Point CameraCenterOffset = new Point(GameFieldSize.Width / 2, GameFieldSize.Height / 2);
-           
-            string[] mapInStringArray =
-                _game.GetMapInStringArray(_game.player.X - GameFieldSize.Width / 2, _game.player.Y - GameFieldSize.Height / 2, GameFieldSize.Width, GameFieldSize.Height);
-            for (int i = 0; i < mapInStringArray.Length; i++)
-            {
-                Console.SetCursorPosition(GameFieldPosition.TopLeftPosX,
-                    GameFieldPosition.TopLeftPosY + i);
-                Console.Write(mapInStringArray[i]);
-            }
+            PrintFixedObjects();
+            PrintPlayer();
+            PrintMonsters();
 
+            Console.SetCursorPosition(0, 0);
+            Console.Write(GetCameraPos());
+        }
+
+        private void PrintMonsters()
+        {
+            foreach (Monster monster in _game._monsterManager.monsterList)
+            {
+                Point CursorPos = MapToBufferPos(monster.X, monster.Y);
+                Console.SetCursorPosition(CursorPos.X, CursorPos.Y);
+                Console.Write(monster.Character);
+            }
+        }
+
+        private void PrintPlayer()
+        {
             int playerX = ((_game.player.X < CameraCenterOffset.X) ?
                 _game.player.X : CameraCenterOffset.X);
             playerX = (_game.player.X >
@@ -45,23 +58,43 @@ namespace Roguelike.Client
                 (CameraCenterOffset.Y + _game.player.Y -
                 (MapSize.Height - (GameFieldSize.Height - CameraCenterOffset.Y))) :
                 playerY);
+
             Console.SetCursorPosition(playerX + GameFieldPosition.TopLeftPosX,
                 playerY + GameFieldPosition.TopLeftPosY);
             Console.Write(_game.player.Character);
-
-            //TEMP
-            Console.SetCursorPosition(0,0);
-            Console.Write(GetCameraPos());
         }
+
+        private void PrintFixedObjects()
+        {
+            string[] mapInStringArray =
+                _game.GetMapInStringArray(_game.player.X - GameFieldSize.Width / 2, _game.player.Y - GameFieldSize.Height / 2, GameFieldSize.Width, GameFieldSize.Height);
+            for (int i = 0; i < mapInStringArray.Length; i++)
+            {
+                Console.SetCursorPosition(GameFieldPosition.TopLeftPosX,
+                    GameFieldPosition.TopLeftPosY + i);
+                Console.Write(mapInStringArray[i]);
+            }
+        }
+
         ///<summary>
         ///принимает координаты относительно буфера
         ///</summary>
         public void PrintCellDescription(int X, int Y)
         {
             Point absolutePoint = BufferToMapCoord(X, Y);
+            string description = string.Empty;
+
             if (_game._map.WithinBounds(absolutePoint.X, absolutePoint.Y))
             {
-                string description = _game._map.GetObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;
+                foreach (Monster monster in _game._monsterManager.monsterList)
+                {
+                    if (monster.coordinates == absolutePoint)
+                    {
+                        description = monster.Description;
+                    }
+                }
+                if(description == string.Empty)
+                description = _game._map.GetObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;
                 int XOffset = DescriptionBox.String[0].Length / 2;
                 int GameFieldCenterX = GameFieldPosition.TopLeftPosX + GameFieldSize.Width / 2;
 
@@ -70,7 +103,7 @@ namespace Roguelike.Client
 
                 PrintGUIElement(DescriptionBox.String, DescriptionBoxX, DescriptionBoxY);
 
-                string[] SnippedDesc = ChunksOf(description, DescriptionBox.textWidth);
+                string[] SnippedDesc = GameMath.ChunksOf(description, DescriptionBox.textWidth);
                 PrintGUIElement(SnippedDesc, DescriptionBoxX + DescriptionBox.textStartOffsetX,
                     DescriptionBoxY + DescriptionBox.textStartOffsetY);
             }
@@ -79,7 +112,7 @@ namespace Roguelike.Client
         ///<summary>
         ///Переводит координаты относительно буфера в абсолютные координаты карты.
         ///</summary>
-        private Point BufferToMapCoord(int X, int Y)
+        public Point BufferToMapCoord(int X, int Y)
         {
             Point output = new Point();
             output = BufferToCameraPos(X,Y);
@@ -87,14 +120,29 @@ namespace Roguelike.Client
             output.Y += GetCameraPos().Y;
             return output;
         }
-        private Point BufferToCameraPos(int X, int Y)
+        public Point BufferToCameraPos(int X, int Y)
         {
             Point output = new();
             output.X = X - GameFieldPosition.TopLeftPosX;
             output.Y = Y - GameFieldPosition.TopLeftPosY;
             return output;
         }
-        private Point GetCameraPos()
+        //
+        public Point MapToBufferPos(int X, int Y)
+        {
+            X -= GetCameraPos().X;
+            Y -= GetCameraPos().Y;
+            Point output = CameraToBufferPos(X, Y);
+            return output;
+        }
+        public Point CameraToBufferPos(int X, int Y)
+        {
+            Point output = new Point();
+            output.X = X + GameFieldPosition.TopLeftPosX;
+            output.Y = Y + GameFieldPosition.TopLeftPosY;
+            return output;
+        }
+        public Point GetCameraPos()
         {
             Point cameraPos = new();
             cameraPos.X = _game.player.X - GameFieldSize.Width / 2;
@@ -118,16 +166,6 @@ namespace Roguelike.Client
                 Console.Write(row);
                 offset++;
             }
-        }
-        private string[] ChunksOf(string input, int chunkSize)
-        {
-            StringBuilder builder = new StringBuilder(input);
-            List<string> list = new List<string>();
-            for (int i = 0; i < input.Length; i+=chunkSize)
-            {
-                list.Add(builder.ToString(i, Math.Min(input.Length - i - 1,chunkSize)));
-            }
-            return list.ToArray();
         }
     }
 }

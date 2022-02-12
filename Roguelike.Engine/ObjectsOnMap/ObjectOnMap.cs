@@ -2,14 +2,18 @@
 {
     public abstract class ObjectOnMap
     {
-        public char Сharacter { get; }
-
-        public string Description { get; }
-
-        protected ObjectOnMap(char сharacter, string description)
+        public char Character { get; protected set; }
+        public string Description { get; protected set; }
+        public bool Seethrough { get; protected set; }
+        
+        public void SetDisplayedCharacter(char character)
         {
-            Сharacter = сharacter;
-            Description = description;
+            Character = character;
+        }
+
+        public virtual void Use(object input)
+        {
+            //do nothing
         }
     }
 }

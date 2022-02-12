@@ -2,8 +2,11 @@
 {
     abstract class Wall : FixedObject
     {
-        protected Wall(char сharacter) : base(сharacter, "Wall: a boring white wall. I guess you can spit on it for entertainment.")
+        protected Wall(char character)
         {
+            Character = character;
+            Description = "Wall: a boring white wall. I guess you can spit on it for entertainment.";
+            Seethrough = false;
         }
     }
     class VerticalWall : Wall

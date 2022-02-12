@@ -1,6 +1,8 @@
 ﻿using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
-using System.Collections.Generic;
+using Roguelike.Engine.Monsters;
+using System.Drawing;
+using System;
 
 namespace Roguelike.Engine
 {
@@ -10,43 +12,42 @@ namespace Roguelike.Engine
 
         public Player player { get; }
 
+        public MonsterManager _monsterManager { get; }
+
         public Game(Map map, Player player)
         {
             _map = map;
             this.player = player;
+            _monsterManager = new(map,player);
         }
-
 
         public string[] GetMapInStringArray(int xPos, int yPos, int width, int height)
         {
             return _map.ToStringArray(xPos, yPos, width, height);
         }
 
-        public MapDiff InitPlayer()
-        {
-            return new MapDiff(player.X, player.Y, player.Character);
-        }
-
-        public void Move(Directions direction)
+        public void Move(Direction direction)
         {
             if (player.CanMove(direction, _map))
             {
-                switch (direction)
-                {
-                    case Directions.Up:
-                        --player.Y;
-                        break;
-                    case Directions.Down:
-                        ++player.Y;
-                        break;
-                    case Directions.Right:
-                        ++player.X;
-                        break;
-                    case Directions.Left:
-                        --player.X;
-                        break;
-                }
+                Point coordDiff = GameMath.DirectionToCoordDiff(direction);
+                player.X += coordDiff.X;
+                player.Y += coordDiff.Y;
+                _monsterManager.OnPlayerTurnEnded();
             }
         }
+        public void Use(int X, int Y, object useWith)
+        {
+            if (player.NextTo(X,Y)) 
+            {
+                _map.GetObjWithCoord(X, Y).Use(useWith);
+                _monsterManager.OnPlayerTurnEnded();
+            }
+        }
+        public void Wait()
+        {
+            _monsterManager.OnPlayerTurnEnded();
+        }
+
     }
 }

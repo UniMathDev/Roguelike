@@ -17,7 +17,8 @@ namespace Roguelike.Engine.ObjectsOnMap
                 ['|'] = _fixedObjFactory,
                 ['_'] = _fixedObjFactory,
                 ['I'] = _fixedObjFactory,
-                ['/'] = _fixedObjFactory
+                ['/'] = _fixedObjFactory,
+                ['o'] = _fixedObjFactory,
             };
         }
 

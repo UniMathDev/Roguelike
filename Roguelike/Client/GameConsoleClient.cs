@@ -2,17 +2,17 @@
 using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
 using Roguelike.GameConfig;
+using Roguelike.Input;
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using Input;
-using ConsoleLib;
+using System.Drawing;
 
 namespace Roguelike.Client
 {
     class GameConsoleClient
     {
         private readonly Dictionary<ConsoleKey, GameMenuItem> _keyboardMenu;
+        private readonly Dictionary<ConsoleKey, Direction> _directionKeys;
         private readonly Game _game;
         private readonly GUI _GUI;
 
@@ -29,10 +29,25 @@ namespace Roguelike.Client
             InputManager.KeyPress += OnKeyPress;
             _keyboardMenu = new Dictionary<ConsoleKey, GameMenuItem>();
             _keyboardMenu.Add(ConsoleKey.Escape, new GameMenuItem(Exit));
-            _keyboardMenu.Add(ConsoleKey.UpArrow, new GameMenuItem(MoveUp));
-            _keyboardMenu.Add(ConsoleKey.DownArrow, new GameMenuItem(MoveDown));
-            _keyboardMenu.Add(ConsoleKey.RightArrow, new GameMenuItem(MoveRight));
-            _keyboardMenu.Add(ConsoleKey.LeftArrow, new GameMenuItem(MoveLeft));
+            _keyboardMenu.Add(ConsoleKey.NumPad0, new GameMenuItem(Wait));
+
+            #region _directionKeys assignment
+            _directionKeys = new Dictionary<ConsoleKey, Direction>();
+            _directionKeys.Add(ConsoleKey.UpArrow, Direction.Up);
+            _directionKeys.Add(ConsoleKey.DownArrow, Direction.Down);
+            _directionKeys.Add(ConsoleKey.LeftArrow, Direction.Left);
+            _directionKeys.Add(ConsoleKey.RightArrow, Direction.Right);
+
+            _directionKeys.Add(ConsoleKey.NumPad8, Direction.Up);
+            _directionKeys.Add(ConsoleKey.NumPad9, Direction.RightUp);
+            _directionKeys.Add(ConsoleKey.NumPad6, Direction.Right);
+            _directionKeys.Add(ConsoleKey.NumPad3, Direction.RightDown);
+            _directionKeys.Add(ConsoleKey.NumPad2, Direction.Down);
+            _directionKeys.Add(ConsoleKey.NumPad1, Direction.LeftDown);
+            _directionKeys.Add(ConsoleKey.NumPad4, Direction.Left);
+            _directionKeys.Add(ConsoleKey.NumPad7, Direction.LeftUp);
+            #endregion
+
             InputManager.RMousePress += Examine;
             InputManager.LMousePress += Use;
 
@@ -56,44 +71,40 @@ namespace Roguelike.Client
             {
                 _keyboardMenu[k.key].Action();
             }
+
+            if (_directionKeys.ContainsKey(k.key))
+            {
+                Move(_directionKeys[k.key]);
+            }
+
         }
 
-        private void MoveUp()
+        private void Move(Direction direction)
         {
-            _game.Move(Directions.Up);
+            _game.Move(direction);
             _GUI.PrintAMove();
         }
 
-        private void MoveDown()
+        private void Wait()
         {
-            _game.Move(Directions.Down);
+            _game.Wait();
             _GUI.PrintAMove();
         }
-
-        private void MoveRight()
-        {
-            _game.Move(Directions.Right);
-            _GUI.PrintAMove();
-        }
-
-        private void MoveLeft()
-        {
-            _game.Move(Directions.Left);
-            _GUI.PrintAMove();
-        }
-
-
 
         private void Use(MOUSE_PRESS_INFO m)
         {
-            if (interceptNextInput)
+            if (_game._map.WithinBounds(m.X, m.Y))
             {
-                interceptNextInput = false;
-                OnInputIntercept.Invoke();
-                return;
+                if (interceptNextInput)
+                {
+                    interceptNextInput = false;
+                    OnInputIntercept.Invoke();
+                    return;
+                }
+                Point OnMap = _GUI.BufferToMapCoord(m.X, m.Y);
+                _game.Use(OnMap.X, OnMap.Y, null);
+                _GUI.PrintAMove();
             }
-            //_game.Use(m.X,m.Y);
-            _GUI.PrintAMove();
         }
         private void Examine(MOUSE_PRESS_INFO m)
         {

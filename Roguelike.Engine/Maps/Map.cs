@@ -1,5 +1,8 @@
 ﻿using Roguelike.Engine.ObjectsOnMap;
 using System.Text;
+using System.Collections.Generic;
+using Roguelike.Engine.Monsters;
+using Roguelike.Engine.ObjectsOnMap.FixedObjects;
 
 namespace Roguelike.Engine.Maps
 {
@@ -7,6 +10,8 @@ namespace Roguelike.Engine.Maps
     {
         public int Height { get; }
         public int Width { get; }
+
+        protected List<Egg> eggList;
 
         protected Map(int height, int width)
         {
@@ -52,6 +57,11 @@ namespace Roguelike.Engine.Maps
                 return false;
             }
             return true;
+        }
+
+        public List<Egg> GetEggList()
+        {
+            return eggList;
         }
     }
 }
