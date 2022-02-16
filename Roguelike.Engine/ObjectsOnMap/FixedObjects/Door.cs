@@ -32,4 +32,14 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
         }
         
     }
+
+    class KeyClosedDoor : Door
+    {
+        public KeyClosedDoor()
+        {
+            Character = '/';
+            Description = "Door: find a key or another way to open it.";
+            Seethrough = false;
+        }
+    }
 }

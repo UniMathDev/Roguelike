@@ -20,7 +20,7 @@ namespace Roguelike.Client
 
         public GameConsoleClient()
         {
-            Map map = TxtToMapConverter.ConvertToArrayMap(@"..\..\..\..\Maps\TestMap1.txt", MapSize.Height, MapSize.Width);
+            Map map = TxtToMapConverter.ConvertToArrayMap(@"..\..\..\..\Maps\Maps.txt", MapSize.Height, MapSize.Width);
             Player player = new(PlayerInitCoords.X, PlayerInitCoords.Y);
             _game = new(map, player);
             _GUI = new(_game);
