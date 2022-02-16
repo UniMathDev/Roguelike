@@ -8,9 +8,12 @@ using System.Linq;
 
 namespace Roguelike.Engine
 {
-    public abstract class LivingObject
+    public abstract class LivingObject : IDrawable
     {
         public char Character { get; protected set; }
+        public ConsoleColor BackgroundColor { get; protected set; }
+        public ConsoleColor ForegroundColor { get; protected set; }
+
         public int X { get; set; }
         public int Y { get; set; }
         public string Description { get; protected set; }
@@ -19,6 +22,11 @@ namespace Roguelike.Engine
             get
             {
                 return new Point(X, Y);
+            }
+            set
+            {
+                X = value.X;
+                Y = value.Y;
             }
         }
         public float health { get; protected set; }
@@ -36,6 +44,7 @@ namespace Roguelike.Engine
             }
             return map.IsPossibleToMove(movingTo.X,movingTo.Y);
         }
+
         //Преобразует monsters и player в один List<LivingObject> и передаёт в функцию выше
         public bool CanMove(Direction direction, Map map, List<Monster> monsters, Player player)
         {
@@ -59,6 +68,7 @@ namespace Roguelike.Engine
             this.X += X;
             this.Y += Y;
         }
+
         public void Damage(float amount)
         {
             health -= amount;

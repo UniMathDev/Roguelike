@@ -11,6 +11,7 @@ namespace Roguelike.Engine
         public Player(int x, int y)
         {
             Character = '@';
+            ForegroundColor = ConsoleColor.White;
             Description = "Me: thats me. ";
             health = 100;
             X = x;

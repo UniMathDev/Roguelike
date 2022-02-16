@@ -1,5 +1,6 @@
 ﻿using System;
 using Roguelike.Engine;
+using Roguelike.Engine.ObjectsOnMap;
 using Roguelike.GameConfig;
 using Roguelike.GameConfig.GUIElements;
 using Roguelike.Engine.Monsters;
@@ -40,7 +41,7 @@ namespace Roguelike.Client
                 {
                     Point CursorPos = MapToBufferPos(monster.X, monster.Y);
                     Console.SetCursorPosition(CursorPos.X, CursorPos.Y);
-                    Console.Write(monster.Character);
+                    (monster as IDrawable).Write();
                 }
             }
         }
@@ -71,20 +72,31 @@ namespace Roguelike.Client
         {
             string[] mapInStringArray =
                 _game.GetMapInStringArray(_game.player.X - MapDisplaySize.Width / 2, _game.player.Y - MapDisplaySize.Height / 2, MapDisplaySize.Width, MapDisplaySize.Height);
-            for (int i = 0; i < mapInStringArray.Length; i++)
+            for (int y = 0; y < mapInStringArray.Length; y++)
             {
-                Console.SetCursorPosition(MapDisplayPosition.TopLeftPosX,
-                    MapDisplayPosition.TopLeftPosY + i);
-                Console.Write(mapInStringArray[i]);
+                Point bufferCoord = CameraToBufferPos(0, y);
+                Console.SetCursorPosition(bufferCoord.X, bufferCoord.Y);
+                for (int x = 0; x < mapInStringArray[0].Length; x++)
+                {
+                    Point mapCoord = CameraToMapPos(x, y);
+                    if (_game._map.WithinBounds(mapCoord.X,mapCoord.Y))
+                    {
+                        ObjectOnMap objectOnMap = _game._map.GetObjWithCoord(mapCoord.X, mapCoord.Y);
+                    
+                        (objectOnMap as IDrawable).Write();
+                    }
+                }
             }
         }
+
+
 
         ///<summary>
         ///принимает координаты относительно буфера
         ///</summary>
         public void PrintCellDescription(int X, int Y)
         {
-            Point absolutePoint = BufferToMapCoord(X, Y);
+            Point absolutePoint = BufferToMapPos(X, Y);
             string description = string.Empty;
 
             if (_game._map.WithinBounds(absolutePoint.X, absolutePoint.Y))
@@ -115,7 +127,7 @@ namespace Roguelike.Client
         ///<summary>
         ///Переводит координаты относительно буфера в абсолютные координаты карты.
         ///</summary>
-        public Point BufferToMapCoord(int X, int Y)
+        public Point BufferToMapPos(int X, int Y)
         {
             Point output = new Point();
             output = BufferToCameraPos(X,Y);
@@ -144,6 +156,11 @@ namespace Roguelike.Client
             output.X = X + MapDisplayPosition.TopLeftPosX;
             output.Y = Y + MapDisplayPosition.TopLeftPosY;
             return output;
+        }
+        public Point CameraToMapPos(int X, int Y)
+        {
+            Point point = CameraToBufferPos(X, Y);
+            return BufferToMapPos(point.X, point.Y);
         }
         public Point GetCameraPos()
         {

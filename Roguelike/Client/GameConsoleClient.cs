@@ -101,7 +101,7 @@ namespace Roguelike.Client
                     OnInputIntercept.Invoke();
                     return;
                 }
-                Point OnMap = _GUI.BufferToMapCoord(m.X, m.Y);
+                Point OnMap = _GUI.BufferToMapPos(m.X, m.Y);
                 _game.Use(OnMap.X, OnMap.Y, null);
                 _GUI.PrintGame();
             }
