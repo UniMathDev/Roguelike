@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
 {
-    public class Door : VariableFixedObject
+    public class Door : FixedObject , IUsable
     {
         private char openedChar = ' ';
 
@@ -16,7 +16,7 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
             closedChar = Character;
         }
         
-        public override void Use(object input)
+        public void Use(object input)
         {
             if (isOpen)
             {

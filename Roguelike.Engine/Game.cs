@@ -1,6 +1,7 @@
 ﻿using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
 using Roguelike.Engine.Monsters;
+using Roguelike.Engine.ObjectsOnMap;
 using System.Drawing;
 using System;
 
@@ -37,9 +38,10 @@ namespace Roguelike.Engine
         }
         public void Use(int X, int Y, object useWith)
         {
-            if (player.NextTo(X,Y)) 
+            ObjectOnMap usedObject = _map.GetObjWithCoord(X, Y);
+            if (player.NextTo(X,Y) && (usedObject is IUsable)) 
             {
-                _map.GetObjWithCoord(X, Y).Use(useWith);
+                (usedObject as IUsable).Use(useWith);
                 _monsterManager.OnPlayerTurnEnded();
             }
         }

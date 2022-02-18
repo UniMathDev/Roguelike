@@ -14,10 +14,5 @@ namespace Roguelike.Engine.ObjectsOnMap
         {
             Character = character;
         }
-
-        public virtual void Use(object input)
-        {
-            //do nothing
-        }
     }
 }

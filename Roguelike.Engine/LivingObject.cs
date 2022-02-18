@@ -1,6 +1,7 @@
 ﻿using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
 using Roguelike.Engine.Monsters;
+using Roguelike.Engine.ObjectsOnMap;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
