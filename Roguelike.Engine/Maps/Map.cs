@@ -6,25 +6,42 @@ using Roguelike.Engine.ObjectsOnMap.FixedObjects;
 
 namespace Roguelike.Engine.Maps
 {
-    public abstract class Map
+    public class Map
     {
         public int Height { get; }
         public int Width { get; }
 
         protected List<Egg> eggList;
 
-        protected Map(int height, int width)
+        private ObjectOnMap[,] _objectsOnMap;
+
+        public Map(int height, int width, ObjectOnMap[,] objectsOnMap, List<Egg> eggList)
         {
             Height = height;
             Width = width;
+            _objectsOnMap = objectsOnMap;
+            this.eggList = eggList;
         }
 
-        public abstract ObjectOnMap GetObjWithCoord(int x, int y);
-        public abstract void SetObjWithCoord(int x, int y, ObjectOnMap obj);
+        public ObjectOnMap GetObjWithCoord(int x, int y)
+        {
+            return _objectsOnMap[y, x];
+        }
 
-        public abstract char GetCharWithCoord(int x, int y);
+        public void SetObjWithCoord(int x, int y, ObjectOnMap obj)
+        {
+            _objectsOnMap[y, x] = obj;
+        }
 
-        public abstract bool IsPossibleToMove(int x, int y);
+        public char GetCharWithCoord(int x, int y)
+        {
+            return _objectsOnMap[y, x].Character;
+        }
+
+        public bool IsPossibleToMove(int x, int y)
+        {
+            return ((_objectsOnMap[y, x] is Floor) || ((_objectsOnMap[y, x] is Door && (_objectsOnMap[y, x] as Door).isOpen)));
+        }
 
         public string[] ToStringArray(int xPosMap, int yPosMap, int width, int height)
         {

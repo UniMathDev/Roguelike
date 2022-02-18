@@ -5,7 +5,6 @@ using Roguelike.GameConfig;
 using Roguelike.GameConfig.GUIElements;
 using Roguelike.Engine.Monsters;
 using System.Drawing;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Roguelike.Client
@@ -30,20 +29,34 @@ namespace Roguelike.Client
             PrintMonsters();
 
             Console.SetCursorPosition(0, 0);
-            Console.Write(_game.player.health);
+            Console.Write(_game.player.health + " ");
         }
 
         private void PrintMonsters()
         {
             foreach (Monster monster in _game._monsterManager.monsterList)
             {
-                //if (InsideMapDisplayArea(monster.X,monster.Y)) 
+                
+                Point CursorPos = MapToBufferPos(monster.X, monster.Y);
+                if (BufferPosInsideDisplayArea(CursorPos.X, CursorPos.Y))
                 {
-                    Point CursorPos = MapToBufferPos(monster.X, monster.Y);
                     Console.SetCursorPosition(CursorPos.X, CursorPos.Y);
                     (monster as IDrawable).Write();
                 }
             }
+        }
+
+        private bool BufferPosInsideDisplayArea(int x, int y)
+        {
+            if (x < MapDisplayPosition.TopLeftPosX || x > MapDisplayPosition.TopLeftPosX + MapDisplaySize.Width)
+            {
+                return false;
+            }
+            if (y < MapDisplayPosition.TopLeftPosY || y > MapDisplayPosition.TopLeftPosY + MapDisplaySize.Height)
+            {
+                return false;
+            }
+            return true;
         }
 
         private void PrintPlayer()

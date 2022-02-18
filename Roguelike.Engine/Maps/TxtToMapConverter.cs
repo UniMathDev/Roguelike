@@ -34,8 +34,8 @@ namespace Roguelike.Engine.Maps
                     objectsOnMap[y, x] = objectToBeCreated;
                 }
             }
-            MapInArray map = new(height, width, objectsOnMap, eggList);
-            return map as Map;
+            Map map = new(height, width, objectsOnMap, eggList);
+            return map;
         }
     }
 }
