@@ -24,28 +24,25 @@ namespace Roguelike.Client
 
         public void PrintGame()
         {
-            PrintFixedObjects();
-            PrintPlayer();
-            PrintMonsters();
+            for (int y = 0; y < MapDisplaySize.Height; y++)
+            {
+                Point bufferCoord = CameraToBufferPos(0, y);
+                Console.SetCursorPosition(bufferCoord.X, bufferCoord.Y);
+                for (int x = 0; x < MapDisplaySize.Width; x++)
+                {
+                    Point mapCoord = CameraToMapPos(x, y);
+                    if (_game._map.WithinBounds(mapCoord.X, mapCoord.Y))
+                    {
+                        ObjectOnMap objectOnMap = _game._map.GetObjWithCoord(mapCoord.X, mapCoord.Y);
+
+                        (objectOnMap as IDrawable).Write();
+                    }
+                }
+            }
 
             Console.SetCursorPosition(0, 0);
             Console.Write(_game.player.health + " ");
         }
-
-        private void PrintMonsters()
-        {
-            foreach (Monster monster in _game._monsterManager.monsterList)
-            {
-                
-                Point CursorPos = MapToBufferPos(monster.X, monster.Y);
-                if (BufferPosInsideDisplayArea(CursorPos.X, CursorPos.Y))
-                {
-                    Console.SetCursorPosition(CursorPos.X, CursorPos.Y);
-                    (monster as IDrawable).Write();
-                }
-            }
-        }
-
         private bool BufferPosInsideDisplayArea(int x, int y)
         {
             if (x < MapDisplayPosition.TopLeftPosX || x > MapDisplayPosition.TopLeftPosX + MapDisplaySize.Width)
@@ -58,52 +55,6 @@ namespace Roguelike.Client
             }
             return true;
         }
-
-        private void PrintPlayer()
-        {
-            int playerX = ((_game.player.X < CameraCenterOffset.X) ?
-                _game.player.X : CameraCenterOffset.X);
-            playerX = (_game.player.X >
-                (MapSize.Width - (MapDisplaySize.Width - CameraCenterOffset.X)) ?
-                (CameraCenterOffset.X + _game.player.X -
-                (MapSize.Width - (MapDisplaySize.Width - CameraCenterOffset.X))) :
-                playerX);
-            int playerY = ((_game.player.Y < CameraCenterOffset.Y) ?
-                _game.player.Y : CameraCenterOffset.Y);
-            playerY = (_game.player.Y >
-                (MapSize.Height - (MapDisplaySize.Height - CameraCenterOffset.Y)) ?
-                (CameraCenterOffset.Y + _game.player.Y -
-                (MapSize.Height - (MapDisplaySize.Height - CameraCenterOffset.Y))) :
-                playerY);
-
-            Console.SetCursorPosition(playerX + MapDisplayPosition.TopLeftPosX,
-                playerY + MapDisplayPosition.TopLeftPosY);
-            Console.Write(_game.player.Character);
-        }
-
-        private void PrintFixedObjects()
-        {
-            string[] mapInStringArray =
-                _game.GetMapInStringArray(_game.player.X - MapDisplaySize.Width / 2, _game.player.Y - MapDisplaySize.Height / 2, MapDisplaySize.Width, MapDisplaySize.Height);
-            for (int y = 0; y < mapInStringArray.Length; y++)
-            {
-                Point bufferCoord = CameraToBufferPos(0, y);
-                Console.SetCursorPosition(bufferCoord.X, bufferCoord.Y);
-                for (int x = 0; x < mapInStringArray[0].Length; x++)
-                {
-                    Point mapCoord = CameraToMapPos(x, y);
-                    if (_game._map.WithinBounds(mapCoord.X,mapCoord.Y))
-                    {
-                        ObjectOnMap objectOnMap = _game._map.GetObjWithCoord(mapCoord.X, mapCoord.Y);
-                    
-                        (objectOnMap as IDrawable).Write();
-                    }
-                }
-            }
-        }
-
-
-
         ///<summary>
         ///принимает координаты относительно буфера
         ///</summary>
@@ -155,7 +106,6 @@ namespace Roguelike.Client
             output.Y = Y - MapDisplayPosition.TopLeftPosY;
             return output;
         }
-        //
         public Point MapToBufferPos(int X, int Y)
         {
             X -= GetCameraPos().X;

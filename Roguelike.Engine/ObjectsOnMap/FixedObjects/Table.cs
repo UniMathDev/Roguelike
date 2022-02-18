@@ -8,11 +8,10 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
 {
     abstract class Table : FixedObject
     {
-        protected Table(char character)
+        protected Table(char character) : base()
         {
             Character = character;
             Description = "Table: a great pleace to keep something important.";
-            Seethrough = false;
         }
     }
     class CenterOfTable : Table

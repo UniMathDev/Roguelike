@@ -2,7 +2,7 @@
 {
     abstract class Wall : FixedObject
     {
-        protected Wall(char character)
+        protected Wall(char character) : base()
         {
             Character = character;
             Description = "Wall: a boring white wall. I guess you can spit on it for entertainment.";

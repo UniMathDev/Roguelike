@@ -3,6 +3,7 @@ using System.Text;
 using System.Collections.Generic;
 using Roguelike.Engine.Monsters;
 using Roguelike.Engine.ObjectsOnMap.FixedObjects;
+using Roguelike.Engine.Enums;
 
 namespace Roguelike.Engine.Maps
 {
@@ -11,38 +12,59 @@ namespace Roguelike.Engine.Maps
         public int Height { get; }
         public int Width { get; }
 
-        protected List<Egg> eggList;
+        private List<Egg> eggList;
 
-        private ObjectOnMap[,] _objectsOnMap;
+        private MapCell[,] _mapCells;
 
-        public Map(int height, int width, ObjectOnMap[,] objectsOnMap, List<Egg> eggList)
+        public const int MAPCELL_LAYER_COUNT = 4;
+        public Map(int height, int width, MapCell[,] objectsOnMap, List<Egg> eggList)
         {
             Height = height;
             Width = width;
-            _objectsOnMap = objectsOnMap;
+            _mapCells = objectsOnMap;
             this.eggList = eggList;
         }
 
         public ObjectOnMap GetObjWithCoord(int x, int y)
         {
-            return _objectsOnMap[y, x];
+            for (int i = 0; i < MAPCELL_LAYER_COUNT; i++)
+            {
+                ObjectOnMap obj = _mapCells[y, x].Layers[i];
+                if (obj != null && obj.Visible)
+                {
+                    return obj;
+                }
+            }
+            throw new System.Exception("No visible objects found in MapCell.");
         }
 
         public void SetObjWithCoord(int x, int y, ObjectOnMap obj)
         {
-            _objectsOnMap[y, x] = obj;
+            _mapCells[y, x].Layers[(int)obj.MapLayer] = obj;
+        }
+        public void SetObjWithCoordToNull(int x, int y, MapLayer layer)
+        {
+            _mapCells[y, x].Layers[(int)layer] = null;
         }
 
         public char GetCharWithCoord(int x, int y)
         {
-            return _objectsOnMap[y, x].Character;
+            return GetObjWithCoord(x, y).Character;
         }
 
         public bool IsPossibleToMove(int x, int y)
         {
-            return ((_objectsOnMap[y, x] is Floor) || ((_objectsOnMap[y, x] is Door && (_objectsOnMap[y, x] as Door).isOpen)));
+            for (int i = 0; i < MAPCELL_LAYER_COUNT; i++)
+            {
+                if(_mapCells[y,x].Layers[i] != null && !(_mapCells[y,x].Layers[i].Walkable))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
-
+        //GetMapInStringArray()
+        /*
         public string[] ToStringArray(int xPosMap, int yPosMap, int width, int height)
         {
             var mapInStringArray = new string[Height];
@@ -62,7 +84,7 @@ namespace Roguelike.Engine.Maps
             }
             return mapInStringArray;
         }
-
+        */
         public bool WithinBounds(int X, int Y)
         {
             if (X < 0 || Y < 0)

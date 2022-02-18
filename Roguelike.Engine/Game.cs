@@ -22,17 +22,12 @@ namespace Roguelike.Engine
             _monsterManager = new(map,player);
         }
 
-        public string[] GetMapInStringArray(int xPos, int yPos, int width, int height)
-        {
-            return _map.ToStringArray(xPos, yPos, width, height);
-        }
-
         public void Move(Direction direction)
         {
-            if (player.CanMove(direction, _map, _monsterManager.monsterList))
+            if (player.CanMove(direction, _map))
             {
                 Point coordDiff = GameMath.DirectionToCoordDiff(direction);
-                player.MoveBy(coordDiff.X, coordDiff.Y);
+                player.MoveBy(coordDiff.X, coordDiff.Y, _map);
                 _monsterManager.OnPlayerTurnEnded();
             }
         }

@@ -3,6 +3,7 @@ using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
 using Roguelike.GameConfig;
 using Roguelike.Input;
+using Roguelike.Engine.ObjectsOnMap;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -22,6 +23,7 @@ namespace Roguelike.Client
         {
             Map map = TxtToMapConverter.ConvertToArrayMap(@"..\..\..\..\Maps\Maps.txt", MapSize.Height, MapSize.Width);
             Player player = new(PlayerInitCoords.X, PlayerInitCoords.Y);
+            map.SetObjWithCoord(PlayerInitCoords.X, PlayerInitCoords.Y, player);
             _game = new(map, player);
             _GUI = new(_game);
 
@@ -93,14 +95,14 @@ namespace Roguelike.Client
 
         private void Use(MOUSE_PRESS_INFO m)
         {
+            if (interceptNextInput)
+            {
+                interceptNextInput = false;
+                OnInputIntercept.Invoke();
+                return;
+            }
             if (_game._map.WithinBounds(m.X, m.Y))
             {
-                if (interceptNextInput)
-                {
-                    interceptNextInput = false;
-                    OnInputIntercept.Invoke();
-                    return;
-                }
                 Point OnMap = _GUI.BufferToMapPos(m.X, m.Y);
                 _game.Use(OnMap.X, OnMap.Y, null);
                 _GUI.PrintGame();
