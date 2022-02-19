@@ -2,7 +2,7 @@
 {
     class Window : FixedObject
     {
-        public Window()
+        public Window() : base()
         {
             Character = 'I';
             Description = "Window: hello, world!";

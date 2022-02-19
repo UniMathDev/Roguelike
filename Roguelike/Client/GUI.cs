@@ -1,10 +1,10 @@
 ﻿using System;
 using Roguelike.Engine;
+using Roguelike.Engine.ObjectsOnMap;
 using Roguelike.GameConfig;
 using Roguelike.GameConfig.GUIElements;
 using Roguelike.Engine.Monsters;
 using System.Drawing;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Roguelike.Client
@@ -13,7 +13,7 @@ namespace Roguelike.Client
     {
         private readonly Game _game;
 
-        private Point CameraCenterOffset = new Point(GameFieldSize.Width / 2, GameFieldSize.Height / 2);
+        private Point CameraCenterOffset = new Point(MapDisplaySize.Width / 2, MapDisplaySize.Height / 2);
 
         public GUI(Game game)
         {
@@ -22,66 +22,45 @@ namespace Roguelike.Client
             Console.OutputEncoding = Encoding.Unicode;
         }
 
-        public void PrintAMove()
+        public void PrintGame()
         {
-            PrintFixedObjects();
-            PrintPlayer();
-            PrintMonsters();
+            for (int y = 0; y < MapDisplaySize.Height; y++)
+            {
+                Point bufferCoord = CameraToBufferPos(0, y);
+                Console.SetCursorPosition(bufferCoord.X, bufferCoord.Y);
+                for (int x = 0; x < MapDisplaySize.Width; x++)
+                {
+                    Point mapCoord = CameraToMapPos(x, y);
+                    if (_game._map.WithinBounds(mapCoord.X, mapCoord.Y))
+                    {
+                        ObjectOnMap objectOnMap = _game._map.GetObjWithCoord(mapCoord.X, mapCoord.Y);
+
+                        (objectOnMap as IDrawable).Write();
+                    }
+                }
+            }
 
             Console.SetCursorPosition(0, 0);
-            Console.Write(GetCameraPos());
+            Console.Write(_game.player.health + " ");
         }
-
-        private void PrintMonsters()
+        private bool BufferPosInsideDisplayArea(int x, int y)
         {
-            foreach (Monster monster in _game._monsterManager.monsterList)
+            if (x < MapDisplayPosition.TopLeftPosX || x > MapDisplayPosition.TopLeftPosX + MapDisplaySize.Width)
             {
-                Point CursorPos = MapToBufferPos(monster.X, monster.Y);
-                Console.SetCursorPosition(CursorPos.X, CursorPos.Y);
-                Console.Write(monster.Character);
+                return false;
             }
-        }
-
-        private void PrintPlayer()
-        {
-            int playerX = ((_game.player.X < CameraCenterOffset.X) ?
-                _game.player.X : CameraCenterOffset.X);
-            playerX = (_game.player.X >
-                (MapSize.Width - (GameFieldSize.Width - CameraCenterOffset.X)) ?
-                (CameraCenterOffset.X + _game.player.X -
-                (MapSize.Width - (GameFieldSize.Width - CameraCenterOffset.X))) :
-                playerX);
-            int playerY = ((_game.player.Y < CameraCenterOffset.Y) ?
-                _game.player.Y : CameraCenterOffset.Y);
-            playerY = (_game.player.Y >
-                (MapSize.Height - (GameFieldSize.Height - CameraCenterOffset.Y)) ?
-                (CameraCenterOffset.Y + _game.player.Y -
-                (MapSize.Height - (GameFieldSize.Height - CameraCenterOffset.Y))) :
-                playerY);
-
-            Console.SetCursorPosition(playerX + GameFieldPosition.TopLeftPosX,
-                playerY + GameFieldPosition.TopLeftPosY);
-            Console.Write(_game.player.Character);
-        }
-
-        private void PrintFixedObjects()
-        {
-            string[] mapInStringArray =
-                _game.GetMapInStringArray(_game.player.X - GameFieldSize.Width / 2, _game.player.Y - GameFieldSize.Height / 2, GameFieldSize.Width, GameFieldSize.Height);
-            for (int i = 0; i < mapInStringArray.Length; i++)
+            if (y < MapDisplayPosition.TopLeftPosY || y > MapDisplayPosition.TopLeftPosY + MapDisplaySize.Height)
             {
-                Console.SetCursorPosition(GameFieldPosition.TopLeftPosX,
-                    GameFieldPosition.TopLeftPosY + i);
-                Console.Write(mapInStringArray[i]);
+                return false;
             }
+            return true;
         }
-
         ///<summary>
         ///принимает координаты относительно буфера
         ///</summary>
         public void PrintCellDescription(int X, int Y)
         {
-            Point absolutePoint = BufferToMapCoord(X, Y);
+            Point absolutePoint = BufferToMapPos(X, Y);
             string description = string.Empty;
 
             if (_game._map.WithinBounds(absolutePoint.X, absolutePoint.Y))
@@ -96,7 +75,7 @@ namespace Roguelike.Client
                 if(description == string.Empty)
                 description = _game._map.GetObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;
                 int XOffset = DescriptionBox.String[0].Length / 2;
-                int GameFieldCenterX = GameFieldPosition.TopLeftPosX + GameFieldSize.Width / 2;
+                int GameFieldCenterX = MapDisplayPosition.TopLeftPosX + MapDisplaySize.Width / 2;
 
                 int DescriptionBoxX = GameFieldCenterX - XOffset;
                 int DescriptionBoxY = 4;
@@ -112,7 +91,7 @@ namespace Roguelike.Client
         ///<summary>
         ///Переводит координаты относительно буфера в абсолютные координаты карты.
         ///</summary>
-        public Point BufferToMapCoord(int X, int Y)
+        public Point BufferToMapPos(int X, int Y)
         {
             Point output = new Point();
             output = BufferToCameraPos(X,Y);
@@ -123,11 +102,10 @@ namespace Roguelike.Client
         public Point BufferToCameraPos(int X, int Y)
         {
             Point output = new();
-            output.X = X - GameFieldPosition.TopLeftPosX;
-            output.Y = Y - GameFieldPosition.TopLeftPosY;
+            output.X = X - MapDisplayPosition.TopLeftPosX;
+            output.Y = Y - MapDisplayPosition.TopLeftPosY;
             return output;
         }
-        //
         public Point MapToBufferPos(int X, int Y)
         {
             X -= GetCameraPos().X;
@@ -138,21 +116,26 @@ namespace Roguelike.Client
         public Point CameraToBufferPos(int X, int Y)
         {
             Point output = new Point();
-            output.X = X + GameFieldPosition.TopLeftPosX;
-            output.Y = Y + GameFieldPosition.TopLeftPosY;
+            output.X = X + MapDisplayPosition.TopLeftPosX;
+            output.Y = Y + MapDisplayPosition.TopLeftPosY;
             return output;
+        }
+        public Point CameraToMapPos(int X, int Y)
+        {
+            Point point = CameraToBufferPos(X, Y);
+            return BufferToMapPos(point.X, point.Y);
         }
         public Point GetCameraPos()
         {
             Point cameraPos = new();
-            cameraPos.X = _game.player.X - GameFieldSize.Width / 2;
-            cameraPos.Y  = _game.player.Y - GameFieldSize.Height / 2;
+            cameraPos.X = _game.player.X - MapDisplaySize.Width / 2;
+            cameraPos.Y  = _game.player.Y - MapDisplaySize.Height / 2;
 
             cameraPos.X = Math.Max(0, cameraPos.X);
             cameraPos.Y = Math.Max(0, cameraPos.Y); 
 
-            cameraPos.X = Math.Min(MapSize.Width - GameFieldSize.Width, cameraPos.X);
-            cameraPos.Y = Math.Min(MapSize.Height - GameFieldSize.Height, cameraPos.Y);
+            cameraPos.X = Math.Min(MapSize.Width - MapDisplaySize.Width, cameraPos.X);
+            cameraPos.Y = Math.Min(MapSize.Height - MapDisplaySize.Height, cameraPos.Y);
 
             return cameraPos;
         }

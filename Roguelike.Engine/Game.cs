@@ -1,6 +1,7 @@
 ﻿using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
 using Roguelike.Engine.Monsters;
+using Roguelike.Engine.ObjectsOnMap;
 using System.Drawing;
 using System;
 
@@ -21,26 +22,21 @@ namespace Roguelike.Engine
             _monsterManager = new(map,player);
         }
 
-        public string[] GetMapInStringArray(int xPos, int yPos, int width, int height)
-        {
-            return _map.ToStringArray(xPos, yPos, width, height);
-        }
-
         public void Move(Direction direction)
         {
             if (player.CanMove(direction, _map))
             {
                 Point coordDiff = GameMath.DirectionToCoordDiff(direction);
-                player.X += coordDiff.X;
-                player.Y += coordDiff.Y;
+                player.MoveBy(coordDiff.X, coordDiff.Y, _map);
                 _monsterManager.OnPlayerTurnEnded();
             }
         }
         public void Use(int X, int Y, object useWith)
         {
-            if (player.NextTo(X,Y)) 
+            ObjectOnMap usedObject = _map.GetObjWithCoord(X, Y);
+            if (player.NextTo(X,Y) && (usedObject is IUsable)) 
             {
-                _map.GetObjWithCoord(X, Y).Use(useWith);
+                (usedObject as IUsable).Use(useWith);
                 _monsterManager.OnPlayerTurnEnded();
             }
         }

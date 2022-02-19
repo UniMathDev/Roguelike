@@ -18,11 +18,11 @@ namespace Roguelike.Engine.Monsters
         public Direction FindWay(Point origin, Point destination)
         {
             Point result = new();
-            if (origin.X > destination.X)
+            if (origin.X > destination.X && _map.IsPossibleToMove(origin.X - 1, origin.Y)) 
             {
                 result.X = -1;
             }
-            else if(origin.X < destination.X)
+            else if(origin.X < destination.X && _map.IsPossibleToMove(origin.X + 1, origin.Y))
             {
                 result.X = 1;
             }
@@ -31,11 +31,11 @@ namespace Roguelike.Engine.Monsters
                 result.X = 0;
             }
 
-            if (origin.Y > destination.Y)
+            if (origin.Y > destination.Y && _map.IsPossibleToMove(origin.X, origin.Y - 1))
             {
                 result.Y = -1;
             }
-            else if (origin.Y < destination.Y)
+            else if (origin.Y < destination.Y && _map.IsPossibleToMove(origin.X, origin.Y + 1))
             {
                 result.Y = 1;
             }
