@@ -37,13 +37,12 @@ namespace Roguelike.Engine.Maps
                         Egg egg = objectToBeCreated as Egg;
                         egg.X = x;
                         egg.Y = y;
-                        eggList.Add(egg);
                     }
 
                     mapCells[y,x].Layers[(int)objectToBeCreated.MapLayer] = objectToBeCreated;
                 }
             }
-            Map map = new(height, width, mapCells, eggList);
+            Map map = new(height, width, mapCells);
             return map;
         }
     }

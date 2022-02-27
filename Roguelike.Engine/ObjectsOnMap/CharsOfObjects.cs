@@ -5,33 +5,33 @@ namespace Roguelike.Engine.ObjectsOnMap
 {
     class CharsOfObjects
     {
-        private FixedObjectFactory _fixedObjFactory;
+        private FixedObjectFactory _ObjFactory;
         private Dictionary<char, Factory> _availableCharsOfObjs;
 
         public CharsOfObjects()
         {
-            _fixedObjFactory = new();
+            _ObjFactory = new();
             _availableCharsOfObjs = new()
             {
-                ['.'] = _fixedObjFactory,
-                ['|'] = _fixedObjFactory,
-                ['_'] = _fixedObjFactory,
-                ['I'] = _fixedObjFactory,
-                ['/'] = _fixedObjFactory,
-                ['o'] = _fixedObjFactory,
+                ['.'] = _ObjFactory,
+                ['|'] = _ObjFactory,
+                ['_'] = _ObjFactory,
+                ['I'] = _ObjFactory,
+                ['/'] = _ObjFactory,
+                ['o'] = _ObjFactory,
 
-                ['h'] = _fixedObjFactory,
-                ['X'] = _fixedObjFactory,
-                ['D'] = _fixedObjFactory,
-                ['Y'] = _fixedObjFactory,
-                ['g'] = _fixedObjFactory,
-                ['N'] = _fixedObjFactory,
-                ['B'] = _fixedObjFactory,
-                ['O'] = _fixedObjFactory,
-                ['╒'] = _fixedObjFactory,
-                ['═'] = _fixedObjFactory,
-                ['╕'] = _fixedObjFactory,
-                ['█'] = _fixedObjFactory,
+                ['h'] = _ObjFactory,
+                ['X'] = _ObjFactory,
+                ['D'] = _ObjFactory,
+                ['Y'] = _ObjFactory,
+                ['g'] = _ObjFactory,
+                ['N'] = _ObjFactory,
+                ['B'] = _ObjFactory,
+                ['O'] = _ObjFactory,
+                ['╒'] = _ObjFactory,
+                ['═'] = _ObjFactory,
+                ['╕'] = _ObjFactory,
+                ['█'] = _ObjFactory,
             };
         }
 
