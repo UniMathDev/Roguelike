@@ -6,14 +6,12 @@ namespace Roguelike.Engine.Monsters
 {
     public class Monster : LivingObject
     {
-        public Monster(int x, int y, Map map, Action<LivingObject> OnDeath)
+        public Monster(int x, int y)
         {
             Character = 'Σ';
             ForegroundColor = ConsoleColor.DarkMagenta;
             Description = "Thing: A scary looking thing. ";
             Health = 100f;
-            this.OnDeath += OnDeath.Invoke;
-            map.SetObjWithCoord(x,y,this);
             X = x;
             Y = y;
         }

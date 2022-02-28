@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Roguelike.Engine.ObjectsOnMap
 {
-    public interface ISearchable
+    public interface ISearchable : IChangeAble
     {
-        bool WasSearched { get; set; }
-        List<InventoryObject> Inventory { get; }
+        bool WasSearched { get; }
+        List<InventoryObject> Inventory { get; } 
     }
 }

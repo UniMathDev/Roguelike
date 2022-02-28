@@ -2,9 +2,11 @@
 using Roguelike.Engine.Maps;
 using Roguelike.Engine.Monsters;
 using Roguelike.Engine.ObjectsOnMap;
+using Roguelike.Engine.ObjectsOnMap.FixedObjects;
 using Roguelike.Engine.InventoryObjects;
 using System.Drawing;
 using System;
+using System.Collections.Generic;
 
 namespace Roguelike.Engine
 {
@@ -22,6 +24,29 @@ namespace Roguelike.Engine
             this.player = player;
             player.OnDeath += OnPlayerDeath;
             _monsterManager = new(map,player);
+
+            //TEST
+            InventoryObjectOnGround obj = new InventoryObjectOnGround();
+            map.SetObjWithCoord(18, 2, obj);
+            obj.Inventory.Add(new Axe());
+
+            InventoryObjectOnGround obj2 = new InventoryObjectOnGround();
+            map.SetObjWithCoord(15, 4, obj2);
+            obj2.Inventory.Add(new Pen());
+
+            InventoryObjectOnGround obj3 = new InventoryObjectOnGround();
+            map.SetObjWithCoord(15, 7, obj3);
+            obj3.Inventory.Add(new Axe());
+
+            InventoryObjectOnGround obj4 = new InventoryObjectOnGround();
+            map.SetObjWithCoord(16, 8, obj4);
+            obj4.Inventory.Add(new Pen());
+            obj4.Inventory.Add(new Pen());
+            obj4.Inventory.Add(new Pen());
+            obj4.Inventory.Add(new Pen());
+            obj4.Inventory.Add(new Pen());
+            obj4.Inventory.Add(new Pen());
+            //
         }
 
         public void Move(Direction direction)
@@ -46,12 +71,29 @@ namespace Roguelike.Engine
                 }
                 if (obj is ISearchable)
                 {
-                    (obj as IUsable).Use(useWith);
+                    //
+                    //в идеале:
+                    //GUI.displayObjectInventory((obj as ISearchable).Inventory,X,Y);
+                    //по дальнейшему нажатию можно подобрать чтото определенное, но пока так:
+                    //
+                    List<InventoryObject> addedItems = new();
+                    foreach (InventoryObject item in (obj as ISearchable).Inventory)
+                    {
+                        if (player.inventory.CanAddToInventory(item))
+                        {
+                            player.inventory.AddToInventory(item);
+                            addedItems.Add(item);
+                        }
+                    }
+                    foreach (var item in addedItems)
+                    {
+                        (obj as ISearchable).Inventory.Remove(item);
+                    }
 
                     _monsterManager.OnPlayerTurnEnded();
                     return;
                 }
-                if (obj is Monster)
+                if (obj is LivingObject && !(obj is Player))
                 {
                     Monster monster = (obj as Monster);
                     Weapon weapon = player.inventory.ActiveWeapon;

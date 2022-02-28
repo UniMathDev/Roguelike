@@ -1,8 +1,4 @@
 ﻿using Roguelike.Engine.ObjectsOnMap;
-using System.Text;
-using System.Collections.Generic;
-using Roguelike.Engine.Monsters;
-using Roguelike.Engine.ObjectsOnMap.FixedObjects;
 using Roguelike.Engine.Enums;
 
 namespace Roguelike.Engine.Maps

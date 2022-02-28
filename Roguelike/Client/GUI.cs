@@ -24,11 +24,32 @@ namespace Roguelike.Client
 
         public void PrintGame()
         {
+            PrintInventory();
             PrintMap();
 
             Console.SetCursorPosition(0, 0);
             Console.Write(_game.player.Health + " ");
         }
+
+        private void PrintInventory()
+        {
+            Console.SetCursorPosition(80, 2);
+            if(_game.player.inventory.Hands[0] != null)
+                Console.WriteLine("Right Hand:  " + _game.player.inventory.Hands[0].Description.Split(':')[0]);
+            Console.SetCursorPosition(80, 3);
+            if (_game.player.inventory.Hands[1] != null)
+                Console.WriteLine("Left Hand:  " + _game.player.inventory.Hands[1].Description.Split(':')[0]);
+            Console.SetCursorPosition(80, 4);
+            Console.WriteLine("Pockets:");
+            int counter = 5;
+            foreach (var item in _game.player.inventory.Pockets)
+            {
+                Console.SetCursorPosition(80, counter);
+                Console.WriteLine(item.Description.Split(':')[0]);
+                counter++;
+            }
+        }
+
         public void PrintMap()
         {
             for (int y = 0; y < MapDisplaySize.Height; y++)

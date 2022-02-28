@@ -17,16 +17,12 @@ namespace Roguelike.Engine.ObjectsOnMap
             X = x;
             Y = y;
         }
-        public void AddToInventory(InventoryObject obj)
-        {
-            throw new NotImplementedException();
-        }
     }
     public class PlayerInventory
     {
-        private List<InventoryObject> Pockets = new List<InventoryObject>();
+        public List<InventoryObject> Pockets { get; private set; } = new List<InventoryObject>();
         private int RemainingPocketSpace = 5;
-        private InventoryObject[] Hands = new InventoryObject[2];
+        public InventoryObject[] Hands { get; private set; } = new InventoryObject[2];
         public Weapon ActiveWeapon { get; private set; }
         public InventoryObject ActiveItem { get; private set; }
 

@@ -55,25 +55,30 @@ namespace Roguelike.Engine.Monsters
         }
         private void GrowEggs()
         {
-            if (eggList.Count != 0)
+            if (eggList.Count == 0)
             {
-                List<Egg> eggsToBeRemoved = new List<Egg>();
-                foreach (Egg egg in eggList)
+                return;
+            }
+            List<Egg> eggsToBeRemoved = new List<Egg>();
+            foreach (Egg egg in eggList)
+            {
+                egg.Timer--;
+                if (egg.Timer == 0)
                 {
-                    egg.Timer--;
-                    if (egg.Timer == 0)
-                    {
-                        eggsToBeRemoved.Add(egg);
-                        _map.SetObjWithCoord(egg.X, egg.Y, new Floor());
-                        monsterList.Add(new Monster(egg.X, egg.Y, _map, new Action<LivingObject>(OnMonsterDeath)));
-                    }
-                }
-                foreach (Egg egg in eggsToBeRemoved)
-                {
-                    eggList.Remove(egg);
-                    _map.SetObjWithCoordToNull(egg.X, egg.Y, egg.MapLayer);
+                    eggsToBeRemoved.Add(egg);
+                    _map.SetObjWithCoord(egg.X, egg.Y, new Floor());
+                    Monster monster = new Monster(egg.X, egg.Y);
+                    monster.OnDeath += OnMonsterDeath;
+                    monsterList.Add(monster);
+                    _map.SetObjWithCoord(egg.X, egg.Y, monster);
                 }
             }
+            foreach (Egg egg in eggsToBeRemoved)
+            {
+                eggList.Remove(egg);
+                _map.SetObjWithCoordToNull(egg.X, egg.Y, egg.MapLayer);
+            }
+
         }
         private List<Egg> FindEggs(Map map)
         {
