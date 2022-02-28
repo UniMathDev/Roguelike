@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
@@ -23,10 +24,10 @@ namespace Roguelike.Engine.Monsters
             _player = player;
             _map = map;
             monsterList = new List<Monster>();
-            eggList = _map.GetEggList();
             _pathfinder = new Pathfinder(map);
+            eggList = FindEggs(map);
         }
-        
+
         public void OnPlayerTurnEnded()
         {
             ActWithMonsters();
@@ -54,34 +55,65 @@ namespace Roguelike.Engine.Monsters
         }
         private void GrowEggs()
         {
-            if (eggList.Count != 0)
+            if (eggList.Count == 0)
             {
-                List<Egg> eggsToBeRemoved = new List<Egg>();
-                foreach (Egg egg in eggList)
+                return;
+            }
+            List<Egg> eggsToBeRemoved = new List<Egg>();
+            foreach (Egg egg in eggList)
+            {
+                egg.Timer--;
+                if (egg.Timer == 0)
                 {
-                    egg.Timer--;
-                    if (egg.Timer == 0)
-                    {
-                        eggsToBeRemoved.Add(egg);
-                        _map.SetObjWithCoord(egg.X, egg.Y, new Floor());
-                        monsterList.Add(new Monster(egg.X, egg.Y));
-                    }
-                }
-                foreach (Egg egg in eggsToBeRemoved)
-                {
-                    eggList.Remove(egg);
-                    _map.SetObjWithCoordToNull(egg.X, egg.Y, egg.MapLayer);
+                    eggsToBeRemoved.Add(egg);
+                    _map.SetObjWithCoord(egg.X, egg.Y, new Floor());
+                    Monster monster = new Monster(egg.X, egg.Y);
+                    monster.OnDeath += OnMonsterDeath;
+                    monsterList.Add(monster);
+                    _map.SetObjWithCoord(egg.X, egg.Y, monster);
                 }
             }
+            foreach (Egg egg in eggsToBeRemoved)
+            {
+                eggList.Remove(egg);
+                _map.SetObjWithCoordToNull(egg.X, egg.Y, egg.MapLayer);
+            }
+
         }
+        private List<Egg> FindEggs(Map map)
+        {
+            //кайффф xdddddddddddddddd
+            List<Egg> foundEggs = new();
+            for (int i = 0; i < 4; i++)
+            {
+                for (int x = 0; x < map.Width; x++)
+                {
+                    for (int y = 0; y < map.Height; y++)
+                    {
+                        ObjectOnMap obj = map.GetObjWithCoord(x,y,(MapLayer)i);
+                        if (obj is Egg)
+                        {
+                            foundEggs.Add(obj as Egg);
+                        }
+                    }
+                }
+            }
+            return foundEggs;
+        }
+
         private void MoveTowardPlayer(Monster monster)
         {
             Direction moveDirection = _pathfinder.FindWay(monster.coordinates, _player.coordinates);
             if (monster.CanMove(moveDirection, _map))
             {
-                Point coordDiff = GameMath.DirectionToCoordDiff(moveDirection);
-                monster.MoveBy(coordDiff.X, coordDiff.Y, _map);
+                monster.Move(moveDirection, _map);
             }
+        }
+        private void OnMonsterDeath(LivingObject m)
+        {
+            Monster monster = m as Monster;
+            monsterList.Remove(monster);
+            _map.SetObjWithCoordToNull(monster.X, monster.Y, monster.MapLayer);
         }
     }
 }

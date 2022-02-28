@@ -24,6 +24,34 @@ namespace Roguelike.Client
 
         public void PrintGame()
         {
+            PrintInventory();
+            PrintMap();
+
+            Console.SetCursorPosition(0, 0);
+            Console.Write(_game.player.Health + " ");
+        }
+
+        private void PrintInventory()
+        {
+            Console.SetCursorPosition(80, 2);
+            if(_game.player.inventory.Hands[0] != null)
+                Console.WriteLine("Right Hand:  " + _game.player.inventory.Hands[0].Description.Split(':')[0]);
+            Console.SetCursorPosition(80, 3);
+            if (_game.player.inventory.Hands[1] != null)
+                Console.WriteLine("Left Hand:  " + _game.player.inventory.Hands[1].Description.Split(':')[0]);
+            Console.SetCursorPosition(80, 4);
+            Console.WriteLine("Pockets:");
+            int counter = 5;
+            foreach (var item in _game.player.inventory.Pockets)
+            {
+                Console.SetCursorPosition(80, counter);
+                Console.WriteLine(item.Description.Split(':')[0]);
+                counter++;
+            }
+        }
+
+        public void PrintMap()
+        {
             for (int y = 0; y < MapDisplaySize.Height; y++)
             {
                 Point bufferCoord = CameraToBufferPos(0, y);
@@ -33,27 +61,12 @@ namespace Roguelike.Client
                     Point mapCoord = CameraToMapPos(x, y);
                     if (_game._map.WithinBounds(mapCoord.X, mapCoord.Y))
                     {
-                        ObjectOnMap objectOnMap = _game._map.GetObjWithCoord(mapCoord.X, mapCoord.Y);
+                        ObjectOnMap objectOnMap = _game._map.GetTopObjWithCoord(mapCoord.X, mapCoord.Y);
 
                         (objectOnMap as IDrawable).Write();
                     }
                 }
             }
-
-            Console.SetCursorPosition(0, 0);
-            Console.Write(_game.player.health + " ");
-        }
-        private bool BufferPosInsideDisplayArea(int x, int y)
-        {
-            if (x < MapDisplayPosition.TopLeftPosX || x > MapDisplayPosition.TopLeftPosX + MapDisplaySize.Width)
-            {
-                return false;
-            }
-            if (y < MapDisplayPosition.TopLeftPosY || y > MapDisplayPosition.TopLeftPosY + MapDisplaySize.Height)
-            {
-                return false;
-            }
-            return true;
         }
         ///<summary>
         ///принимает координаты относительно буфера
@@ -73,7 +86,7 @@ namespace Roguelike.Client
                     }
                 }
                 if(description == string.Empty)
-                description = _game._map.GetObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;
+                description = _game._map.GetTopObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;
                 int XOffset = DescriptionBox.String[0].Length / 2;
                 int GameFieldCenterX = MapDisplayPosition.TopLeftPosX + MapDisplaySize.Width / 2;
 
@@ -139,7 +152,18 @@ namespace Roguelike.Client
 
             return cameraPos;
         }
-
+        private bool BufferPosInsideDisplayArea(int x, int y)
+        {
+            if (x < MapDisplayPosition.TopLeftPosX || x > MapDisplayPosition.TopLeftPosX + MapDisplaySize.Width)
+            {
+                return false;
+            }
+            if (y < MapDisplayPosition.TopLeftPosY || y > MapDisplayPosition.TopLeftPosY + MapDisplaySize.Height)
+            {
+                return false;
+            }
+            return true;
+        }
         private void PrintGUIElement(string[] stringArray, int X, int Y)
         {
             int offset = 0;

@@ -5,7 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="ObjectInterfaces\" />
+    <Compile Remove="ObjectInterfaces\**" />
+    <EmbeddedResource Remove="ObjectInterfaces\**" />
+    <None Remove="ObjectInterfaces\**" />
   </ItemGroup>
 
 </Project>

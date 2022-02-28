@@ -1,8 +1,4 @@
 ﻿using Roguelike.Engine.ObjectsOnMap;
-using System.Text;
-using System.Collections.Generic;
-using Roguelike.Engine.Monsters;
-using Roguelike.Engine.ObjectsOnMap.FixedObjects;
 using Roguelike.Engine.Enums;
 
 namespace Roguelike.Engine.Maps
@@ -12,20 +8,17 @@ namespace Roguelike.Engine.Maps
         public int Height { get; }
         public int Width { get; }
 
-        private List<Egg> eggList;
-
         private MapCell[,] _mapCells;
 
         public const int MAPCELL_LAYER_COUNT = 4;
-        public Map(int height, int width, MapCell[,] objectsOnMap, List<Egg> eggList)
+        public Map(int height, int width, MapCell[,] objectsOnMap)
         {
             Height = height;
             Width = width;
             _mapCells = objectsOnMap;
-            this.eggList = eggList;
         }
 
-        public ObjectOnMap GetObjWithCoord(int x, int y)
+        public ObjectOnMap GetTopObjWithCoord(int x, int y)
         {
             for (int i = 0; i < MAPCELL_LAYER_COUNT; i++)
             {
@@ -36,6 +29,10 @@ namespace Roguelike.Engine.Maps
                 }
             }
             throw new System.Exception("No visible objects found in MapCell.");
+        }
+        public ObjectOnMap GetObjWithCoord(int x, int y, MapLayer layer)
+        {
+            return _mapCells[y, x].Layers[(int)layer];
         }
 
         public void SetObjWithCoord(int x, int y, ObjectOnMap obj)
@@ -49,7 +46,7 @@ namespace Roguelike.Engine.Maps
 
         public char GetCharWithCoord(int x, int y)
         {
-            return GetObjWithCoord(x, y).Character;
+            return GetTopObjWithCoord(x, y).Character;
         }
 
         public bool IsPossibleToMove(int x, int y)
@@ -96,11 +93,6 @@ namespace Roguelike.Engine.Maps
                 return false;
             }
             return true;
-        }
-
-        public List<Egg> GetEggList()
-        {
-            return eggList;
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Roguelike.Engine.ObjectsOnMap
 {
-    public abstract class MobileObject : ObjectOnMap
+    public abstract class MobileObject : ObjectOnMap, IChangeAble
     {
         public int X { get; protected set; }
         public int Y { get; protected set; }
@@ -29,12 +29,19 @@ namespace Roguelike.Engine.ObjectsOnMap
             Point movingTo = new(this.X + coordDiff.X, this.Y + coordDiff.Y);
             return map.IsPossibleToMove(movingTo.X, movingTo.Y);
         }
-        public void MoveBy(int x, int y, Map map) 
+        public void Move(Direction direction, Map map) 
         {
+            if (!CanMove(direction,map))
+            {
+                return;
+            }
+            Point coordDiff = GameMath.DirectionToCoordDiff(direction);
+
             map.SetObjWithCoordToNull(this.X, this.Y, MapLayer);
-            map.SetObjWithCoord(this.X + x, this.Y + y, this);
-            this.X += x;
-            this.Y += y;
+            map.SetObjWithCoord(this.X + coordDiff.X, this.Y + coordDiff.Y, this);
+            this.X += coordDiff.X;
+            this.Y += coordDiff.Y;
         }
+
     }
 }

@@ -51,7 +51,7 @@ namespace Roguelike.Client
             #endregion
 
             InputManager.RMousePress += Examine;
-            InputManager.LMousePress += Use;
+            InputManager.LMousePress += Interact;
 
             OnInputIntercept += ClearIntercept;
         }
@@ -93,7 +93,7 @@ namespace Roguelike.Client
             _GUI.PrintGame();
         }
 
-        private void Use(MOUSE_PRESS_INFO m)
+        private void Interact(MOUSE_PRESS_INFO m)
         {
             if (interceptNextInput)
             {
@@ -104,7 +104,7 @@ namespace Roguelike.Client
             if (_game._map.WithinBounds(m.X, m.Y))
             {
                 Point OnMap = _GUI.BufferToMapPos(m.X, m.Y);
-                _game.Use(OnMap.X, OnMap.Y, null);
+                _game.Interact(OnMap.X, OnMap.Y, null);
                 _GUI.PrintGame();
             }
         }

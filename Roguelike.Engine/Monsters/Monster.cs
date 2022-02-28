@@ -11,7 +11,7 @@ namespace Roguelike.Engine.Monsters
             Character = 'Σ';
             ForegroundColor = ConsoleColor.DarkMagenta;
             Description = "Thing: A scary looking thing. ";
-            health = 100;
+            Health = 100f;
             X = x;
             Y = y;
         }
