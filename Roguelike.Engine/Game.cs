@@ -77,7 +77,8 @@ namespace Roguelike.Engine
                     //по дальнейшему нажатию можно подобрать чтото определенное, но пока так:
                     //
                     List<InventoryObject> addedItems = new();
-                    foreach (InventoryObject item in (obj as ISearchable).Inventory)
+                    List<InventoryObject> itemsOnGround = (obj as ISearchable).Inventory;
+                    foreach (InventoryObject item in itemsOnGround)
                     {
                         if (player.inventory.CanAddToInventory(item))
                         {
@@ -85,11 +86,17 @@ namespace Roguelike.Engine
                             addedItems.Add(item);
                         }
                     }
+
+                    if (addedItems.Count == itemsOnGround.Count)
+                    {
+                        _map.SetObjWithCoordToNull(X,Y,MapLayer.SPACE);
+                    }
+
                     foreach (var item in addedItems)
                     {
                         (obj as ISearchable).Inventory.Remove(item);
                     }
-
+                    
                     _monsterManager.OnPlayerTurnEnded();
                     return;
                 }

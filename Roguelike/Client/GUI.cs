@@ -4,8 +4,10 @@ using Roguelike.Engine.ObjectsOnMap;
 using Roguelike.GameConfig;
 using Roguelike.GameConfig.GUIElements;
 using Roguelike.Engine.Monsters;
+using Roguelike.Engine.ObjectsOnMap.FixedObjects;
 using System.Drawing;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Roguelike.Client
 {
@@ -101,6 +103,43 @@ namespace Roguelike.Client
             }
             //Console.Write(description);
         }
+
+        public bool PrintGroundItemList(int X, int Y)
+        {
+            if (!BufferPosInsideDisplayArea(X,Y))
+            {
+                return false;
+            }
+            Point onMap = BufferToMapPos(X,Y);
+            ObjectOnMap obj = _game._map.GetTopObjWithCoord(onMap.X, onMap.Y);
+            if (!(obj is InventoryObjectOnGround))
+            {
+                return false;
+            }
+
+            List<string> itemsWindow = new();
+            itemsWindow.Add(ItemListBox.String[0]);
+            int itemCount = (obj as InventoryObjectOnGround).Inventory.Count;
+            for (int i = 0; i < itemCount; i++)
+            {
+                itemsWindow.Add(ItemListBox.String[1]);
+            }
+            itemsWindow.Add(ItemListBox.String[2]);
+            PrintGUIElement(itemsWindow.ToArray(), X - ItemListBox.boxWidth / 2, Y - 3 - itemCount);
+            string[] arrow = { "V" };
+            PrintGUIElement(arrow,X,Y - 1);
+
+            List<string> itemNames = new();
+            foreach (var inv in (obj as InventoryObjectOnGround).Inventory)
+            {
+                string name = inv.Description.Split(":")[0];
+                itemNames.Add(name);
+            }
+            PrintGUIElement(itemNames.ToArray(), X - ItemListBox.boxWidth / 2 + 1, Y - 2 - itemCount);
+
+            return true;
+        }
+
         ///<summary>
         ///Переводит координаты относительно буфера в абсолютные координаты карты.
         ///</summary>
@@ -152,7 +191,7 @@ namespace Roguelike.Client
 
             return cameraPos;
         }
-        private bool BufferPosInsideDisplayArea(int x, int y)
+        public bool BufferPosInsideDisplayArea(int x, int y)
         {
             if (x < MapDisplayPosition.TopLeftPosX || x > MapDisplayPosition.TopLeftPosX + MapDisplaySize.Width)
             {

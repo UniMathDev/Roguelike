@@ -52,7 +52,7 @@ namespace Roguelike.Client
 
             InputManager.RMousePress += Examine;
             InputManager.LMousePress += Interact;
-
+            InputManager.MouseMoved += OnMouseMove;
             OnInputIntercept += ClearIntercept;
         }
 
@@ -81,6 +81,23 @@ namespace Roguelike.Client
 
         }
 
+        private bool drewGroundItemListLastMouseMove = false;
+        void OnMouseMove(MOUSE_MOVE_INFO m)
+        {
+            if (interceptNextInput)
+            {
+                return;
+            }
+            if (_GUI.PrintGroundItemList(m.X, m.Y) && !drewGroundItemListLastMouseMove)
+            {
+                drewGroundItemListLastMouseMove = true;
+            }
+            else if(!_GUI.PrintGroundItemList(m.X, m.Y) && drewGroundItemListLastMouseMove)
+            {
+                drewGroundItemListLastMouseMove = false;
+                _GUI.PrintGame();
+            }
+        }
         private void Move(Direction direction)
         {
             _game.Move(direction);

@@ -23,4 +23,15 @@
         public const int textHeight = 7;
         
     }
+    class ItemListBox : GUIElement
+    {
+        new public static readonly string[] String = new string[3]
+        {
+            "_________________",
+            "|               |",
+            "|_______________|",
+        };
+        public const int boxWidth = 17;
+        public const int textStartOffsetX = 1;
+    }
 }
