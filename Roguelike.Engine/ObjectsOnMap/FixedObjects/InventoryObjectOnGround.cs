@@ -12,6 +12,8 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
             Character = '%';
             Description = "There's something on the ground here";
             Inventory = new();
+            Walkable = true;
+            MapLayer = Enums.MapLayer.SECONDARY;
         }
     }
 }

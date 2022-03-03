@@ -11,6 +11,7 @@ namespace Roguelike.Engine.Maps
         private MapCell[,] _mapCells;
 
         public const int MAPCELL_LAYER_COUNT = 4;
+        public bool ShowCeiling { get; set; } = false;
         public Map(int height, int width, MapCell[,] objectsOnMap)
         {
             Height = height;
@@ -20,10 +21,15 @@ namespace Roguelike.Engine.Maps
 
         public ObjectOnMap GetTopObjWithCoord(int x, int y)
         {
-            for (int i = 0; i < MAPCELL_LAYER_COUNT; i++)
+            int startAt = 1;
+            if (ShowCeiling)
+            {
+                startAt--;
+            }
+            for (int i = startAt; i < MAPCELL_LAYER_COUNT; i++)
             {
                 ObjectOnMap obj = _mapCells[y, x].Layers[i];
-                if (obj != null && obj.Visible)
+                if (obj != null && !obj.Hidden)
                 {
                     return obj;
                 }

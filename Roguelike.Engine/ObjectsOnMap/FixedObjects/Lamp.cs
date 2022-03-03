@@ -13,8 +13,10 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
         public Lamp() : base()
         {
             Character = 'o';
+            ForegroundColor = ConsoleColor.Yellow;
             Description = "Bright power saving lamp";
             MapLayer = Enums.MapLayer.CEILING;
+            Walkable = true;
         }
         public void Use(object obj)
         {

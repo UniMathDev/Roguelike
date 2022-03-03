@@ -28,9 +28,42 @@ namespace Roguelike.Client
         {
             PrintInventory();
             PrintMap();
+            PrintRevealCeilingButton();
 
             Console.SetCursorPosition(0, 0);
             Console.Write(_game.player.Health + " ");
+        }
+
+        private void PrintRevealCeilingButton()
+        {
+            int X = RevealCeilingButton.X;
+            int Y = RevealCeilingButton.Y;
+            Console.SetCursorPosition(X, Y);
+            if (!_game._map.ShowCeiling)
+            {
+                Console.BackgroundColor = ConsoleColor.DarkGray;
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.Write("   / ");
+                Console.SetCursorPosition(X, Y + 1);
+                Console.Write("  Ø  ");
+                Console.SetCursorPosition(X, Y + 2);
+                Console.Write(" /");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("U  ");
+            }
+            else
+            {
+                Console.BackgroundColor = ConsoleColor.White;
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("     ");
+                Console.SetCursorPosition(X, Y + 1);
+                Console.Write("  O  ");
+                Console.SetCursorPosition(X, Y + 2);
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.Write("  U  ");
+            }
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         private void PrintInventory()

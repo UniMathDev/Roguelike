@@ -25,7 +25,7 @@ namespace Roguelike.Engine
             player.OnDeath += OnPlayerDeath;
             _monsterManager = new(map,player);
 
-            //TEST
+            //TESTING GROUND ITEMS
             InventoryObjectOnGround obj = new InventoryObjectOnGround();
             map.SetObjWithCoord(18, 2, obj);
             obj.Inventory.Add(new Axe());
@@ -46,6 +46,12 @@ namespace Roguelike.Engine
             obj4.Inventory.Add(new Pen());
             obj4.Inventory.Add(new Pen());
             obj4.Inventory.Add(new Pen());
+
+            //TESTING LAMPS ITEMS
+            Lamp lamp = new();
+            _map.SetObjWithCoord(13,5,lamp);
+
+
             //
         }
 
@@ -89,7 +95,7 @@ namespace Roguelike.Engine
 
                     if (addedItems.Count == itemsOnGround.Count)
                     {
-                        _map.SetObjWithCoordToNull(X,Y,MapLayer.SPACE);
+                        _map.SetObjWithCoordToNull(X,Y,MapLayer.MAIN);
                     }
 
                     foreach (var item in addedItems)

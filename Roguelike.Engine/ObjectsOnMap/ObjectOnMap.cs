@@ -12,6 +12,8 @@ namespace Roguelike.Engine.ObjectsOnMap
         public MapLayer MapLayer { get; protected set; }
         public bool Seethrough { get; protected set; } = true;
         public bool Walkable { get; protected set; } = false;
-        public bool Visible { get; protected set; } = true;
+        public bool Hidden { get; set; } = false;
+        public bool InFOV { get; set; } = false;
+        public bool LitUp { get; set; } = false;
     }
 }

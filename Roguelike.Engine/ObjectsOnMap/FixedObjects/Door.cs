@@ -13,6 +13,7 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
             Seethrough = false;
             Walkable = false;
             closedChar = Character;
+            MapLayer = Enums.MapLayer.SECONDARY;
         }
         
         public void Use(object input)

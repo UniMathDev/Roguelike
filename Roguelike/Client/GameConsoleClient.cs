@@ -7,6 +7,7 @@ using Roguelike.Engine.ObjectsOnMap;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using Roguelike.GameConfig.GUIElements;
 
 namespace Roguelike.Client
 {
@@ -50,8 +51,8 @@ namespace Roguelike.Client
             _directionKeys.Add(ConsoleKey.NumPad7, Direction.LeftUp);
             #endregion
 
-            InputManager.RMousePress += Examine;
-            InputManager.LMousePress += Interact;
+            InputManager.RMousePress += OnRightClick;
+            InputManager.LMousePress += OnLeftClick;
             InputManager.MouseMoved += OnMouseMove;
             OnInputIntercept += ClearIntercept;
         }
@@ -110,7 +111,7 @@ namespace Roguelike.Client
             _GUI.PrintGame();
         }
 
-        private void Interact(MOUSE_PRESS_INFO m)
+        private void OnLeftClick(MOUSE_PRESS_INFO m)
         {
             if (interceptNextInput)
             {
@@ -118,14 +119,23 @@ namespace Roguelike.Client
                 OnInputIntercept.Invoke();
                 return;
             }
+            if (TryClickInterfaceButtons(m.X,m.Y))
+            {
+                _GUI.PrintGame();
+                return;
+            }
             if (_game._map.WithinBounds(m.X, m.Y))
             {
                 Point OnMap = _GUI.BufferToMapPos(m.X, m.Y);
                 _game.Interact(OnMap.X, OnMap.Y, null);
                 _GUI.PrintGame();
+                return;
             }
         }
-        private void Examine(MOUSE_PRESS_INFO m)
+
+
+
+        private void OnRightClick(MOUSE_PRESS_INFO m)
         {
             if (interceptNextInput)
             {
@@ -150,6 +160,24 @@ namespace Roguelike.Client
             OnInputIntercept += ClearIntercept;
         }
 
+        private bool TryClickInterfaceButtons(int X, int Y)
+        {
+            //RevealCeilingButton
+            if (X >= RevealCeilingButton.X && X <= RevealCeilingButton.X + RevealCeilingButton.width 
+                && Y >= RevealCeilingButton.Y && Y <= RevealCeilingButton.Y + RevealCeilingButton.height)
+            {
+                _game._map.ShowCeiling = !_game._map.ShowCeiling;
+                return true;
+            }
+            /*
+            if ()
+            {
+
+                return;
+            }
+            */
+            return false;
+        }
 
         private void Exit()
         {
