@@ -158,9 +158,11 @@ namespace Roguelike.Client
                 itemsWindow.Add(ItemListBox.String[1]);
             }
             itemsWindow.Add(ItemListBox.String[2]);
-            PrintGUIElement(itemsWindow.ToArray(), X - ItemListBox.boxWidth / 2, Y - 3 - itemCount);
             string[] arrow = { "V" };
-            PrintGUIElement(arrow,X,Y - 1);
+            PrintGUIElement(arrow, X, Y - 1);
+            Point windowPosition = new Point(Math.Max(0, X - ItemListBox.boxWidth / 2), Math.Max(0, Y - 3 - itemCount));
+            PrintGUIElement(itemsWindow.ToArray(), windowPosition.X, windowPosition.Y);
+
 
             List<string> itemNames = new();
             foreach (var inv in (obj as InventoryObjectOnGround).Inventory)
@@ -168,7 +170,7 @@ namespace Roguelike.Client
                 string name = inv.Description.Split(":")[0];
                 itemNames.Add(name);
             }
-            PrintGUIElement(itemNames.ToArray(), X - ItemListBox.boxWidth / 2 + 1, Y - 2 - itemCount);
+            PrintGUIElement(itemNames.ToArray(), windowPosition.X + 1, windowPosition.Y + 1);
 
             return true;
         }
@@ -226,11 +228,11 @@ namespace Roguelike.Client
         }
         public bool BufferPosInsideDisplayArea(int x, int y)
         {
-            if (x < MapDisplayPosition.TopLeftPosX || x > MapDisplayPosition.TopLeftPosX + MapDisplaySize.Width)
+            if (x < MapDisplayPosition.TopLeftPosX || x >= MapDisplayPosition.TopLeftPosX + MapDisplaySize.Width)
             {
                 return false;
             }
-            if (y < MapDisplayPosition.TopLeftPosY || y > MapDisplayPosition.TopLeftPosY + MapDisplaySize.Height)
+            if (y < MapDisplayPosition.TopLeftPosY || y >= MapDisplayPosition.TopLeftPosY + MapDisplaySize.Height)
             {
                 return false;
             }

@@ -89,6 +89,8 @@ namespace Roguelike.Client
             {
                 return;
             }
+
+            //try print ground item list
             if (_GUI.PrintGroundItemList(m.X, m.Y) && !drewGroundItemListLastMouseMove)
             {
                 drewGroundItemListLastMouseMove = true;
@@ -98,6 +100,10 @@ namespace Roguelike.Client
                 drewGroundItemListLastMouseMove = false;
                 _GUI.PrintGame();
             }
+            Console.SetCursorPosition(0, 2);
+            Console.Write(_GUI.BufferPosInsideDisplayArea(m.X, m.Y));
+            Console.SetCursorPosition(0, 4);
+            Console.Write(m.X + " " + m.Y);
         }
         private void Move(Direction direction)
         {
