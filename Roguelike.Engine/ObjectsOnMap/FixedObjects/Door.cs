@@ -1,11 +1,11 @@
-﻿using System.Diagnostics;
-namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
+﻿namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
 {
     public class Door : FixedObject , IUsable
     {
         private char openedChar = ' ';
 
         private char closedChar;
+
         public Door() : base()
         {
             Character = '/';

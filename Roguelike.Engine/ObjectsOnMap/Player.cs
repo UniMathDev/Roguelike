@@ -11,7 +11,7 @@ namespace Roguelike.Engine.ObjectsOnMap
         public Player(int x, int y)
         {
             Character = '@';
-            ForegroundColor = ConsoleColor.White;
+            ForegroundColor = ConsoleColor.Green;
             Description = "Me: this is me. ";
             Health = 100;
             X = x;
