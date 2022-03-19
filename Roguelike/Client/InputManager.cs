@@ -39,12 +39,12 @@ namespace Roguelike.Input
             pressInfo.X = r.dwMousePosition.X;
             pressInfo.Y = r.dwMousePosition.Y;
 
-            EnvokeMousePressEventIfPressSingle(r);
+            InvokeMousePressEventIfPressSingle(r);
             MOUSE_MOVE_INFO mouseMoveinfo = new();
             mouseMoveinfo.X = r.dwMousePosition.X;
             mouseMoveinfo.Y = r.dwMousePosition.Y;
             if(MouseMoved != null)
-            MouseMoved.Invoke(mouseMoveinfo);
+                MouseMoved.Invoke(mouseMoveinfo);
         }
 
         static void OnKeyboardEvent(KEY_EVENT_RECORD r)
@@ -59,7 +59,7 @@ namespace Roguelike.Input
 
         // В ConsoleLib если зажать кнопку мыши и потянуть это будет регистрироваться как куча нажатий этой кнопки,
         // чтобы подобное фиксировалось как единственное нажатие нужна эта функция.
-        static void EnvokeMousePressEventIfPressSingle(MOUSE_EVENT_RECORD r)
+        static void InvokeMousePressEventIfPressSingle(MOUSE_EVENT_RECORD r)
         {
             MOUSE_PRESS_INFO info = new MOUSE_PRESS_INFO(r.dwMousePosition.X, r.dwMousePosition.Y);
 

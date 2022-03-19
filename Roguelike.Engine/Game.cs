@@ -59,6 +59,10 @@ namespace Roguelike.Engine
         }
         public void Interact(int X, int Y)
         {
+            if (!_map.WithinBounds(X, Y))
+            {
+                return;
+            }
             ObjectOnMap obj = _map.GetTopObjWithCoord(X, Y);
             object useWith = player.inventory.ActiveTool;
             if (player.NextTo(X,Y)) 
