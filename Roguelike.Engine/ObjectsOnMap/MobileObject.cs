@@ -23,6 +23,10 @@ namespace Roguelike.Engine.ObjectsOnMap
                 Y = value.Y;
             }
         }
+        public MobileObject()
+        {
+            MapLayer = MapLayer.MAIN;
+        }
         public bool CanMove(Direction direction, Map map)
         {
             Point coordDiff = GameMath.DirectionToCoordDiff(direction);

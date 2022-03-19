@@ -76,7 +76,6 @@ namespace Roguelike.Engine.Monsters
             foreach (Egg egg in eggsToBeRemoved)
             {
                 eggList.Remove(egg);
-                _map.SetObjWithCoordToNull(egg.X, egg.Y, egg.MapLayer);
             }
 
         }

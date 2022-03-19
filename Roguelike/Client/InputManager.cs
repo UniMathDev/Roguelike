@@ -7,10 +7,12 @@ namespace Roguelike.Input
     {
         public static event MousePressEvent RMousePress;
         public static event MousePressEvent LMousePress;
+        public static event MouseMoveEvent MouseMoved;
         public static event KeyPressEvent KeyPress;
 
 
         public delegate void MousePressEvent(MOUSE_PRESS_INFO m);
+        public delegate void MouseMoveEvent(MOUSE_MOVE_INFO k);
         public delegate void KeyPressEvent(KEY_PRESS_INFO k);
 
         static private bool singleRMBClick = true;
@@ -37,7 +39,12 @@ namespace Roguelike.Input
             pressInfo.X = r.dwMousePosition.X;
             pressInfo.Y = r.dwMousePosition.Y;
 
-            EnvokeEventIfPressSingle(r);
+            EnvokeMousePressEventIfPressSingle(r);
+            MOUSE_MOVE_INFO mouseMoveinfo = new();
+            mouseMoveinfo.X = r.dwMousePosition.X;
+            mouseMoveinfo.Y = r.dwMousePosition.Y;
+            if(MouseMoved != null)
+            MouseMoved.Invoke(mouseMoveinfo);
         }
 
         static void OnKeyboardEvent(KEY_EVENT_RECORD r)
@@ -52,7 +59,7 @@ namespace Roguelike.Input
 
         // В ConsoleLib если зажать кнопку мыши и потянуть это будет регистрироваться как куча нажатий этой кнопки,
         // чтобы подобное фиксировалось как единственное нажатие нужна эта функция.
-        static void EnvokeEventIfPressSingle(MOUSE_EVENT_RECORD r)
+        static void EnvokeMousePressEventIfPressSingle(MOUSE_EVENT_RECORD r)
         {
             MOUSE_PRESS_INFO info = new MOUSE_PRESS_INFO(r.dwMousePosition.X, r.dwMousePosition.Y);
 
@@ -96,5 +103,10 @@ namespace Roguelike.Input
     public struct KEY_PRESS_INFO
     {
         public ConsoleKey key;
+    }
+    public struct MOUSE_MOVE_INFO
+    {
+        public int X; //в строках и столбцах буфера
+        public int Y;
     }
 }

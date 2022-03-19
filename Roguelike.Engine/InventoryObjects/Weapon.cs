@@ -11,6 +11,7 @@ namespace Roguelike.Engine.InventoryObjects
         public float AverageDamage { get; protected set; }
         public float DamageRange { get; protected set; }
 
+
     }
     public class MeleeWeapon : Weapon
     {
