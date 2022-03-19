@@ -8,6 +8,7 @@ using Roguelike.Engine.ObjectsOnMap.FixedObjects;
 using System.Drawing;
 using System.Text;
 using System.Collections.Generic;
+using Roguelike.Engine.InventoryObjects;
 
 namespace Roguelike.Client
 {
@@ -15,7 +16,8 @@ namespace Roguelike.Client
     {
         private readonly Game _game;
 
-        private Point CameraCenterOffset = new Point(MapDisplaySize.Width / 2, MapDisplaySize.Height / 2);
+        private Point CameraCenterOffset =
+            new Point(MapDisplaySize.Width / 2, MapDisplaySize.Height / 2);
 
         public GUI(Game game)
         {
@@ -36,8 +38,8 @@ namespace Roguelike.Client
 
         private void PrintRevealCeilingButton()
         {
-            int X = RevealCeilingButton.X;
-            int Y = RevealCeilingButton.Y;
+            int X = CeilingRevealButton.X;
+            int Y = CeilingRevealButton.Y;
             Console.SetCursorPosition(X, Y);
             if (!_game._map.ShowCeiling)
             {
@@ -68,21 +70,48 @@ namespace Roguelike.Client
 
         private void PrintInventory()
         {
-            Console.SetCursorPosition(80, 2);
-            if(_game.player.inventory.Hands[0] != null)
-                Console.WriteLine("Right Hand:  " + _game.player.inventory.Hands[0].Description.Split(':')[0]);
-            Console.SetCursorPosition(80, 3);
-            if (_game.player.inventory.Hands[1] != null)
-                Console.WriteLine("Left Hand:  " + _game.player.inventory.Hands[1].Description.Split(':')[0]);
-            Console.SetCursorPosition(80, 4);
-            Console.WriteLine("Pockets:");
-            int counter = 5;
+            string[] HandTexts = { "Right Hand:  ", "Left Hand:  " };
+            HandInventoryGUI[] HandGUIS = { new RightHandInventoryGUI(), new LeftHandInventoryGUI() };
+            for (int i = 0; i < 2; i++)
+            {
+                Console.SetCursorPosition(HandGUIS[i].X, HandGUIS[i].Y);
+                if (_game.player.inventory.Hands[1 - i] != null &&
+                    _game.player.inventory.Hands[1 - i].TwoHanded)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                }
+                Console.Write(HandTexts[i]);
+                Console.Write("                 ");
+                Console.SetCursorPosition(HandGUIS[i].X + HandTexts[i].Length, HandGUIS[i].Y);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                if (_game.player.inventory.Hands[i] != null)
+                {
+                    if (_game.player.inventory.Hands[i] == _game.player.inventory.ActiveWeapon)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    }
+                    else if (_game.player.inventory.Hands[i] == _game.player.inventory.ActiveTool)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                    }
+
+                    Console.Write(_game.player.inventory.Hands[i].Description.Split(':')[0]);
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+            }
+
+            Console.SetCursorPosition(PocketsInventoryBox.X, PocketsInventoryBox.Y);
+            Console.Write("Pockets:");
+            int counter = 1;
             foreach (var item in _game.player.inventory.Pockets)
             {
-                Console.SetCursorPosition(80, counter);
-                Console.WriteLine(item.Description.Split(':')[0]);
+                Console.SetCursorPosition(PocketsInventoryBox.X, PocketsInventoryBox.Y + counter);
+                Console.Write(item.Description.Split(':')[0] + "       ");
                 counter++;
             }
+            PrintGUIElement(PocketInventoryDeleter.String,
+                PocketsInventoryBox.X, PocketsInventoryBox.Y + counter);
         }
 
         public void PrintMap()
@@ -109,32 +138,32 @@ namespace Roguelike.Client
         public void PrintCellDescription(int X, int Y)
         {
             Point absolutePoint = BufferToMapPos(X, Y);
-            string description = string.Empty;
+            string description;
 
             if (_game._map.WithinBounds(absolutePoint.X, absolutePoint.Y))
             {
-                foreach (Monster monster in _game._monsterManager.monsterList)
-                {
-                    if (monster.coordinates == absolutePoint)
-                    {
-                        description = monster.Description;
-                    }
-                }
-                if(description == string.Empty)
-                description = _game._map.GetTopObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;
-                int XOffset = DescriptionBox.String[0].Length / 2;
-                int GameFieldCenterX = MapDisplayPosition.TopLeftPosX + MapDisplaySize.Width / 2;
-
-                int DescriptionBoxX = GameFieldCenterX - XOffset;
-                int DescriptionBoxY = 4;
-
-                PrintGUIElement(DescriptionBox.String, DescriptionBoxX, DescriptionBoxY);
-
-                string[] SnippedDesc = GameMath.ChunksOf(description, DescriptionBox.textWidth);
-                PrintGUIElement(SnippedDesc, DescriptionBoxX + DescriptionBox.textStartOffsetX,
-                    DescriptionBoxY + DescriptionBox.textStartOffsetY);
+                description = 
+                    _game._map.GetTopObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;   
+                PrintDescriptionBox(description);
             }
-            //Console.Write(description);
+        }
+        public void PrintInventoryItemDescription(InventoryObject iObject)
+        {
+            PrintDescriptionBox(iObject.Description);
+        }
+        private void PrintDescriptionBox(string description)
+        {
+            int XOffset = DescriptionBox.String[0].Length / 2;
+            int GameFieldCenterX = MapDisplayPosition.TopLeftPosX + MapDisplaySize.Width / 2;
+
+            int DescriptionBoxX = GameFieldCenterX - XOffset;
+            int DescriptionBoxY = 4;
+
+            PrintGUIElement(DescriptionBox.String, DescriptionBoxX, DescriptionBoxY);
+
+            string[] SnippedDesc = GameMath.ChunksOf(description, DescriptionBox.textWidth);
+            PrintGUIElement(SnippedDesc, DescriptionBoxX + DescriptionBox.textStartOffsetX,
+                DescriptionBoxY + DescriptionBox.textStartOffsetY);
         }
 
         public bool PrintGroundItemList(int X, int Y)
@@ -160,7 +189,8 @@ namespace Roguelike.Client
             itemsWindow.Add(ItemListBox.String[2]);
             string[] arrow = { "V" };
             PrintGUIElement(arrow, X, Y - 1);
-            Point windowPosition = new Point(Math.Max(0, X - ItemListBox.boxWidth / 2), Math.Max(0, Y - 3 - itemCount));
+            Point windowPosition = new Point(Math.Max(0, X - ItemListBox.boxWidth / 2),
+                                             Math.Max(0, Y - 3 - itemCount));
             PrintGUIElement(itemsWindow.ToArray(), windowPosition.X, windowPosition.Y);
 
 
@@ -173,6 +203,44 @@ namespace Roguelike.Client
             PrintGUIElement(itemNames.ToArray(), windowPosition.X + 1, windowPosition.Y + 1);
 
             return true;
+        }
+
+        public void PrintHandPopupMenu(int handIndex)
+        {
+           
+            HandInventoryGUI[] handInventoryGUI = { new RightHandInventoryGUI(),
+                                                    new LeftHandInventoryGUI() };
+            int X = handInventoryGUI[handIndex].X + HandPopupMenu.arrowOffestX;
+            int Y = handInventoryGUI[handIndex].Y + HandPopupMenu.arrowOffestY;
+            PrintGUIElement(HandPopupMenu.String, X, Y);
+            X += HandPopupMenu.optionStartOffsetX;
+            Y += HandPopupMenu.optionStartOffsetY;
+            Console.SetCursorPosition(X,Y);
+            Console.Write("USE");
+            Console.SetCursorPosition(X, ++Y);
+            Console.Write("DROP");
+            Console.SetCursorPosition(X, ++Y);
+            Console.Write("POCKET");
+        }
+        internal void PrintPocketPopupMenu(int index)
+        {
+            int X = PocketsInventoryBox.X + PocketPopupMenu.arrowOffestX;
+            int Y = PocketsInventoryBox.Y + 1 + index + PocketPopupMenu.arrowOffestY;
+            PrintGUIElement(PocketPopupMenu.String, X, Y);
+            X += PocketPopupMenu.optionStartOffsetX;
+            Y += PocketPopupMenu.optionStartOffsetY;
+            Console.SetCursorPosition(X, Y);
+            Console.Write("GRAB");
+            Console.SetCursorPosition(X, ++Y);
+            Console.Write("DROP");
+        }
+        internal void EraseInventoryPopups()
+        {
+            HandInventoryGUI[] handInventoryGUI = { new RightHandInventoryGUI(),
+                                                    new LeftHandInventoryGUI() };
+            int X = handInventoryGUI[1].X + HandPopupMenu.arrowOffestX;
+            int Y = handInventoryGUI[1].Y + HandPopupMenu.arrowOffestY;
+            PrintGUIElement(PopupMenuDeleter.String, X, Y);
         }
 
         ///<summary>
@@ -207,6 +275,8 @@ namespace Roguelike.Client
             output.Y = Y + MapDisplayPosition.TopLeftPosY;
             return output;
         }
+
+
         public Point CameraToMapPos(int X, int Y)
         {
             Point point = CameraToBufferPos(X, Y);
@@ -228,11 +298,13 @@ namespace Roguelike.Client
         }
         public bool BufferPosInsideDisplayArea(int x, int y)
         {
-            if (x < MapDisplayPosition.TopLeftPosX || x >= MapDisplayPosition.TopLeftPosX + MapDisplaySize.Width)
+            if (x < MapDisplayPosition.TopLeftPosX ||
+                x >= MapDisplayPosition.TopLeftPosX + MapDisplaySize.Width)
             {
                 return false;
             }
-            if (y < MapDisplayPosition.TopLeftPosY || y >= MapDisplayPosition.TopLeftPosY + MapDisplaySize.Height)
+            if (y < MapDisplayPosition.TopLeftPosY ||
+                y >= MapDisplayPosition.TopLeftPosY + MapDisplaySize.Height)
             {
                 return false;
             }

@@ -16,8 +16,13 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
             MapLayer = Enums.MapLayer.SECONDARY;
         }
         
-        public void Use(object input)
+        public bool TryUse(object input)
         {
+            if (input != null)
+            {
+                return false;
+            }
+
             if (Walkable)
             {
                 Character = closedChar;
@@ -28,6 +33,7 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
                 Character = openedChar;
                 Walkable = true;
             }
+            return true;
         }
         
     }

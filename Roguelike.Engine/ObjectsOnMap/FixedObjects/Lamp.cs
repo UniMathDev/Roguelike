@@ -18,9 +18,10 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
             MapLayer = Enums.MapLayer.CEILING;
             Walkable = true;
         }
-        public void Use(object obj)
+        public bool TryUse(object obj)
         {
             //if a lamp was given then put HasBulb to true;
+            return false;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
         public InventoryObjectOnGround() : base()
         {
             Character = '%';
-            Description = "There's something on the ground here";
+            Description = "There's something on the ground here. ";
             Inventory = new();
             Walkable = true;
             MapLayer = Enums.MapLayer.SECONDARY;
