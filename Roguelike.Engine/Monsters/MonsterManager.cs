@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Collections.Generic;
 using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
 using Roguelike.Engine.ObjectsOnMap.FixedObjects;

@@ -2,7 +2,6 @@
 using Roguelike.Engine.ObjectsOnMap.FixedObjects;
 using System.IO;
 using System.Text;
-using System.Collections.Generic;
 
 namespace Roguelike.Engine.Maps
 {

@@ -1,6 +1,4 @@
-﻿using Roguelike.Engine.Enums;
-using Roguelike.Engine.Maps;
-using System;
+﻿using System;
 
 namespace Roguelike.Engine.Monsters
 {

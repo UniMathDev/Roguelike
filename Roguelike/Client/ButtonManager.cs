@@ -1,6 +1,4 @@
-﻿using Roguelike.Engine;
-using Roguelike.Engine.ObjectsOnMap;
-using Roguelike.GameConfig.GUIElements;
+﻿using Roguelike.GameConfig.GUIElements;
 using System;
 using System.Collections.Generic;
 

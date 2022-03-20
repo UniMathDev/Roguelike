@@ -3,12 +3,12 @@ using Roguelike.Engine;
 using Roguelike.Engine.ObjectsOnMap;
 using Roguelike.GameConfig;
 using Roguelike.GameConfig.GUIElements;
-using Roguelike.Engine.Monsters;
 using Roguelike.Engine.ObjectsOnMap.FixedObjects;
 using System.Drawing;
 using System.Text;
 using System.Collections.Generic;
 using Roguelike.Engine.InventoryObjects;
+using Roguelike.Engine.Enums;
 
 namespace Roguelike.Client
 {
@@ -168,12 +168,14 @@ namespace Roguelike.Client
 
         public bool PrintGroundItemList(int X, int Y)
         {
-            if (!BufferPosInsideDisplayArea(X,Y))
+            if (!BufferPosInsideDisplayArea(X, Y))
             {
                 return false;
             }
-            Point onMap = BufferToMapPos(X,Y);
+
+            Point onMap = BufferToMapPos(X, Y);
             ObjectOnMap obj = _game._map.GetTopObjWithCoord(onMap.X, onMap.Y);
+
             if (!(obj is InventoryObjectOnGround))
             {
                 return false;
@@ -182,17 +184,38 @@ namespace Roguelike.Client
             List<string> itemsWindow = new();
             itemsWindow.Add(ItemListBox.String[0]);
             int itemCount = (obj as InventoryObjectOnGround).Inventory.Count;
+
             for (int i = 0; i < itemCount; i++)
             {
                 itemsWindow.Add(ItemListBox.String[1]);
             }
             itemsWindow.Add(ItemListBox.String[2]);
-            string[] arrow = { "V" };
-            PrintGUIElement(arrow, X, Y - 1);
-            Point windowPosition = new Point(Math.Max(0, X - ItemListBox.boxWidth / 2),
-                                             Math.Max(0, Y - 3 - itemCount));
-            PrintGUIElement(itemsWindow.ToArray(), windowPosition.X, windowPosition.Y);
 
+            Direction directionOfItemList =
+                (Y - itemsWindow.Count - 1 > MapDisplayPosition.TopLeftPosY ?
+                Direction.Up : Direction.Down);
+
+            
+            Point windowPosition = new(0, 0);
+            if (directionOfItemList == Direction.Up)
+            {
+                PrintGUIElement(new string[] { "V" }, X, Y - 1);
+                windowPosition = new Point(Math.Max(0, X - ItemListBox.boxWidth / 2),
+                                             Math.Max(0, Y - 3 - itemCount));
+            }  
+            else if (directionOfItemList == Direction.Down)
+            {
+                PrintGUIElement(new string[] { "Ʌ" }, X, Y + 1);
+                windowPosition = new Point(Math.Max(0, X - ItemListBox.boxWidth / 2),
+                                             Math.Max(0, Y + 2));
+            }
+
+            PrintGUIElement(new string[]{ itemsWindow[0] }, windowPosition.X, windowPosition.Y);
+
+            Console.ForegroundColor = ConsoleColor.Black;
+            Console.BackgroundColor = ConsoleColor.Gray;
+            PrintGUIElement(itemsWindow.GetRange(1, itemCount + 1).ToArray(),
+                windowPosition.X, windowPosition.Y + 1);
 
             List<string> itemNames = new();
             foreach (var inv in (obj as InventoryObjectOnGround).Inventory)
@@ -202,6 +225,8 @@ namespace Roguelike.Client
             }
             PrintGUIElement(itemNames.ToArray(), windowPosition.X + 1, windowPosition.Y + 1);
 
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.Black;
             return true;
         }
 
