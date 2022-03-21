@@ -13,6 +13,7 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
         {
             Character = 'g';
             Description = "A dead person: I'm not sure if I want to get any closer. ";
+            Seethrough = true;
         }
     }
 }

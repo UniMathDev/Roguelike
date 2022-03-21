@@ -29,8 +29,8 @@ namespace Roguelike.Client
         public GameConsoleClient()
         {
             Map map = TxtToMapConverter.ConvertToArrayMap(@"..\..\..\..\Maps\Maps.txt", MapSize.Height, MapSize.Width);
-            Player player = new(PlayerInitCoords.X, PlayerInitCoords.Y);
-            map.SetObjWithCoord(PlayerInitCoords.X, PlayerInitCoords.Y, player);
+            Player player = new(PlayerInit.X, PlayerInit.Y, PlayerInit.FOVSize);
+            map.SetObjWithCoord(PlayerInit.X, PlayerInit.Y, player);
             _game = new(map, player);
             _GUI = new(_game);
             _buttonManager = new();
@@ -40,6 +40,7 @@ namespace Roguelike.Client
             _keyboardMenu = new Dictionary<ConsoleKey, GameMenuItem>();
             _keyboardMenu.Add(ConsoleKey.Escape, new GameMenuItem(Exit));
             _keyboardMenu.Add(ConsoleKey.NumPad0, new GameMenuItem(OnWaitButtonPress));
+            _keyboardMenu.Add(ConsoleKey.D0, new GameMenuItem(OnWaitButtonPress));
 
             #region _directionKeys assignment
             _directionKeys = new Dictionary<ConsoleKey, Direction>();
@@ -69,7 +70,7 @@ namespace Roguelike.Client
             {
                 Action leftClickAction = () =>
                 {
-                    _game._map.ShowCeiling = !_game._map.ShowCeiling;
+                    _game.map.ShowCeiling = !_game.map.ShowCeiling;
                 };
                 int X = CeilingRevealButton.X;
                 int Y = CeilingRevealButton.Y;
@@ -86,7 +87,11 @@ namespace Roguelike.Client
 
         public void Start()
         {
-            _GUI.PrintGame();
+            _GUI.PrintStartScreen();
+
+            interceptNextInput = true;
+            InputIntercepted += Console.Clear;
+            InputIntercepted += _GUI.PrintGame;
         }
         void OnKeyPress(KEY_PRESS_INFO k)
         {
@@ -104,7 +109,7 @@ namespace Roguelike.Client
 
             if (_directionKeys.ContainsKey(k.key))
             {
-                OnDirectionKeyPress(_directionKeys[k.key]);
+                OnDirectionKeyPress(_directionKeys[k.key],k.altHeld);
             }
 
         }
@@ -128,9 +133,16 @@ namespace Roguelike.Client
                 _GUI.PrintGame();
             }
         }
-        private void OnDirectionKeyPress(Direction direction)
+        private void OnDirectionKeyPress(Direction direction, bool shiftHeld)
         {
-            _game.Move(direction);
+            if (shiftHeld)
+            {
+                _game.Run(direction);
+            }
+            else
+            {
+                _game.Walk(direction);
+            }
             _GUI.PrintGame();
         }
 

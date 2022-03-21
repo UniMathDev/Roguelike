@@ -15,6 +15,7 @@ namespace Roguelike.Client
     class GUI
     {
         private readonly Game _game;
+        private bool firstGamePrint = true;
 
         private Point CameraCenterOffset =
             new Point(MapDisplaySize.Width / 2, MapDisplaySize.Height / 2);
@@ -28,13 +29,47 @@ namespace Roguelike.Client
 
         public void PrintGame()
         {
+            if (firstGamePrint)
+            {
+                EraseInventoryPopups();
+                firstGamePrint = false;
+            }
             PrintInventory();
             PrintMap();
             PrintRevealCeilingButton();
-            EraseInventoryPopups();
+            PrintStatusBar(StatusBars.X, StatusBars.Y,
+                StatusBars.Length, ConsoleColor.DarkRed, _game.player.Health, PlayerStats.MaxHealth);
+            PrintStatusBar(StatusBars.X, StatusBars.Y + 1,
+                StatusBars.Length, ConsoleColor.DarkGray, _game.player.Stamina, PlayerStats.MaxStamina);
 
             Console.SetCursorPosition(0, 0);
-            Console.Write(_game.player.Health + " ");
+
+            Console.Write("Health: " + _game.player.Health + "  ");
+            Console.SetCursorPosition(0, 1);
+            Console.Write("Stamina: " + _game.player.Stamina + "  ");
+            Console.SetCursorPosition(0, 2);
+            Console.Write("Turn number: " + _game.playerTurnNumber + " ");
+
+        }
+
+        private void PrintStatusBar(int X, int Y, int length, ConsoleColor FGcolour, float value, float maxValue)
+        {
+            int actualLength = (int)(value / maxValue * length);
+            StringBuilder builder = new();
+            builder.Append('.');
+            for (int i = 1; i < actualLength; i++)
+            {
+                builder.Append('_');
+            }
+            for (int i = 0; i < length - actualLength; i++)
+            {
+                builder.Append(' ');
+            }
+            builder.Append('.');
+            Console.SetCursorPosition(X,Y);
+            Console.ForegroundColor = FGcolour;
+            Console.Write(builder.ToString());
+            Console.ResetColor();
         }
 
         private void PrintRevealCeilingButton()
@@ -42,7 +77,7 @@ namespace Roguelike.Client
             int X = CeilingRevealButton.X;
             int Y = CeilingRevealButton.Y;
             Console.SetCursorPosition(X, Y);
-            if (!_game._map.ShowCeiling)
+            if (!_game.map.ShowCeiling)
             {
                 Console.BackgroundColor = ConsoleColor.DarkGray;
                 Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -68,7 +103,11 @@ namespace Roguelike.Client
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
         }
-
+        public void PrintStartScreen()
+        {
+            Console.Clear();
+            PrintGUIElement(StartScreen.String, StartScreen.X, StartScreen.Y);
+        }
         private void PrintInventory()
         {
             string[] HandTexts = { "Right Hand:  ", "Left Hand:  " };
@@ -124,11 +163,39 @@ namespace Roguelike.Client
                 for (int x = 0; x < MapDisplaySize.Width; x++)
                 {
                     Point mapCoord = CameraToMapPos(x, y);
-                    if (_game._map.WithinBounds(mapCoord.X, mapCoord.Y))
+                    if (_game.map.WithinBounds(mapCoord.X, mapCoord.Y))
                     {
-                        ObjectOnMap objectOnMap = _game._map.GetTopObjWithCoord(mapCoord.X, mapCoord.Y);
+                        ObjectOnMap objectOnMap = _game.map.GetTopObjWithCoord(mapCoord.X, mapCoord.Y);
 
-                        (objectOnMap as IDrawable).Write();
+                        if (objectOnMap.InFOV)
+                        {
+                            double distanceFromPlayerSquared = 
+                                Math.Pow(mapCoord.X - _game.player.X, 2) / 4 +
+                                Math.Pow(mapCoord.Y - _game.player.Y, 2);
+                            if (distanceFromPlayerSquared <
+                                Math.Pow(_game.player.FOVSize, 2) * 0.4)
+                            {
+                                Console.ForegroundColor = ConsoleColor.White;
+                            }
+                            else if (distanceFromPlayerSquared <
+                                Math.Pow(_game.player.FOVSize, 2) * 0.7)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Gray;
+                            }
+                            else if (distanceFromPlayerSquared <
+                                Math.Pow(_game.player.FOVSize, 2))
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkGray;
+                            }
+
+                            (objectOnMap as IDrawable).Write();
+                        }
+                        else
+                        {
+                            Console.Write(" ");
+                        }
+
+                        
                     }
                 }
             }
@@ -159,10 +226,10 @@ namespace Roguelike.Client
             Point absolutePoint = BufferToMapPos(X, Y);
             string description;
 
-            if (_game._map.WithinBounds(absolutePoint.X, absolutePoint.Y))
+            if (_game.map.WithinBounds(absolutePoint.X, absolutePoint.Y))
             {
                 description = 
-                    _game._map.GetTopObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;   
+                    _game.map.GetTopObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;   
                 PrintDescriptionBox(description);
             }
         }
@@ -193,7 +260,7 @@ namespace Roguelike.Client
             }
 
             Point onMap = BufferToMapPos(X, Y);
-            ObjectOnMap obj = _game._map.GetTopObjWithCoord(onMap.X, onMap.Y);
+            ObjectOnMap obj = _game.map.GetTopObjWithCoord(onMap.X, onMap.Y);
 
             if (!(obj is InventoryObjectOnGround))
             {

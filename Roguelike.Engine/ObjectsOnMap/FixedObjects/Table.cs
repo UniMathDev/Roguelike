@@ -9,6 +9,7 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
         {
             Character = character;
             Description = "Table: a great pleace to keep something important.";
+            Seethrough = true;
         }
     }
     class CenterOfTable : Table, ISearchable

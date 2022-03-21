@@ -3,6 +3,7 @@ using System.Drawing;
 using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
 using System.Collections.Generic;
+using Roguelike.GameConfig;
 
 namespace Roguelike.Engine.Monsters
 {
@@ -18,7 +19,7 @@ namespace Roguelike.Engine.Monsters
             nodes = new Node[_map.Height, _map.Width];
         }
 
-        public Direction FindWay(Point origin, Point destination)
+        public Direction FindWay(Point origin, Point destination, int playerTurnNumber)
         {
             for (int y = 0; y < _map.Height; y++)
             {
@@ -30,11 +31,13 @@ namespace Roguelike.Engine.Monsters
                 }
             }
 
-            nodes[destination.Y, destination.X] = new Node(destination, int.MaxValue, 0, false);
+            nodes[destination.Y, destination.X] = new Node(destination,
+                int.MaxValue, 0, false);
 
             int minPathLength = int.MaxValue;
             Point result = new(0, 0);
             var possibleMoves = new List<Point>();
+            possibleMoves.Add(new Point(0, 0));
 
             int pathLength = 0;
             for (int y = origin.Y - 1; y <= origin.Y + 1; y++)
@@ -56,8 +59,14 @@ namespace Roguelike.Engine.Monsters
                 }
             }
 
-            if (minPathLength == int.MaxValue)
+            if (minPathLength == int.MaxValue || 
+                ((Math.Pow(origin.X - destination.X, 2) +
+                Math.Pow(origin.Y - destination.Y, 2) > Math.Pow(MonsterFOV.Value, 2)) &&
+                playerTurnNumber < MonsterFOV.СriticalPlayerTurn))
+            {
                 result = possibleMoves[GameMath.rand.Next(0, possibleMoves.Count)];
+            }
+
             return GameMath.CoordDiffToDirection(result);
         }
 

@@ -9,6 +9,7 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
         {
             Character = character;
             Description = "Toilet: do you want to drink?";
+            Seethrough = false;
         }
     }
     class FirstPartOfToilet : Toilet

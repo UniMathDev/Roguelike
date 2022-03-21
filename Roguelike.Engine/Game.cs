@@ -1,29 +1,35 @@
 ﻿using Roguelike.Engine.Enums;
+using Roguelike.Engine.InventoryObjects;
 using Roguelike.Engine.Maps;
 using Roguelike.Engine.Monsters;
 using Roguelike.Engine.ObjectsOnMap;
 using Roguelike.Engine.ObjectsOnMap.FixedObjects;
-using Roguelike.Engine.InventoryObjects;
-using System.Drawing;
+using Roguelike.GameConfig;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace Roguelike.Engine
 {
     public class Game
     {
-        public Map _map { get; }
+        public Map map { get; }
 
         public Player player { get; }
 
-        public MonsterManager _monsterManager { get; }
-        
+        public MonsterManager monsterManager { get; }
+
+        public int playerTurnNumber { get; private set; }
+
         public Game(Map map, Player player)
         {
-            _map = map;
+            this.map = map;
             this.player = player;
             player.OnDeath += OnPlayerDeath;
-            _monsterManager = new(map,player);
+            monsterManager = new(map, player);
+            playerTurnNumber = 1;
+
+            UpdateFOV();
 
             //TESTING GROUND ITEMS
             Wardrobe obj = new Wardrobe();
@@ -44,37 +50,136 @@ namespace Roguelike.Engine
 
             //TESTING LAMPS ITEMS
             Lamp lamp = new();
-            _map.SetObjWithCoord(13,5,lamp);
+            this.map.SetObjWithCoord(13, 5, lamp);
 
 
             //
         }
-        public void Move(Direction direction)
+        public void Walk(Direction direction)
         {
-            if (player.CanMove(direction, _map))
+            if (TryMove(direction))
             {
-                player.Move(direction, _map);
-                _monsterManager.OnPlayerTurnEnded();
+                player.Stamina -= PlayerStats.WalkStaminaPenalty;
+                OnPlayerTurnEnded();
             }
         }
+
+        public void Run(Direction direction)
+        {
+            if (player.Stamina - PlayerStats.RunStaminaPenalty < 0)
+            {
+                Walk(direction);
+                return;
+            }
+
+            bool success = false;
+            if (TryMove(direction))
+            {
+                success = true;
+                TryMove(direction);
+            }
+
+            if (success)
+            {
+                player.Stamina -= PlayerStats.RunStaminaPenalty;
+                OnPlayerTurnEnded();
+            }
+        }
+        private bool TryMove(Direction direction)
+        {
+            if (player.CanMove(direction, map))
+            {
+                player.Move(direction, map);
+                return true;
+            }
+
+            player.Move(direction, map);
+            monsterManager.OnPlayerTurnEnded(playerTurnNumber);
+            return false;
+        }
+
+        public void UpdateFOV()
+        {
+            for (int y = 0; y < map.Height; y++)
+            {
+                for (int x = 0; x < map.Width; x++)
+                {
+                    map.GetTopObjWithCoord(x, y).InFOV = false;
+                    if ((Math.Pow(x - player.X, 2) / 4 +
+                            Math.Pow(y - player.Y, 2)) < Math.Pow(player.FOVSize, 2))
+                    {
+                        map.GetTopObjWithCoord(x, y).InFOV = true;
+
+                        if (player.X == x && player.Y == y)
+                            continue;
+
+                        if (player.X == x)
+                        {
+                            int i = x;
+                            int offset = (player.Y < y ? 1 : -1);
+                            for (int j = player.Y + offset; j != y; j += offset)
+                            {
+                                if (!map.GetTopObjWithCoord(i, j).Seethrough)
+                                {
+                                    map.GetTopObjWithCoord(x, y).InFOV = false;
+                                    break;
+                                }
+                            }
+
+                            continue;
+                        }
+
+                        //y = kx + b
+                        double k = ((double)player.Y - y) / ((double)player.X - x);
+                        double b = (double)y + 0.5 - k * ((double)x + 0.5);
+
+                        int j1;
+                        double offsetX = (player.X < x ? 0.05 : -0.05);
+                        for (double i = player.X + 0.5;
+                            (int)Math.Floor(i) != x || (int)Math.Floor(k * i + b) != y; i += offsetX)
+                        {
+                            j1 = (int)Math.Floor(k * i + b);
+                            j1 = (j1 < 0 ? 0 : j1);
+                            j1 = (j1 >= map.Height ? map.Height - 1 : j1);
+                            if (!map.GetTopObjWithCoord((int)Math.Floor(i), j1).Seethrough)
+                            {
+                                map.GetTopObjWithCoord(x, y).InFOV = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         public void Interact(int X, int Y)
         {
-            if (!_map.WithinBounds(X, Y))
+            if (!map.WithinBounds(X, Y))
             {
                 return;
             }
-            ObjectOnMap obj = _map.GetTopObjWithCoord(X, Y);
+
+            ObjectOnMap obj = map.GetTopObjWithCoord(X, Y);
             object useWith = player.inventory.ActiveTool;
-            if (player.NextTo(X,Y)) 
+
+            if (player.NextTo(X, Y)) 
             {
                 if (obj is IUsable)
                 {
-                    (obj as IUsable).TryUse(useWith);
-
-                    _monsterManager.OnPlayerTurnEnded();
+                    UseCallBack callback = (obj as IUsable).TryUse(useWith);
+                    if (callback.ItemUsedUp) 
+                    {
+                        player.inventory.RemoveFromInventory(useWith as InventoryObject); 
+                    }
+                    if (!callback.Success)
+                    {
+                        //log
+                    }
+                    OnPlayerTurnEnded();
                     player.inventory.SetActiveInventoryToolToNull();
                     return;
                 }
+
                 player.inventory.SetActiveInventoryToolToNull();
                 if (obj is ISearchable)
                 {
@@ -83,8 +188,10 @@ namespace Roguelike.Engine
                     //GUI.displayObjectInventory((obj as ISearchable).Inventory,X,Y);
                     //по дальнейшему нажатию можно подобрать чтото определенное, но пока так:
                     //
+
                     List<InventoryObject> addedItems = new();
                     List<InventoryObject> itemsOnGround = (obj as ISearchable).Inventory;
+
                     foreach (InventoryObject item in itemsOnGround)
                     {
                         if (player.inventory.TryAddToInventory(item))
@@ -95,17 +202,18 @@ namespace Roguelike.Engine
 
                     if (addedItems.Count == itemsOnGround.Count)
                     {
-                        _map.SetObjWithCoordToNull(X,Y, new InventoryObjectOnGround().MapLayer);
+                        map.SetObjWithCoordToNull(X, Y, new InventoryObjectOnGround().MapLayer);
                     }
 
                     foreach (var item in addedItems)
                     {
                         (obj as ISearchable).Inventory.Remove(item);
                     }
-                    
-                    _monsterManager.OnPlayerTurnEnded();
+
+                    OnPlayerTurnEnded();
                     return;
                 }
+
                 if (obj is LivingObject && !(obj is Player))
                 {
                     Monster monster = (obj as Monster);
@@ -115,14 +223,14 @@ namespace Roguelike.Engine
                     else
                         ShootMonster(monster, weapon as RangedWeapon);
 
-                    _monsterManager.OnPlayerTurnEnded();
+                    OnPlayerTurnEnded();
                     return;
                 }
             }
         }
         public void Wait()
         {
-            _monsterManager.OnPlayerTurnEnded();
+            OnPlayerTurnEnded();
         }
         public void TrySwitchActiveInventoryItem(int handIndex)
         {
@@ -144,27 +252,30 @@ namespace Roguelike.Engine
                 iObj = player.inventory.Pockets[index];
             }
             ObjectOnMap objUnderPlayer =
-                _map.GetObjWithCoord(player.X, player.Y, MapLayer.SECONDARY);
+                map.GetObjWithCoord(player.X, player.Y, MapLayer.SECONDARY);
             if (objUnderPlayer == null)
             {
                 InventoryObjectOnGround newInvObjOnGround = new();
                 (newInvObjOnGround as ISearchable).Inventory.Add(iObj);
-                _map.SetObjWithCoord(player.X, player.Y, newInvObjOnGround);
+                map.SetObjWithCoord(player.X, player.Y, newInvObjOnGround);
             }
             else if (objUnderPlayer is InventoryObjectOnGround)
             {
                 (objUnderPlayer as ISearchable).Inventory.Add(iObj);
             }
             player.inventory.RemoveFromInventory(iObj);
-            _monsterManager.OnPlayerTurnEnded();
+
+            OnPlayerTurnEnded();
         }
+
         public void UnpocketItem(int index)
         {
             InventoryObject iObj = player.inventory.Pockets[index];
             if (player.inventory.TryAddToHands(iObj))
             {
                 player.inventory.Pockets.RemoveAt(index);
-                _monsterManager.OnPlayerTurnEnded();
+
+                OnPlayerTurnEnded();
             }
         }
         public void PocketItem(int index)
@@ -173,16 +284,19 @@ namespace Roguelike.Engine
             if (player.inventory.TryAddToPockets(iObj))
             {
                 player.inventory.Hands[index] = null;
-                _monsterManager.OnPlayerTurnEnded();
+
+                OnPlayerTurnEnded();
+
             }
         }
         private void OnPlayerDeath(LivingObject player)
         {
+            Console.Clear();
             Environment.Exit(0);
         }
-        private void HitMonster(Monster monster , MeleeWeapon weapon)
+        private void HitMonster(Monster monster, MeleeWeapon weapon)
         {
-            float damageAmount = 30f; //Заменить на FistDamage из конфига. (сейчас он из этого места в коде недоступен.)
+            float damageAmount = GameConfig.PlayerStats.FistDamage;
 
             if (weapon != null)
             {
@@ -192,10 +306,10 @@ namespace Roguelike.Engine
                 if (knockedBack)
                 {
                     Point coordDiff = new(monster.X - player.X, monster.Y - player.Y);
-                    monster.Move(GameMath.CoordDiffToDirection(coordDiff), _map);
+                    monster.Move(GameMath.CoordDiffToDirection(coordDiff), map);
                 }
                 weapon.Durability -= 1;
-                if(weapon.Durability <= 0)
+                if (weapon.Durability <= 0)
                 {
                     BreakWeapon(weapon);
                 }
@@ -210,6 +324,15 @@ namespace Roguelike.Engine
         private void ShootMonster(Monster monster, RangedWeapon weapon)
         {
             throw new NotImplementedException();
+        }
+        private void OnPlayerTurnEnded()
+        {
+            playerTurnNumber++;
+
+            UpdateFOV();
+            player.Stamina = MathF.Min(player.Stamina + PlayerStats.EndOfTurnStaminaGain,
+                                       PlayerStats.MaxStamina);
+            monsterManager.OnPlayerTurnEnded(playerTurnNumber);
         }
     }
 }

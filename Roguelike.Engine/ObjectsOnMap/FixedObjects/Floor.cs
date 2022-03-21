@@ -8,6 +8,7 @@
             Description = "Floor: it's floor. ";
             Walkable = true;
             MapLayer = Enums.MapLayer.FLOOR;
+            Seethrough = true;
         }
     }
 }
