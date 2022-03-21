@@ -2,7 +2,6 @@
 using Roguelike.Engine.ObjectsOnMap.FixedObjects;
 using System.IO;
 using System.Text;
-using System.Collections.Generic;
 
 namespace Roguelike.Engine.Maps
 {
@@ -10,10 +9,16 @@ namespace Roguelike.Engine.Maps
     {
         public static Map ConvertToArrayMap(string pathToFileWithMap, int height, int width)
         {
-            var objectsOnMap = new ObjectOnMap[height, width];
+            MapCell[,] mapCells = new MapCell[height, width];
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    mapCells[y,x] = new MapCell();
+                }
+            }
             var availableCharsOfObjs = new CharsOfObjects();
-            List<Egg> eggList = new List<Egg>();
-
+            
             using var streamReader = new StreamReader(pathToFileWithMap, Encoding.UTF8);
 
             string[] mapInStrings = streamReader.ReadToEnd().Split('\n');
@@ -24,18 +29,19 @@ namespace Roguelike.Engine.Maps
                 {
                     char objSymbol = objSymbols[x];
                     ObjectOnMap objectToBeCreated = availableCharsOfObjs.GetObjForChar(objSymbol);
+
                     if (objectToBeCreated is Egg)
                     {
                         Egg egg = objectToBeCreated as Egg;
                         egg.X = x;
                         egg.Y = y;
-                        eggList.Add(egg);
                     }
-                    objectsOnMap[y, x] = objectToBeCreated;
+
+                    mapCells[y,x].Layers[(int)objectToBeCreated.MapLayer] = objectToBeCreated;
                 }
             }
-            MapInArray map = new(height, width, objectsOnMap, eggList);
-            return map as Map;
+            Map map = new(height, width, mapCells);
+            return map;
         }
     }
 }

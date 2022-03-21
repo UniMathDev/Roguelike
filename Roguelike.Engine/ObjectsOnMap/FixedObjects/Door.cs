@@ -1,45 +1,48 @@
-﻿using System.Diagnostics;
-namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
+﻿namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
 {
-    public class Door : VariableFixedObject
+    public class Door : FixedObject , IUsable
     {
         private char openedChar = ' ';
 
         private char closedChar;
 
-        public bool isOpen = false;
-        public Door()
+        public Door() : base()
         {
             Character = '/';
             Description = "Door: a white office door. ";
             Seethrough = false;
+            Walkable = false;
             closedChar = Character;
+            MapLayer = Enums.MapLayer.SECONDARY;
         }
         
-        public override void Use(object input)
+        public bool TryUse(object input)
         {
-            if (isOpen)
+            if (input != null)
+            {
+                return false;
+            }
+
+            if (Walkable)
             {
                 Character = closedChar;
-                isOpen = false;
+                Walkable = false;
             }
             else
             {
                 Character = openedChar;
-                isOpen = true;
+                Walkable = true;
             }
-            Debug.WriteLine("1");
+            return true;
         }
         
     }
 
     class KeyClosedDoor : Door
     {
-        public KeyClosedDoor()
+        public KeyClosedDoor() : base()
         {
-            Character = '/';
             Description = "Door: find a key or another way to open it.";
-            Seethrough = false;
         }
     }
 }

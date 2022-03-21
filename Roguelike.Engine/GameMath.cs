@@ -8,6 +8,7 @@ namespace Roguelike.Engine
 {
     public static class GameMath
     {
+        public static Random rand = new Random(0);
         private static Dictionary<Direction, Point> DirectionToCoordDiffDictionary = new Dictionary<Direction, Point>
         {
                  {Direction.Up, new Point(0,-1)},
@@ -18,6 +19,7 @@ namespace Roguelike.Engine
                  {Direction.LeftDown, new Point(-1,1)},
                  {Direction.Left, new Point(-1,0)},
                  {Direction.LeftUp, new Point(-1,-1)},
+                 {Direction.Null, new Point(0,0) }
         };
         public static Point DirectionToCoordDiff(Direction direction)
         {
@@ -33,11 +35,11 @@ namespace Roguelike.Engine
                  {new Point(0,1), Direction.Down},
                  {new Point(-1,1), Direction.LeftDown},
                  {new Point(-1,0), Direction.Left},
-                 {new Point(-1,-1), Direction.LeftUp }
+                 {new Point(-1,-1), Direction.LeftUp },
+                 {new Point(0,0),Direction.Null }
         };
         public static Direction CoordDiffToDirection(Point Diff)
         {
-
             return CoordDiffToDirectionDictionary[Diff];
         }
         public static string[] ChunksOf(string input, int chunkSize)
@@ -50,5 +52,10 @@ namespace Roguelike.Engine
             }
             return list.ToArray();
         }
+    }
+    public class IntWrapper
+    {
+        public int Value { get; set; }
+        public IntWrapper(int value) { Value = value; }
     }
 }

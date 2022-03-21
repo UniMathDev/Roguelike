@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
+﻿namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
 {
     abstract class Table : FixedObject
     {
-        protected Table(char character)
+        protected Table(char character) : base()
         {
             Character = character;
             Description = "Table: a great pleace to keep something important.";
-            Seethrough = false;
         }
     }
     class CenterOfTable : Table

@@ -1,5 +1,4 @@
-﻿using Roguelike.Engine.Enums;
-using Roguelike.Engine.Maps;
+﻿using System;
 
 namespace Roguelike.Engine.Monsters
 {
@@ -8,8 +7,9 @@ namespace Roguelike.Engine.Monsters
         public Monster(int x, int y)
         {
             Character = 'Σ';
+            ForegroundColor = ConsoleColor.DarkMagenta;
             Description = "Thing: A scary looking thing. ";
-            health = 100;
+            Health = 100f;
             X = x;
             Y = y;
         }

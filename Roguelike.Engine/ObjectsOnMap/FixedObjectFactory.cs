@@ -32,14 +32,11 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
         public override ObjectOnMap CreateObjectOnMap(char character)
         {
             FixedObject fixedObject = _fixedObjects[character];
-            if (fixedObject is VariableFixedObject)
+            if (fixedObject is IChangeAble)
             {
                 return Activator.CreateInstance(fixedObject.GetType()) as ObjectOnMap;
             }
-            else
-            {
-                return _fixedObjects[character] as ObjectOnMap;
-            }
+            return _fixedObjects[character] as ObjectOnMap;
         }
     }
 }

@@ -2,11 +2,12 @@
 {
     class Floor : FixedObject
     {
-        public Floor()
+        public Floor() : base()
         {
             Character = '.';
             Description = "Floor: it's floor. ";
-            Seethrough = true;
+            Walkable = true;
+            MapLayer = Enums.MapLayer.FLOOR;
         }
     }
 }
