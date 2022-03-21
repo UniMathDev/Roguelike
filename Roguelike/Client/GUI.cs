@@ -31,6 +31,7 @@ namespace Roguelike.Client
             PrintInventory();
             PrintMap();
             PrintRevealCeilingButton();
+            EraseInventoryPopups();
 
             Console.SetCursorPosition(0, 0);
             Console.Write(_game.player.Health + " ");
@@ -131,6 +132,24 @@ namespace Roguelike.Client
                     }
                 }
             }
+        }
+        public void PrintFlash()
+        {
+            string[] final = new string[MapDisplaySize.Height];
+            for (int rowIndex = 0; rowIndex < MapDisplaySize.Height; rowIndex++)
+            {
+                StringBuilder row = new();
+                for (int columnIndex = 0; columnIndex < MapDisplaySize.Width; columnIndex++)
+                {
+                    row.Append("█");
+                }
+                final[rowIndex] = row.ToString();
+            }
+            Console.ForegroundColor = ConsoleColor.White;
+            PrintGUIElement(final,MapDisplayPosition.TopLeftPosX, MapDisplayPosition.TopLeftPosY);
+            Console.ResetColor();
+            System.Threading.Thread.Sleep(20);
+            PrintGame();
         }
         ///<summary>
         ///принимает координаты относительно буфера

@@ -5,7 +5,7 @@
         public Deadbody() : base()
         {
             Character = 'g';
-            Description = "Deadbody: Are you ok to search here?";
+            Description = "A dead person: I'm not sure if I want to get any closer. ";
         }
     }
 }
