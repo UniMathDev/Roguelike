@@ -69,12 +69,14 @@ namespace Roguelike.Engine
                 Walk(direction);
                 return;
             }
+
             bool success = false;
             if (TryMove(direction))
             {
                 success = true;
                 TryMove(direction);
             }
+
             if (success)
             {
                 player.Stamina -= PlayerStats.RunStaminaPenalty;
@@ -85,14 +87,12 @@ namespace Roguelike.Engine
         {
             if (player.CanMove(direction, map))
             {
-
                 player.Move(direction, map);
                 return true;
             }
             else
             {
                 return false;
-
             }
         }
         public void Interact(int X, int Y)
@@ -101,14 +101,14 @@ namespace Roguelike.Engine
             {
                 return;
             }
+
             ObjectOnMap obj = map.GetTopObjWithCoord(X, Y);
             object useWith = player.inventory.ActiveTool;
+
             if (player.NextTo(X,Y)) 
             {
                 if (obj is IUsable)
                 {
-                    playerTurnNumber++;
-
                     (obj as IUsable).TryUse(useWith);
 
                     OnPlayerTurnEnded();
@@ -124,8 +124,6 @@ namespace Roguelike.Engine
                     //GUI.displayObjectInventory((obj as ISearchable).Inventory,X,Y);
                     //по дальнейшему нажатию можно подобрать чтото определенное, но пока так:
                     //
-
-                    playerTurnNumber++;
 
                     List<InventoryObject> addedItems = new();
                     List<InventoryObject> itemsOnGround = (obj as ISearchable).Inventory;
@@ -154,8 +152,6 @@ namespace Roguelike.Engine
 
                 if (obj is LivingObject && !(obj is Player))
                 {
-                    playerTurnNumber++;
-
                     Monster monster = (obj as Monster);
                     Weapon weapon = player.inventory.ActiveWeapon;
                     if (weapon is MeleeWeapon || weapon == null)
@@ -170,9 +166,7 @@ namespace Roguelike.Engine
         }
         public void Wait()
         {
-
             OnPlayerTurnEnded();
-
         }
         public void TrySwitchActiveInventoryItem(int handIndex)
         {
@@ -208,8 +202,8 @@ namespace Roguelike.Engine
             player.inventory.RemoveFromInventory(iObj);
 
             OnPlayerTurnEnded();
-
         }
+
         public void UnpocketItem(int index)
         {
             InventoryObject iObj = player.inventory.Pockets[index];
@@ -218,7 +212,6 @@ namespace Roguelike.Engine
                 player.inventory.Pockets.RemoveAt(index);
 
                 OnPlayerTurnEnded();
-
             }
         }
         public void PocketItem(int index)
@@ -226,7 +219,6 @@ namespace Roguelike.Engine
             InventoryObject iObj = player.inventory.Hands[index];
             if (player.inventory.TryAddToPockets(iObj))
             {
-                playerTurnNumber++;
                 player.inventory.Hands[index] = null;
 
                 OnPlayerTurnEnded();
