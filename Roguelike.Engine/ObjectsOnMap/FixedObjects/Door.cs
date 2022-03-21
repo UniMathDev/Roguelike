@@ -1,4 +1,6 @@
-﻿namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
+﻿using Roguelike.GameConfig;
+
+namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
 {
     public class Door : FixedObject , IUsable
     {
@@ -25,13 +27,13 @@
 
             if (Walkable)
             {
-                GameLog.Add(GameConfig.LogMessages.DoorClosed);
+                GameLog.Add(LogMessages.DoorClosed);
                 Character = closedChar;
                 Walkable = false;
             }
             else
             {
-                GameLog.Add(GameConfig.LogMessages.DoorOpened);
+                GameLog.Add(LogMessages.DoorOpened);
                 Character = openedChar;
                 Walkable = true;
             }

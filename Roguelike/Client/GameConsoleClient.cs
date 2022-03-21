@@ -65,7 +65,7 @@ namespace Roguelike.Client
             InputManager.MouseMoved += OnMouseMove;
 
             _game.player.inventory.InventoryUpdated += OnInventoryUpdate;
-
+            _game.PlayerTookDamage += OnPlayerDamage;
             #region static UI buttons creation
             //ceiling reveal button
             {
@@ -291,6 +291,12 @@ namespace Roguelike.Client
                 }
             }
 
+        }
+
+        private void OnPlayerDamage()
+        {
+            _GUI.PrintFlash(ConsoleColor.DarkRed);
+            _GUI.PrintGame();
         }
 
         /// <summary>

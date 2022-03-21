@@ -8,14 +8,14 @@ namespace Roguelike.Engine.ObjectsOnMap
     public class Player : LivingObject, IUsable
     {
         public PlayerInventory inventory = new PlayerInventory();
-        public float Stamina { get; set; } = GameConfig.PlayerStats.MaxStamina;
+        public float Stamina { get; set; } = PlayerStats.MaxStamina;
         public int FOVSize { get; set; }
         public Player(int x, int y, int fovSize)
         {
             Character = '@';
             ForegroundColor = ConsoleColor.Green;
             Description = "Me: this is me. ";
-            Health = GameConfig.PlayerStats.MaxHealth;
+            Health = PlayerStats.MaxHealth;
             X = x;
             Y = y;
             FOVSize = fovSize;
@@ -25,17 +25,7 @@ namespace Roguelike.Engine.ObjectsOnMap
 
         public UseCallBack TryUse(object useWith)
         {
-            if(useWith is Bandage && Health < GameConfig.PlayerStats.MaxHealth)
-            {
-                Health = MathF.Min(Health + Bandage.HealAmount, PlayerStats.MaxHealth);
-                return new UseCallBack(true, true);
-            }
-            return new UseCallBack(false, false);
-        }
-
-        public UseCallBack TryUse(object useWith)
-        {
-            if(useWith is Bandage && Health < GameConfig.PlayerStats.MaxHealth)
+            if(useWith is Bandage && Health < PlayerStats.MaxHealth)
             {
                 Health = MathF.Min(Health + Bandage.HealAmount, PlayerStats.MaxHealth);
                 return new UseCallBack(true, true);
@@ -47,7 +37,7 @@ namespace Roguelike.Engine.ObjectsOnMap
     {
         public Action InventoryUpdated;
         public List<InventoryObject> Pockets { get; private set; } = new List<InventoryObject>();
-        private int RemainingPocketSpace = GameConfig.PlayerStats.PocketSize;
+        private int RemainingPocketSpace = PlayerStats.PocketSize;
         public InventoryObject[] Hands { get; private set; } = new InventoryObject[2];
         public Weapon ActiveWeapon { get; private set; }
         public InventoryObject ActiveTool { get; private set; }

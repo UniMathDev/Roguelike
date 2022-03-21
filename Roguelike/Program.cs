@@ -27,7 +27,7 @@ namespace Roguelike
 
         static void Main(string[] args)
         {
-            Console.SetWindowSize(100, 20); //-->
+            //Console.SetWindowSize(100, 20); //-->
             // -->более подходящий
 
             /*

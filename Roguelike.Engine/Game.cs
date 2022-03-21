@@ -21,6 +21,8 @@ namespace Roguelike.Engine
 
         public int playerTurnNumber { get; private set; }
 
+        public Action PlayerTookDamage;
+
         public Game(Map map, Player player)
         {
             this.map = map;
@@ -296,7 +298,7 @@ namespace Roguelike.Engine
         }
         private void HitMonster(Monster monster, MeleeWeapon weapon)
         {
-            float damageAmount = GameConfig.PlayerStats.FistDamage;
+            float damageAmount = PlayerStats.FistDamage;
 
             if (weapon != null)
             {
@@ -327,12 +329,17 @@ namespace Roguelike.Engine
         }
         private void OnPlayerTurnEnded()
         {
+            float oldPlayerHealth = player.Health;
             playerTurnNumber++;
 
             UpdateFOV();
             player.Stamina = MathF.Min(player.Stamina + PlayerStats.EndOfTurnStaminaGain,
                                        PlayerStats.MaxStamina);
             monsterManager.OnPlayerTurnEnded(playerTurnNumber);
+            if(oldPlayerHealth > player.Health)
+            {
+                PlayerTookDamage.Invoke();
+            }
         }
     }
 }

@@ -25,6 +25,7 @@ namespace Roguelike.Client
             _game = game;
             Console.CursorVisible = false;
             Console.OutputEncoding = Encoding.Unicode;
+            Console.SetWindowSize(WindowSize.Width, WindowSize.Height);
         }
 
         public void PrintGame()
@@ -216,7 +217,7 @@ namespace Roguelike.Client
                 }
             }
         }
-        public void PrintFlash()
+        public void PrintFlash(ConsoleColor color)
         {
             string[] final = new string[MapDisplaySize.Height];
             for (int rowIndex = 0; rowIndex < MapDisplaySize.Height; rowIndex++)
@@ -228,10 +229,10 @@ namespace Roguelike.Client
                 }
                 final[rowIndex] = row.ToString();
             }
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ForegroundColor = color;
             PrintGUIElement(final,MapDisplayPosition.TopLeftPosX, MapDisplayPosition.TopLeftPosY);
             Console.ResetColor();
-            System.Threading.Thread.Sleep(20);
+            System.Threading.Thread.Sleep(50);
             PrintGame();
         }
         ///<summary>
