@@ -39,9 +39,13 @@ namespace Roguelike.Client
             PrintRevealCeilingButton();
 
             Console.SetCursorPosition(0, 0);
-            Console.Write(_game.player.Health + "  ");
+
+            Console.Write("Health: " + _game.player.Health + "  ");
             Console.SetCursorPosition(0, 1);
-            Console.Write(_game.player.Stamina + "  ");
+            Console.Write("Stamina: " + _game.player.Stamina + "  ");
+            Console.SetCursorPosition(0, 2);
+            Console.Write("Turn number: " + _game.playerTurnNumber + " ");
+
         }
 
         private void PrintRevealCeilingButton()
@@ -49,7 +53,7 @@ namespace Roguelike.Client
             int X = CeilingRevealButton.X;
             int Y = CeilingRevealButton.Y;
             Console.SetCursorPosition(X, Y);
-            if (!_game._map.ShowCeiling)
+            if (!_game.map.ShowCeiling)
             {
                 Console.BackgroundColor = ConsoleColor.DarkGray;
                 Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -135,9 +139,9 @@ namespace Roguelike.Client
                 for (int x = 0; x < MapDisplaySize.Width; x++)
                 {
                     Point mapCoord = CameraToMapPos(x, y);
-                    if (_game._map.WithinBounds(mapCoord.X, mapCoord.Y))
+                    if (_game.map.WithinBounds(mapCoord.X, mapCoord.Y))
                     {
-                        ObjectOnMap objectOnMap = _game._map.GetTopObjWithCoord(mapCoord.X, mapCoord.Y);
+                        ObjectOnMap objectOnMap = _game.map.GetTopObjWithCoord(mapCoord.X, mapCoord.Y);
 
                         (objectOnMap as IDrawable).Write();
                     }
@@ -170,10 +174,10 @@ namespace Roguelike.Client
             Point absolutePoint = BufferToMapPos(X, Y);
             string description;
 
-            if (_game._map.WithinBounds(absolutePoint.X, absolutePoint.Y))
+            if (_game.map.WithinBounds(absolutePoint.X, absolutePoint.Y))
             {
                 description = 
-                    _game._map.GetTopObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;   
+                    _game.map.GetTopObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;   
                 PrintDescriptionBox(description);
             }
         }
@@ -204,7 +208,7 @@ namespace Roguelike.Client
             }
 
             Point onMap = BufferToMapPos(X, Y);
-            ObjectOnMap obj = _game._map.GetTopObjWithCoord(onMap.X, onMap.Y);
+            ObjectOnMap obj = _game.map.GetTopObjWithCoord(onMap.X, onMap.Y);
 
             if (!(obj is InventoryObjectOnGround))
             {

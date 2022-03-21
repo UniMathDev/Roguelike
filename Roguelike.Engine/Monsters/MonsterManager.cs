@@ -17,6 +17,9 @@ namespace Roguelike.Engine.Monsters
         private Pathfinder _pathfinder;
 
         private Player _player;
+
+        private int _playerTurnNumber;
+
         public MonsterManager(Map map, Player player)
         {
             _player = player;
@@ -24,13 +27,16 @@ namespace Roguelike.Engine.Monsters
             monsterList = new List<Monster>();
             _pathfinder = new Pathfinder(map);
             eggList = FindEggs(map);
+            _playerTurnNumber = 0;
         }
 
-        public void OnPlayerTurnEnded()
+        public void OnPlayerTurnEnded(int moveNumber)
         {
+            _playerTurnNumber = moveNumber;
             ActWithMonsters();
             GrowEggs();
         }
+
         private void ActWithMonsters()
         {
             if (monsterList.Count == 0)
@@ -51,6 +57,7 @@ namespace Roguelike.Engine.Monsters
             }
 
         }
+
         private void GrowEggs()
         {
             if (eggList.Count == 0)
@@ -77,9 +84,9 @@ namespace Roguelike.Engine.Monsters
             }
 
         }
+
         private List<Egg> FindEggs(Map map)
         {
-            //кайффф xdddddddddddddddd
             List<Egg> foundEggs = new();
             for (int i = 0; i < 4; i++)
             {
@@ -100,12 +107,14 @@ namespace Roguelike.Engine.Monsters
 
         private void MoveTowardPlayer(Monster monster)
         {
-            Direction moveDirection = _pathfinder.FindWay(monster.coordinates, _player.coordinates);
+            Direction moveDirection = _pathfinder.FindWay(monster.coordinates,
+                _player.coordinates, _playerTurnNumber);
             if (monster.CanMove(moveDirection, _map))
             {
                 monster.Move(moveDirection, _map);
             }
         }
+
         private void OnMonsterDeath(LivingObject m)
         {
             Monster monster = m as Monster;

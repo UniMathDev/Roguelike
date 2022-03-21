@@ -13,18 +13,21 @@ namespace Roguelike.Engine
 {
     public class Game
     {
-        public Map _map { get; }
+        public Map map { get; }
 
         public Player player { get; }
 
-        public MonsterManager _monsterManager { get; }
+        public MonsterManager monsterManager { get; }
+
+        public int playerTurnNumber { get; private set; }
         
         public Game(Map map, Player player)
         {
-            _map = map;
+            this.map = map;
             this.player = player;
             player.OnDeath += OnPlayerDeath;
-            _monsterManager = new(map,player);
+            monsterManager = new(map,player);
+            playerTurnNumber = 1;    
 
             //TESTING GROUND ITEMS
             Wardrobe obj = new Wardrobe();
@@ -45,7 +48,7 @@ namespace Roguelike.Engine
 
             //TESTING LAMPS ITEMS
             Lamp lamp = new();
-            _map.SetObjWithCoord(13,5,lamp);
+            this.map.SetObjWithCoord(13,5, lamp);
 
 
             //
@@ -80,34 +83,39 @@ namespace Roguelike.Engine
         }
         private bool TryMove(Direction direction)
         {
-            if (player.CanMove(direction, _map))
+            if (player.CanMove(direction, map))
             {
+
                 player.Move(direction, _map);
                 return true;
             }
             else
             {
                 return false;
+
             }
         }
         public void Interact(int X, int Y)
         {
-            if (!_map.WithinBounds(X, Y))
+            if (!map.WithinBounds(X, Y))
             {
                 return;
             }
-            ObjectOnMap obj = _map.GetTopObjWithCoord(X, Y);
+            ObjectOnMap obj = map.GetTopObjWithCoord(X, Y);
             object useWith = player.inventory.ActiveTool;
             if (player.NextTo(X,Y)) 
             {
                 if (obj is IUsable)
                 {
+                    playerTurnNumber++;
+
                     (obj as IUsable).TryUse(useWith);
 
                     OnPlayerTurnEnded();
                     player.inventory.SetActiveInventoryToolToNull();
                     return;
                 }
+
                 player.inventory.SetActiveInventoryToolToNull();
                 if (obj is ISearchable)
                 {
@@ -116,8 +124,12 @@ namespace Roguelike.Engine
                     //GUI.displayObjectInventory((obj as ISearchable).Inventory,X,Y);
                     //по дальнейшему нажатию можно подобрать чтото определенное, но пока так:
                     //
+
+                    playerTurnNumber++;
+
                     List<InventoryObject> addedItems = new();
                     List<InventoryObject> itemsOnGround = (obj as ISearchable).Inventory;
+
                     foreach (InventoryObject item in itemsOnGround)
                     {
                         if (player.inventory.TryAddToInventory(item))
@@ -128,7 +140,7 @@ namespace Roguelike.Engine
 
                     if (addedItems.Count == itemsOnGround.Count)
                     {
-                        _map.SetObjWithCoordToNull(X,Y, new InventoryObjectOnGround().MapLayer);
+                        map.SetObjWithCoordToNull(X,Y, new InventoryObjectOnGround().MapLayer);
                     }
 
                     foreach (var item in addedItems)
@@ -139,8 +151,11 @@ namespace Roguelike.Engine
                     OnPlayerTurnEnded();
                     return;
                 }
+
                 if (obj is LivingObject && !(obj is Player))
                 {
+                    playerTurnNumber++;
+
                     Monster monster = (obj as Monster);
                     Weapon weapon = player.inventory.ActiveWeapon;
                     if (weapon is MeleeWeapon || weapon == null)
@@ -155,7 +170,9 @@ namespace Roguelike.Engine
         }
         public void Wait()
         {
+
             OnPlayerTurnEnded();
+
         }
         public void TrySwitchActiveInventoryItem(int handIndex)
         {
@@ -177,19 +194,21 @@ namespace Roguelike.Engine
                 iObj = player.inventory.Pockets[index];
             }
             ObjectOnMap objUnderPlayer =
-                _map.GetObjWithCoord(player.X, player.Y, MapLayer.SECONDARY);
+                map.GetObjWithCoord(player.X, player.Y, MapLayer.SECONDARY);
             if (objUnderPlayer == null)
             {
                 InventoryObjectOnGround newInvObjOnGround = new();
                 (newInvObjOnGround as ISearchable).Inventory.Add(iObj);
-                _map.SetObjWithCoord(player.X, player.Y, newInvObjOnGround);
+                map.SetObjWithCoord(player.X, player.Y, newInvObjOnGround);
             }
             else if (objUnderPlayer is InventoryObjectOnGround)
             {
                 (objUnderPlayer as ISearchable).Inventory.Add(iObj);
             }
             player.inventory.RemoveFromInventory(iObj);
+
             OnPlayerTurnEnded();
+
         }
         public void UnpocketItem(int index)
         {
@@ -197,7 +216,9 @@ namespace Roguelike.Engine
             if (player.inventory.TryAddToHands(iObj))
             {
                 player.inventory.Pockets.RemoveAt(index);
+
                 OnPlayerTurnEnded();
+
             }
         }
         public void PocketItem(int index)
@@ -205,8 +226,11 @@ namespace Roguelike.Engine
             InventoryObject iObj = player.inventory.Hands[index];
             if (player.inventory.TryAddToPockets(iObj))
             {
+                playerTurnNumber++;
                 player.inventory.Hands[index] = null;
+
                 OnPlayerTurnEnded();
+
             }
         }
         private void OnPlayerDeath(LivingObject player)
@@ -225,7 +249,7 @@ namespace Roguelike.Engine
                 if (knockedBack)
                 {
                     Point coordDiff = new(monster.X - player.X, monster.Y - player.Y);
-                    monster.Move(GameMath.CoordDiffToDirection(coordDiff), _map);
+                    monster.Move(GameMath.CoordDiffToDirection(coordDiff), map);
                 }
                 weapon.Durability -= 1;
                 if(weapon.Durability <= 0)
@@ -248,7 +272,7 @@ namespace Roguelike.Engine
         {
             player.Stamina = MathF.Min(player.Stamina + PlayerStats.EndOfTurnStaminaGain,
                                        PlayerStats.MaxStamina);
-            _monsterManager.OnPlayerTurnEnded();
+            _monsterManager.OnPlayerTurnEnded(playerTurnNumber);
         }
     }
 }

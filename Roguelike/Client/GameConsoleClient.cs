@@ -40,6 +40,7 @@ namespace Roguelike.Client
             _keyboardMenu = new Dictionary<ConsoleKey, GameMenuItem>();
             _keyboardMenu.Add(ConsoleKey.Escape, new GameMenuItem(Exit));
             _keyboardMenu.Add(ConsoleKey.NumPad0, new GameMenuItem(OnWaitButtonPress));
+            _keyboardMenu.Add(ConsoleKey.D0, new GameMenuItem(OnWaitButtonPress));
 
             #region _directionKeys assignment
             _directionKeys = new Dictionary<ConsoleKey, Direction>();
@@ -69,7 +70,7 @@ namespace Roguelike.Client
             {
                 Action leftClickAction = () =>
                 {
-                    _game._map.ShowCeiling = !_game._map.ShowCeiling;
+                    _game.map.ShowCeiling = !_game.map.ShowCeiling;
                 };
                 int X = CeilingRevealButton.X;
                 int Y = CeilingRevealButton.Y;
