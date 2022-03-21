@@ -34,7 +34,7 @@ namespace Roguelike.Engine
             //TESTING GROUND ITEMS
             Wardrobe obj = new Wardrobe();
             map.SetObjWithCoord(18, 2, obj);
-            (obj as ISearchable).Inventory.Add(new Bandage());
+            (obj as ISearchable).Inventory.Add(new Axe());
 
             InventoryObjectOnGround obj2 = new InventoryObjectOnGround();
             map.SetObjWithCoord(15, 4, obj2);
