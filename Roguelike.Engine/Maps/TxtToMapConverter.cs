@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System;
 using Roguelike.Engine.InventoryObjects;
+using System.Collections.Generic;
 
 namespace Roguelike.Engine.Maps
 {
@@ -62,6 +63,8 @@ namespace Roguelike.Engine.Maps
             using var sr = new StreamReader(@"..\..\..\..\Maps\LootMap.txt", Encoding.UTF8);
             int[,] LootMap = new int[height, width];
 
+            var ElementToSripts = new Loot();
+
             string[] lootMapInStrings = sr.ReadToEnd().Split('\n');
             for (int y = 0; y < height; y++)
             {
@@ -79,94 +82,18 @@ namespace Roguelike.Engine.Maps
                         throw new ArgumentException("Error in converting from LootMap");
                     }
 
-                    //foreach ( ... i in CreateLoot(.../numberOfScript))
+                    if (numberOfScript != 0)
                     {
-
+                        List<InventoryObject> FinalItems = ElementToSripts.CreateLoot(numberOfScript);
+                        foreach (var i in FinalItems)
+                        {
+                            (mapCells[y, x].Layers[1] as ISearchable).Inventory.Add(i);
+                        }
                     }
-                    /*
-                    if (numberOfScript == 1) //Max Weapon
-                    {
-                        //bool knockedBack = weapon.KnockBackChance - (float)GameMath.rand.NextDouble() >= 0f;
-                        (mapCells[y, x].Layers[1] as ISearchable).Inventory.Add(new Axe());
-                        (mapCells[y, x].Layers[1] as ISearchable).Inventory.Add(new Pen());
-                        (mapCells[y, x].Layers[1] as ISearchable).Inventory.Add(new KitchenKnife());
-                    }
-                    else if (numberOfScript == 2) //Канцелярия, рабочее место, и т.д.
-                    {
-                        (mapCells[y, x].Layers[1] as ISearchable).Inventory.Add(new Pen());
-                        (mapCells[y, x].Layers[1] as ISearchable).Inventory.Add(new Pen());
-                        (mapCells[y, x].Layers[1] as ISearchable).Inventory.Add(new Pen());
-                        (mapCells[y, x].Layers[1] as ISearchable).Inventory.Add(new Pen());
-                        (mapCells[y, x].Layers[1] as ISearchable).Inventory.Add(new Pen());
-                        (mapCells[y, x].Layers[1] as ISearchable).Inventory.Add(new LightBulb());
-                    }
-                    else if (numberOfScript == 3)
-                    {
-
-                    }
-                    */
-                    //массив скриптов
-                    /*
-                    Type typeOfObject = mapCells[y, x].Layers[1].GetType();
-                    switch (typeOfObject)
-                    {
-                        case Wardrobe:// ---> не может обработать?
-                            // ---> вызов функции-оборотня, но тогда пропадет проверка на соответствие!!!
-
-                            break;
-                        case Deadbody:
-                            //
-                            break;
-                        case Fridge:
-                            //
-                            break;
-                        case Hanger:
-                            //
-                            break;
-                        case Screen:
-                            //
-                            break;
-                        case CenterOfTable:
-                            //
-                            break;
-                    }
-                    */
-
-                    /*
-                    //сделать отдельной функцией
-                    Type typeOfObject = mapCells[y, x].Layers[1].GetType();
-                    if (typeOfObject == typeof(Wardrobe))
-                    {
-
-                    }
-                    else if (typeOfObject == typeof(Deadbody))
-                    {
-
-                    }
-                    else if (typeOfObject == typeof(Fridge))
-                    {
-
-                    }
-                    else if (typeOfObject == typeof(Hanger))
-                    {
-
-                    }
-                    else if (typeOfObject == typeof(Screen))
-                    {
-
-                    }
-                    else if (typeOfObject == typeof(CenterOfTable))
-                    {
-
-                    }
-                    else
-                    {
-
-                    }
-                    */
 
                 }
             }
+
         }
 
     }

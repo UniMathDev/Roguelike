@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Roguelike.Engine.InventoryObjects
 {
-    class Class1
+    public class Eat: InventoryObject
     {
+        public Eat()
+        {
+
+        }
     }
 }

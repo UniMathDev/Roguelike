@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Roguelike.Engine.InventoryObjects
 {
-    class Bandage : InventoryObject
+    public class Bandage : InventoryObject
     {
-        Bandage()
+        public Bandage()
         {
 
         }
