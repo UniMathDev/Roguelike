@@ -5,7 +5,7 @@
         public Screen() : base()
         {
             Character = 'D';
-            Description = "Screen: information also can be a weapon.";
+            Description = "Screen: For showing boring presentations. ";
             Seethrough = false;
         }
     }

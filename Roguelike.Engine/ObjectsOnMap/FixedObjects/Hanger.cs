@@ -5,7 +5,7 @@
         public Hanger() : base()
         {
             Character = 'Y';
-            Description = "Hanger: may be you can find something in pockets.";
+            Description = "Hanger: Could be something useful in the pockets. ";
         }
     }
 }

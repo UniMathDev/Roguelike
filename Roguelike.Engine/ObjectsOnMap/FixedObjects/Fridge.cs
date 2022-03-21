@@ -5,7 +5,7 @@
         public Fridge() : base()
         {
             Character = 'N';
-            Description = "Fridge: hope is a good breakfast, but a bad supper.";
+            Description = "Fridge: I'm not hungry right now. ";
             Seethrough = false;
         }
     }

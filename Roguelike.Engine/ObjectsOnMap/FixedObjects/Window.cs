@@ -5,7 +5,7 @@
         public Window() : base()
         {
             Character = 'I';
-            Description = "Window: hello, world!";
+            Description = "Window: hello, world! ";
             Seethrough = true;
         }
     }

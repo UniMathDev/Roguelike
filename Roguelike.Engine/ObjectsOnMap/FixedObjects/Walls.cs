@@ -5,7 +5,7 @@
         protected Wall(char character) : base()
         {
             Character = character;
-            Description = "Wall: a boring white wall. I guess you can spit on it for entertainment.";
+            Description = "Wall: a boring white wall. I guess I can spit on it for entertainment. ";
             Seethrough = false;
         }
     }

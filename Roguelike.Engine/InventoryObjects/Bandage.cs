@@ -8,7 +8,8 @@ namespace Roguelike.Engine.InventoryObjects
 {
     class Bandage : InventoryObject
     {
-        Bandage()
+        public static float HealAmount = 20;
+        public Bandage()
         {
             Size = 1;
             TwoHanded = false;

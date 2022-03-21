@@ -31,6 +31,7 @@ namespace Roguelike.Client
             Map map = TxtToMapConverter.ConvertToArrayMap(@"..\..\..\..\Maps\Maps.txt", MapSize.Height, MapSize.Width);
             Player player = new(PlayerInitCoords.X, PlayerInitCoords.Y);
             map.SetObjWithCoord(PlayerInitCoords.X, PlayerInitCoords.Y, player);
+            GameLog.Start();
             _game = new(map, player);
             _GUI = new(_game);
             _buttonManager = new();
@@ -122,11 +123,11 @@ namespace Roguelike.Client
             }
 
             //try print ground item list
-            if (_GUI.PrintGroundItemList(m.X, m.Y) && !drewGroundItemListLastMouseMove)
+            if (_GUI.PrintLootableItemList(m.X, m.Y) && !drewGroundItemListLastMouseMove)
             {
                 drewGroundItemListLastMouseMove = true;
             }
-            else if(!_GUI.PrintGroundItemList(m.X, m.Y) && drewGroundItemListLastMouseMove)
+            else if(!_GUI.PrintLootableItemList(m.X, m.Y) && drewGroundItemListLastMouseMove)
             {
                 drewGroundItemListLastMouseMove = false;
                 _GUI.PrintGame();

@@ -5,7 +5,7 @@
         protected Table(char character) : base()
         {
             Character = character;
-            Description = "Table: a great pleace to keep something important.";
+            Description = "Table: many important things are stored here. ";
         }
     }
     class CenterOfTable : Table

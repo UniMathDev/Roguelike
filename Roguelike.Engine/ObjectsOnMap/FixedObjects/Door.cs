@@ -16,24 +16,27 @@
             MapLayer = Enums.MapLayer.SECONDARY;
         }
         
-        public bool TryUse(object input)
+        public UseCallBack TryUse(object input)
         {
             if (input != null)
             {
-                return false;
+                return new UseCallBack(false,false);
             }
 
             if (Walkable)
             {
+                GameLog.Add(GameConfig.LogMessages.DoorClosed);
                 Character = closedChar;
                 Walkable = false;
             }
             else
             {
+                GameLog.Add(GameConfig.LogMessages.DoorOpened);
                 Character = openedChar;
                 Walkable = true;
             }
-            return true;
+
+            return new UseCallBack(true, false); ;
         }
         
     }

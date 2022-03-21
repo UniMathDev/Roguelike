@@ -5,7 +5,7 @@
         protected Toilet(char character) : base()
         {
             Character = character;
-            Description = "Toilet: do you want to drink?";
+            Description = "Toilet: I'm not THAT thirsty for now. ";
         }
     }
     class FirstPartOfToilet : Toilet

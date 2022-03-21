@@ -8,7 +8,7 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
         public Wardrobe() : base()
         {
             Character = '█';
-            Description = "Wardrobe: in addition to someone else's underwear, you can find something useful here.";
+            Description = "Wardrobe: Guess I could find something useful here. ";
             Seethrough = false;
         }
 

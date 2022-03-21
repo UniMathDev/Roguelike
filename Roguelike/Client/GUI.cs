@@ -37,15 +37,55 @@ namespace Roguelike.Client
             PrintInventory();
             PrintMap();
             PrintRevealCeilingButton();
+            PrintStatusBar(StatusBars.X, StatusBars.Y,
+                StatusBars.Length, ConsoleColor.DarkRed, _game.player.Health, PlayerStats.MaxHealth);
+            PrintStatusBar(StatusBars.X, StatusBars.Y + 1,
+                StatusBars.Length, ConsoleColor.DarkGray, _game.player.Stamina, PlayerStats.MaxStamina);
+            PrintLogBox();
 
             Console.SetCursorPosition(0, 0);
 
-            Console.Write("Health: " + _game.player.Health + "  ");
-            Console.SetCursorPosition(0, 1);
-            Console.Write("Stamina: " + _game.player.Stamina + "  ");
             Console.SetCursorPosition(0, 2);
             Console.Write("Turn number: " + _game.playerTurnNumber + " ");
 
+        }
+        private void PrintLogBox()
+        {
+            int X = LogBox.X;
+            int Y = LogBox.Y;
+            Console.SetCursorPosition(X,Y);
+            Console.Write(LogBox.String[0]);
+            for (int i = 0; i < GameLog.logLength; i++)
+            {
+                Console.SetCursorPosition(X + 1, Y + 1 + i);
+                string message = GameLog.Messages[i];
+                string filler = "                                                      " +
+                    "                                                             ".Substring
+                    (0, LogBox.String[0].Length - message.Length);
+                Console.Write(message + filler);
+            }
+            Console.SetCursorPosition(X, Y + 1 + GameLog.logLength);
+            Console.Write(LogBox.String[2]);
+
+        }
+        private void PrintStatusBar(int X, int Y, int length, ConsoleColor FGcolour, float value, float maxValue)
+        {
+            int actualLength = (int)(value / maxValue * length);
+            StringBuilder builder = new();
+            builder.Append('.');
+            for (int i = 1; i < actualLength; i++)
+            {
+                builder.Append('_');
+            }
+            for (int i = 0; i < length - actualLength; i++)
+            {
+                builder.Append(' ');
+            }
+            builder.Append('.');
+            Console.SetCursorPosition(X,Y);
+            Console.ForegroundColor = FGcolour;
+            Console.Write(builder.ToString());
+            Console.ResetColor();
         }
 
         private void PrintRevealCeilingButton()
@@ -199,8 +239,7 @@ namespace Roguelike.Client
             PrintGUIElement(SnippedDesc, DescriptionBoxX + DescriptionBox.textStartOffsetX,
                 DescriptionBoxY + DescriptionBox.textStartOffsetY);
         }
-
-        public bool PrintGroundItemList(int X, int Y)
+        public bool PrintLootableItemList(int X, int Y)
         {
             if (!BufferPosInsideDisplayArea(X, Y))
             {
@@ -210,14 +249,14 @@ namespace Roguelike.Client
             Point onMap = BufferToMapPos(X, Y);
             ObjectOnMap obj = _game.map.GetTopObjWithCoord(onMap.X, onMap.Y);
 
-            if (!(obj is InventoryObjectOnGround))
+            if ((!(obj is ISearchable)) || ((obj as ISearchable).Inventory.Count == 0))
             {
                 return false;
             }
 
             List<string> itemsWindow = new();
             itemsWindow.Add(ItemListBox.String[0]);
-            int itemCount = (obj as InventoryObjectOnGround).Inventory.Count;
+            int itemCount = (obj as ISearchable).Inventory.Count;
 
             for (int i = 0; i < itemCount; i++)
             {
@@ -252,7 +291,7 @@ namespace Roguelike.Client
                 windowPosition.X, windowPosition.Y + 1);
 
             List<string> itemNames = new();
-            foreach (var inv in (obj as InventoryObjectOnGround).Inventory)
+            foreach (var inv in (obj as ISearchable).Inventory)
             {
                 string name = inv.Description.Split(":")[0];
                 itemNames.Add(name);
@@ -263,7 +302,6 @@ namespace Roguelike.Client
             Console.BackgroundColor = ConsoleColor.Black;
             return true;
         }
-
         public void PrintHandPopupMenu(int handIndex)
         {
            
@@ -334,7 +372,6 @@ namespace Roguelike.Client
             output.Y = Y + MapDisplayPosition.TopLeftPosY;
             return output;
         }
-
 
         public Point CameraToMapPos(int X, int Y)
         {

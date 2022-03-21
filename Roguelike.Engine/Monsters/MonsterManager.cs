@@ -3,6 +3,7 @@ using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
 using Roguelike.Engine.ObjectsOnMap.FixedObjects;
 using Roguelike.Engine.ObjectsOnMap;
+using Roguelike.GameConfig;
 
 namespace Roguelike.Engine.Monsters
 {
@@ -48,7 +49,8 @@ namespace Roguelike.Engine.Monsters
             {
                 if (monster.NextTo(_player.X, _player.Y))
                 {
-                    _player.Damage(10f);
+                    GameLog.Add(LogMessages.DamageTakenFromMonster);
+                    _player.Damage(MonsterDamage.Value);
                 }
                 else
                 {

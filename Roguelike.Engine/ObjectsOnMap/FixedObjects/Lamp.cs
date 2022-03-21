@@ -10,14 +10,14 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
         {
             Character = 'o';
             ForegroundColor = ConsoleColor.Yellow;
-            Description = "Bright power saving lamp";
+            Description = "Lamp: Bright power saving lamp. ";
             MapLayer = Enums.MapLayer.CEILING;
             Walkable = true;
         }
-        public bool TryUse(object obj)
+        public UseCallBack TryUse(object obj)
         {
             //if a lamp was given then put HasBulb to true;
-            return false;
+            return new UseCallBack();
         }
     }
 }
