@@ -86,7 +86,7 @@ namespace Roguelike.Engine
             if (player.CanMove(direction, map))
             {
 
-                player.Move(direction, _map);
+                player.Move(direction, map);
                 return true;
             }
             else
@@ -270,9 +270,10 @@ namespace Roguelike.Engine
         }
         private void OnPlayerTurnEnded()
         {
+            playerTurnNumber++;
             player.Stamina = MathF.Min(player.Stamina + PlayerStats.EndOfTurnStaminaGain,
                                        PlayerStats.MaxStamina);
-            _monsterManager.OnPlayerTurnEnded(playerTurnNumber);
+            monsterManager.OnPlayerTurnEnded(playerTurnNumber);
         }
     }
 }
