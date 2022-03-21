@@ -158,7 +158,7 @@
             "|        ",
         };
     }
-    public class PocketInventoryDeleter
+    public class PocketInventoryDeleter : GUIElement
     {
         new public static readonly string[] String = new string[10]
         {
