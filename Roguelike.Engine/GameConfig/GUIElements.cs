@@ -177,18 +177,19 @@
     }
     public class StartScreen : GUIElement
     {
-        new public static readonly string[] String = new string[16]
+        new public static readonly string[] String = new string[17]
        {
             @"                                                                       ",
             @"                                                                      ",
             @"                                                                            ",
             @"              M O U S E                       K E Y B O A R D                  ",
             @"                 ___                                                         ",
-            @"    attack/use> /_|_\ <inspect             numpad 1-9  -  move             ",
+            @"    attack/use> /_|_\ <inspect             numpad 1-9  -  move                ",
             @"               |     |                        or                        ",
-            @"               |     |                     arrow keys                  ",
-            @"                \___/                      shift       -  run           ",
-            @"                                           numpad 0    -  wait        ",
+            @"               |     |                     arrow keys                    ",
+            @"                \___/                      alt         -  run                ",
+            @"                                           numpad 0    -  wait to restore       ",
+            @"                                                          stamina          ",
             @"                                           esc         -  exit           ",
             @"                                                                       ",
             @"                                                                       ",
@@ -198,5 +199,11 @@
        };
         public const int X = 0;
         public const int Y = 0;
+    }
+    public class StatusBars : GUIElement
+    {
+        public const int X = 10;
+        public const int Y = 15;
+        public const int Length = 30;
     }
 }

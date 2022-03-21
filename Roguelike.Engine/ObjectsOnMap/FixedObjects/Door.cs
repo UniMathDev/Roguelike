@@ -16,11 +16,11 @@
             MapLayer = Enums.MapLayer.SECONDARY;
         }
         
-        public bool TryUse(object input)
+        public UseCallBack TryUse(object input)
         {
             if (input != null)
             {
-                return false;
+                return new UseCallBack(false,false);
             }
 
             if (Walkable)
@@ -33,7 +33,7 @@
                 Character = openedChar;
                 Walkable = true;
             }
-            return true;
+            return new UseCallBack(true, false); ;
         }
         
     }

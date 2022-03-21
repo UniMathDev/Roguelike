@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System;
 using Roguelike.Engine.InventoryObjects;
+using Roguelike.GameConfig;
 
 namespace Roguelike.Engine.ObjectsOnMap
 {
-    public class Player : LivingObject
+    public class Player : LivingObject, IUsable
     {
         public PlayerInventory inventory = new PlayerInventory();
         public float Stamina { get; set; } = GameConfig.PlayerStats.MaxStamina;
@@ -16,6 +17,16 @@ namespace Roguelike.Engine.ObjectsOnMap
             Health = GameConfig.PlayerStats.MaxHealth;
             X = x;
             Y = y;
+        }
+
+        public UseCallBack TryUse(object useWith)
+        {
+            if(useWith is Bandage && Health < GameConfig.PlayerStats.MaxHealth)
+            {
+                Health = MathF.Min(Health + Bandage.HealAmount, PlayerStats.MaxHealth);
+                return new UseCallBack(true, true);
+            }
+            return new UseCallBack(false, false);
         }
     }
     public class PlayerInventory

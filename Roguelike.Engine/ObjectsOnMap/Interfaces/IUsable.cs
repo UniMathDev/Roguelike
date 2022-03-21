@@ -2,12 +2,12 @@
 {
     public interface IUsable : IChangeAble
     {
-        public bool TryUse(object useWith);
+        public UseCallBack TryUse(object useWith);
     }
     public struct UseCallBack
     {
-        public readonly bool Success;
-        public readonly bool ItemUsedUp;
+        public bool Success;
+        public bool ItemUsedUp;
         public UseCallBack(bool success, bool itemUsedUp)
         {
             Success = success;

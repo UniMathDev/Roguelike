@@ -32,7 +32,7 @@ namespace Roguelike.Engine
             //TESTING GROUND ITEMS
             Wardrobe obj = new Wardrobe();
             map.SetObjWithCoord(18, 2, obj);
-            (obj as ISearchable).Inventory.Add(new Axe());
+            (obj as ISearchable).Inventory.Add(new Bandage());
 
             InventoryObjectOnGround obj2 = new InventoryObjectOnGround();
             map.SetObjWithCoord(15, 4, obj2);
@@ -105,12 +105,19 @@ namespace Roguelike.Engine
             ObjectOnMap obj = map.GetTopObjWithCoord(X, Y);
             object useWith = player.inventory.ActiveTool;
 
-            if (player.NextTo(X,Y)) 
+            if (player.NextTo(X, Y)) 
             {
                 if (obj is IUsable)
                 {
-                    (obj as IUsable).TryUse(useWith);
-
+                    UseCallBack callback = (obj as IUsable).TryUse(useWith);
+                    if (callback.ItemUsedUp) 
+                    {
+                        player.inventory.RemoveFromInventory(useWith as InventoryObject); 
+                    }
+                    if (!callback.Success)
+                    {
+                        //log
+                    }
                     OnPlayerTurnEnded();
                     player.inventory.SetActiveInventoryToolToNull();
                     return;

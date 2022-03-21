@@ -37,6 +37,10 @@ namespace Roguelike.Client
             PrintInventory();
             PrintMap();
             PrintRevealCeilingButton();
+            PrintStatusBar(StatusBars.X, StatusBars.Y,
+                StatusBars.Length, ConsoleColor.DarkRed, _game.player.Health, PlayerStats.MaxHealth);
+            PrintStatusBar(StatusBars.X, StatusBars.Y + 1,
+                StatusBars.Length, ConsoleColor.DarkGray, _game.player.Stamina, PlayerStats.MaxStamina);
 
             Console.SetCursorPosition(0, 0);
 
@@ -46,6 +50,26 @@ namespace Roguelike.Client
             Console.SetCursorPosition(0, 2);
             Console.Write("Turn number: " + _game.playerTurnNumber + " ");
 
+        }
+
+        private void PrintStatusBar(int X, int Y, int length, ConsoleColor FGcolour, float value, float maxValue)
+        {
+            int actualLength = (int)(value / maxValue * length);
+            StringBuilder builder = new();
+            builder.Append('.');
+            for (int i = 1; i < actualLength; i++)
+            {
+                builder.Append('_');
+            }
+            for (int i = 0; i < length - actualLength; i++)
+            {
+                builder.Append(' ');
+            }
+            builder.Append('.');
+            Console.SetCursorPosition(X,Y);
+            Console.ForegroundColor = FGcolour;
+            Console.Write(builder.ToString());
+            Console.ResetColor();
         }
 
         private void PrintRevealCeilingButton()
