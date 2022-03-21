@@ -167,7 +167,35 @@ namespace Roguelike.Client
                     {
                         ObjectOnMap objectOnMap = _game.map.GetTopObjWithCoord(mapCoord.X, mapCoord.Y);
 
-                        (objectOnMap as IDrawable).Write();
+                        if (objectOnMap.InFOV)
+                        {
+                            double distanceFromPlayerSquared = 
+                                Math.Pow(mapCoord.X - _game.player.X, 2) / 4 +
+                                Math.Pow(mapCoord.Y - _game.player.Y, 2);
+                            if (distanceFromPlayerSquared <
+                                Math.Pow(_game.player.FOVSize, 2) * 0.4)
+                            {
+                                Console.ForegroundColor = ConsoleColor.White;
+                            }
+                            else if (distanceFromPlayerSquared <
+                                Math.Pow(_game.player.FOVSize, 2) * 0.7)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Gray;
+                            }
+                            else if (distanceFromPlayerSquared <
+                                Math.Pow(_game.player.FOVSize, 2))
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkGray;
+                            }
+
+                            (objectOnMap as IDrawable).Write();
+                        }
+                        else
+                        {
+                            Console.Write(" ");
+                        }
+
+                        
                     }
                 }
             }

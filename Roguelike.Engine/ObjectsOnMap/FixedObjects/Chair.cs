@@ -6,6 +6,7 @@
         {
             Character = 'h';
             Description = "Chair: there are more ways to close a door.";
+            Seethrough = true;
         }
     }
 }

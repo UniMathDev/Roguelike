@@ -6,6 +6,7 @@
         {
             Character = character;
             Description = "Table: a great pleace to keep something important.";
+            Seethrough = true;
         }
     }
     class CenterOfTable : Table

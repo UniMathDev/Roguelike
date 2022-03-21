@@ -1,13 +1,13 @@
 ﻿using Roguelike.Engine.Enums;
+using Roguelike.Engine.InventoryObjects;
 using Roguelike.Engine.Maps;
 using Roguelike.Engine.Monsters;
 using Roguelike.Engine.ObjectsOnMap;
 using Roguelike.Engine.ObjectsOnMap.FixedObjects;
-using Roguelike.Engine.InventoryObjects;
-using System.Drawing;
+using Roguelike.GameConfig;
 using System;
 using System.Collections.Generic;
-using Roguelike.GameConfig;
+using System.Drawing;
 
 namespace Roguelike.Engine
 {
@@ -20,14 +20,16 @@ namespace Roguelike.Engine
         public MonsterManager monsterManager { get; }
 
         public int playerTurnNumber { get; private set; }
-        
+
         public Game(Map map, Player player)
         {
             this.map = map;
             this.player = player;
             player.OnDeath += OnPlayerDeath;
-            monsterManager = new(map,player);
-            playerTurnNumber = 1;    
+            monsterManager = new(map, player);
+            playerTurnNumber = 1;
+
+            UpdateFOV();
 
             //TESTING GROUND ITEMS
             Wardrobe obj = new Wardrobe();
@@ -48,7 +50,7 @@ namespace Roguelike.Engine
 
             //TESTING LAMPS ITEMS
             Lamp lamp = new();
-            this.map.SetObjWithCoord(13,5, lamp);
+            this.map.SetObjWithCoord(13, 5, lamp);
 
 
             //
@@ -90,11 +92,66 @@ namespace Roguelike.Engine
                 player.Move(direction, map);
                 return true;
             }
-            else
+
+            player.Move(direction, map);
+            monsterManager.OnPlayerTurnEnded(playerTurnNumber);
+            return false;
+        }
+
+        public void UpdateFOV()
+        {
+            for (int y = 0; y < map.Height; y++)
             {
-                return false;
+                for (int x = 0; x < map.Width; x++)
+                {
+                    map.GetTopObjWithCoord(x, y).InFOV = false;
+                    if ((Math.Pow(x - player.X, 2) / 4 +
+                            Math.Pow(y - player.Y, 2)) < Math.Pow(player.FOVSize, 2))
+                    {
+                        map.GetTopObjWithCoord(x, y).InFOV = true;
+
+                        if (player.X == x && player.Y == y)
+                            continue;
+
+                        if (player.X == x)
+                        {
+                            int i = x;
+                            int offset = (player.Y < y ? 1 : -1);
+                            for (int j = player.Y + offset; j != y; j += offset)
+                            {
+                                if (!map.GetTopObjWithCoord(i, j).Seethrough)
+                                {
+                                    map.GetTopObjWithCoord(x, y).InFOV = false;
+                                    break;
+                                }
+                            }
+
+                            continue;
+                        }
+
+                        //y = kx + b
+                        double k = ((double)player.Y - y) / ((double)player.X - x);
+                        double b = (double)y + 0.5 - k * ((double)x + 0.5);
+
+                        int j1;
+                        double offsetX = (player.X < x ? 0.05 : -0.05);
+                        for (double i = player.X + 0.5;
+                            (int)Math.Floor(i) != x || (int)Math.Floor(k * i + b) != y; i += offsetX)
+                        {
+                            j1 = (int)Math.Floor(k * i + b);
+                            j1 = (j1 < 0 ? 0 : j1);
+                            j1 = (j1 >= map.Height ? map.Height - 1 : j1);
+                            if (!map.GetTopObjWithCoord((int)Math.Floor(i), j1).Seethrough)
+                            {
+                                map.GetTopObjWithCoord(x, y).InFOV = false;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
+
         public void Interact(int X, int Y)
         {
             if (!map.WithinBounds(X, Y))
@@ -145,14 +202,14 @@ namespace Roguelike.Engine
 
                     if (addedItems.Count == itemsOnGround.Count)
                     {
-                        map.SetObjWithCoordToNull(X,Y, new InventoryObjectOnGround().MapLayer);
+                        map.SetObjWithCoordToNull(X, Y, new InventoryObjectOnGround().MapLayer);
                     }
 
                     foreach (var item in addedItems)
                     {
                         (obj as ISearchable).Inventory.Remove(item);
                     }
-                    
+
                     OnPlayerTurnEnded();
                     return;
                 }
@@ -234,9 +291,10 @@ namespace Roguelike.Engine
         }
         private void OnPlayerDeath(LivingObject player)
         {
+            Console.Clear();
             Environment.Exit(0);
         }
-        private void HitMonster(Monster monster , MeleeWeapon weapon)
+        private void HitMonster(Monster monster, MeleeWeapon weapon)
         {
             float damageAmount = GameConfig.PlayerStats.FistDamage;
 
@@ -251,7 +309,7 @@ namespace Roguelike.Engine
                     monster.Move(GameMath.CoordDiffToDirection(coordDiff), map);
                 }
                 weapon.Durability -= 1;
-                if(weapon.Durability <= 0)
+                if (weapon.Durability <= 0)
                 {
                     BreakWeapon(weapon);
                 }
@@ -270,6 +328,8 @@ namespace Roguelike.Engine
         private void OnPlayerTurnEnded()
         {
             playerTurnNumber++;
+
+            UpdateFOV();
             player.Stamina = MathF.Min(player.Stamina + PlayerStats.EndOfTurnStaminaGain,
                                        PlayerStats.MaxStamina);
             monsterManager.OnPlayerTurnEnded(playerTurnNumber);
