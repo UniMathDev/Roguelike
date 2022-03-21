@@ -5,6 +5,7 @@ using System.Text;
 using System;
 using Roguelike.Engine.InventoryObjects;
 using System.Collections.Generic;
+using Roguelike.Engine.Enums;
 
 namespace Roguelike.Engine.Maps
 {
@@ -74,7 +75,8 @@ namespace Roguelike.Engine.Maps
                     int numberOfScript;
                     try
                     {
-                        numberOfScript = Convert.ToInt32(NumbersOfScript[x]);
+                        //нельзя char --> int, только из string
+                        numberOfScript = Convert.ToInt32(NumbersOfScript[x].ToString()); 
                         LootMap[y, x] = numberOfScript;
                     }
                     catch
@@ -87,7 +89,7 @@ namespace Roguelike.Engine.Maps
                         List<InventoryObject> FinalItems = ElementToSripts.CreateLoot(numberOfScript);
                         foreach (var i in FinalItems)
                         {
-                            (mapCells[y, x].Layers[1] as ISearchable).Inventory.Add(i);
+                            (mapCells[y, x].Layers[(int)MapLayer.MAIN] as ISearchable).Inventory.Add(i);
                         }
                     }
 

@@ -22,6 +22,7 @@ namespace Roguelike.Engine.Maps
             Script1.Add(new ItemProbability(new Pen(), 0.2f));
             Script1.Add(new ItemProbability(new KitchenKnife(), 0.9f));
             Script1.Add(new ItemProbability(new Gun(), 0.1f));
+            Scripts[1] = Script1;
 
             List<ItemProbability> Script2 = new(); //Work items
             Script2.Add(new ItemProbability(new Pen(), 0.8f));
@@ -32,6 +33,7 @@ namespace Roguelike.Engine.Maps
             Script2.Add(new ItemProbability(new KitchenKnife(), 0.2f));
             Script2.Add(new ItemProbability(new Bandage(), 0.15f));
             Script2.Add(new ItemProbability(new LightBulb(), 0.2f));
+            Scripts[2] = Script2;
 
             List<ItemProbability> Script3 = new(); //Safe-Life Collection
             Script3.Add(new ItemProbability(new Axe(), 0.9f));
@@ -39,6 +41,7 @@ namespace Roguelike.Engine.Maps
             Script3.Add(new ItemProbability(new KitchenKnife(), 1f));
             Script3.Add(new ItemProbability(new LightBulb(), 0.9f));
             Script3.Add(new ItemProbability(new Gun(), 0.2f));
+            Scripts[3] = Script3;
 
             List<ItemProbability> Script4 = new(); //Full Random strange thing (for body...) 
             Script4.Add(new ItemProbability(new Axe(), 0.1f));
@@ -48,6 +51,7 @@ namespace Roguelike.Engine.Maps
             Script4.Add(new ItemProbability(new Gun(), 0.05f));
             Script4.Add(new ItemProbability(new Pen(), 0.5f));
             Script4.Add(new ItemProbability(new Pen(), 0.5f));
+            Scripts[4] = Script4;
 
             List<ItemProbability> Script5 = new(); //Smt for kitchen 
             Script5.Add(new ItemProbability(new KitchenKnife(), 0.8f));
@@ -59,12 +63,13 @@ namespace Roguelike.Engine.Maps
             Script5.Add(new ItemProbability(new Eat(), 0.9f));
             Script5.Add(new ItemProbability(new Pen(), 0.2f));
             Script5.Add(new ItemProbability(new Pen(), 0.2f));
+            Scripts[5] = Script5;
         }
 
-        public List<InventoryObject> CreateLoot (int numberOfScript) //Type Object, ???
+        public List<InventoryObject> CreateLoot (int numberOfScript)
         {
             List<InventoryObject> ObjectInventory = new();
-
+            
             foreach (ItemProbability i in Scripts[numberOfScript])
             {
                 bool IsDropped = i.Chance - (float)GameMath.rand.NextDouble() >= 0f;
