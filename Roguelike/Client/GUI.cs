@@ -15,6 +15,7 @@ namespace Roguelike.Client
     class GUI
     {
         private readonly Game _game;
+        private bool firstGamePrint = true;
 
         private Point CameraCenterOffset =
             new Point(MapDisplaySize.Width / 2, MapDisplaySize.Height / 2);
@@ -28,14 +29,23 @@ namespace Roguelike.Client
 
         public void PrintGame()
         {
+            if (firstGamePrint)
+            {
+                EraseInventoryPopups();
+                firstGamePrint = false;
+            }
             PrintInventory();
             PrintMap();
             PrintRevealCeilingButton();
 
             Console.SetCursorPosition(0, 0);
-            Console.Write("Health: " + _game.player.Health + " ");
+
+            Console.Write("Health: " + _game.player.Health + "  ");
             Console.SetCursorPosition(0, 1);
+            Console.Write("Stamina: " + _game.player.Stamina + "  ");
+            Console.SetCursorPosition(0, 2);
             Console.Write("Turn number: " + _game.playerTurnNumber + " ");
+
         }
 
         private void PrintRevealCeilingButton()
@@ -69,7 +79,11 @@ namespace Roguelike.Client
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
         }
-
+        public void PrintStartScreen()
+        {
+            Console.Clear();
+            PrintGUIElement(StartScreen.String, StartScreen.X, StartScreen.Y);
+        }
         private void PrintInventory()
         {
             string[] HandTexts = { "Right Hand:  ", "Left Hand:  " };
@@ -133,6 +147,24 @@ namespace Roguelike.Client
                     }
                 }
             }
+        }
+        public void PrintFlash()
+        {
+            string[] final = new string[MapDisplaySize.Height];
+            for (int rowIndex = 0; rowIndex < MapDisplaySize.Height; rowIndex++)
+            {
+                StringBuilder row = new();
+                for (int columnIndex = 0; columnIndex < MapDisplaySize.Width; columnIndex++)
+                {
+                    row.Append("█");
+                }
+                final[rowIndex] = row.ToString();
+            }
+            Console.ForegroundColor = ConsoleColor.White;
+            PrintGUIElement(final,MapDisplayPosition.TopLeftPosX, MapDisplayPosition.TopLeftPosY);
+            Console.ResetColor();
+            System.Threading.Thread.Sleep(20);
+            PrintGame();
         }
         ///<summary>
         ///принимает координаты относительно буфера

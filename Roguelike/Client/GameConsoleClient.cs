@@ -87,7 +87,10 @@ namespace Roguelike.Client
 
         public void Start()
         {
-            _GUI.PrintGame();
+            _GUI.PrintStartScreen();
+            interceptNextInput = true;
+            InputIntercepted += Console.Clear;
+            InputIntercepted += _GUI.PrintGame;
         }
         void OnKeyPress(KEY_PRESS_INFO k)
         {
@@ -105,7 +108,7 @@ namespace Roguelike.Client
 
             if (_directionKeys.ContainsKey(k.key))
             {
-                OnDirectionKeyPress(_directionKeys[k.key]);
+                OnDirectionKeyPress(_directionKeys[k.key],k.altHeld);
             }
 
         }
@@ -129,9 +132,16 @@ namespace Roguelike.Client
                 _GUI.PrintGame();
             }
         }
-        private void OnDirectionKeyPress(Direction direction)
+        private void OnDirectionKeyPress(Direction direction, bool shiftHeld)
         {
-            _game.Move(direction);
+            if (shiftHeld)
+            {
+                _game.Run(direction);
+            }
+            else
+            {
+                _game.Walk(direction);
+            }
             _GUI.PrintGame();
         }
 
