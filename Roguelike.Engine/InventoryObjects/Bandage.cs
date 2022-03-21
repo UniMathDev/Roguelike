@@ -10,7 +10,9 @@ namespace Roguelike.Engine.InventoryObjects
     {
         Bandage()
         {
-
+            Size = 1;
+            TwoHanded = false;
+            Description = "Bandage: a sterile bandage, could be used to treat wounds. ";
         }
     }
 }

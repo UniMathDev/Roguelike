@@ -50,11 +50,22 @@ namespace Roguelike.Input
         static void OnKeyboardEvent(KEY_EVENT_RECORD r)
         {
             KEY_PRESS_INFO pressInfo;
+            
             pressInfo.key = (ConsoleKey)r.wVirtualKeyCode;
 
             if (r.bKeyDown)
+            {
+                if ((r.dwControlKeyState & KEY_EVENT_RECORD.LEFT_ALT_PRESSED) != 0)
+                {
+                    pressInfo.altHeld = true;
+                }
+                else
+                {
+                    pressInfo.altHeld = false;
+                }
                 if (KeyPress != null)
                     KeyPress.Invoke(pressInfo);
+            }
         }
 
         // В ConsoleLib если зажать кнопку мыши и потянуть это будет регистрироваться как куча нажатий этой кнопки,
@@ -103,6 +114,7 @@ namespace Roguelike.Input
     public struct KEY_PRESS_INFO
     {
         public ConsoleKey key;
+        public bool altHeld;
     }
     public struct MOUSE_MOVE_INFO
     {

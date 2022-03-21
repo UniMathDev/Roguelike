@@ -15,6 +15,7 @@ namespace Roguelike.Client
     class GUI
     {
         private readonly Game _game;
+        private bool firstGamePrint = true;
 
         private Point CameraCenterOffset =
             new Point(MapDisplaySize.Width / 2, MapDisplaySize.Height / 2);
@@ -28,13 +29,19 @@ namespace Roguelike.Client
 
         public void PrintGame()
         {
+            if (firstGamePrint)
+            {
+                EraseInventoryPopups();
+                firstGamePrint = false;
+            }
             PrintInventory();
             PrintMap();
             PrintRevealCeilingButton();
-            EraseInventoryPopups();
 
             Console.SetCursorPosition(0, 0);
-            Console.Write(_game.player.Health + " ");
+            Console.Write(_game.player.Health + "  ");
+            Console.SetCursorPosition(0, 1);
+            Console.Write(_game.player.Stamina + "  ");
         }
 
         private void PrintRevealCeilingButton()
@@ -68,7 +75,11 @@ namespace Roguelike.Client
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
         }
-
+        public void PrintStartScreen()
+        {
+            Console.Clear();
+            PrintGUIElement(StartScreen.String, StartScreen.X, StartScreen.Y);
+        }
         private void PrintInventory()
         {
             string[] HandTexts = { "Right Hand:  ", "Left Hand:  " };

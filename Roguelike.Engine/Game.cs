@@ -7,6 +7,7 @@ using Roguelike.Engine.InventoryObjects;
 using System.Drawing;
 using System;
 using System.Collections.Generic;
+using Roguelike.GameConfig;
 
 namespace Roguelike.Engine
 {
@@ -49,12 +50,44 @@ namespace Roguelike.Engine
 
             //
         }
-        public void Move(Direction direction)
+        public void Walk(Direction direction)
+        {
+            if (TryMove(direction))
+            {
+                player.Stamina -= PlayerStats.WalkStaminaPenalty;
+                OnPlayerTurnEnded();
+            }
+        }
+
+        public void Run(Direction direction)
+        {
+            if (player.Stamina - PlayerStats.RunStaminaPenalty < 0)
+            {
+                Walk(direction);
+                return;
+            }
+            bool success = false;
+            if (TryMove(direction))
+            {
+                success = true;
+                TryMove(direction);
+            }
+            if (success)
+            {
+                player.Stamina -= PlayerStats.RunStaminaPenalty;
+                OnPlayerTurnEnded();
+            }
+        }
+        private bool TryMove(Direction direction)
         {
             if (player.CanMove(direction, _map))
             {
                 player.Move(direction, _map);
-                _monsterManager.OnPlayerTurnEnded();
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
         public void Interact(int X, int Y)
@@ -71,7 +104,7 @@ namespace Roguelike.Engine
                 {
                     (obj as IUsable).TryUse(useWith);
 
-                    _monsterManager.OnPlayerTurnEnded();
+                    OnPlayerTurnEnded();
                     player.inventory.SetActiveInventoryToolToNull();
                     return;
                 }
@@ -103,7 +136,7 @@ namespace Roguelike.Engine
                         (obj as ISearchable).Inventory.Remove(item);
                     }
                     
-                    _monsterManager.OnPlayerTurnEnded();
+                    OnPlayerTurnEnded();
                     return;
                 }
                 if (obj is LivingObject && !(obj is Player))
@@ -115,14 +148,14 @@ namespace Roguelike.Engine
                     else
                         ShootMonster(monster, weapon as RangedWeapon);
 
-                    _monsterManager.OnPlayerTurnEnded();
+                    OnPlayerTurnEnded();
                     return;
                 }
             }
         }
         public void Wait()
         {
-            _monsterManager.OnPlayerTurnEnded();
+            OnPlayerTurnEnded();
         }
         public void TrySwitchActiveInventoryItem(int handIndex)
         {
@@ -156,7 +189,7 @@ namespace Roguelike.Engine
                 (objUnderPlayer as ISearchable).Inventory.Add(iObj);
             }
             player.inventory.RemoveFromInventory(iObj);
-            _monsterManager.OnPlayerTurnEnded();
+            OnPlayerTurnEnded();
         }
         public void UnpocketItem(int index)
         {
@@ -164,7 +197,7 @@ namespace Roguelike.Engine
             if (player.inventory.TryAddToHands(iObj))
             {
                 player.inventory.Pockets.RemoveAt(index);
-                _monsterManager.OnPlayerTurnEnded();
+                OnPlayerTurnEnded();
             }
         }
         public void PocketItem(int index)
@@ -173,7 +206,7 @@ namespace Roguelike.Engine
             if (player.inventory.TryAddToPockets(iObj))
             {
                 player.inventory.Hands[index] = null;
-                _monsterManager.OnPlayerTurnEnded();
+                OnPlayerTurnEnded();
             }
         }
         private void OnPlayerDeath(LivingObject player)
@@ -182,7 +215,7 @@ namespace Roguelike.Engine
         }
         private void HitMonster(Monster monster , MeleeWeapon weapon)
         {
-            float damageAmount = 30f; //Заменить на FistDamage из конфига. (сейчас он из этого места в коде недоступен.)
+            float damageAmount = GameConfig.PlayerStats.FistDamage;
 
             if (weapon != null)
             {
@@ -210,6 +243,12 @@ namespace Roguelike.Engine
         private void ShootMonster(Monster monster, RangedWeapon weapon)
         {
             throw new NotImplementedException();
+        }
+        private void OnPlayerTurnEnded()
+        {
+            player.Stamina = MathF.Min(player.Stamina + PlayerStats.EndOfTurnStaminaGain,
+                                       PlayerStats.MaxStamina);
+            _monsterManager.OnPlayerTurnEnded();
         }
     }
 }

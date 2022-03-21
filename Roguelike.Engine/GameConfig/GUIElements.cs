@@ -175,4 +175,28 @@
         };
 
     }
+    public class StartScreen : GUIElement
+    {
+        new public static readonly string[] String = new string[16]
+       {
+            @"                                                                       ",
+            @"                                                                      ",
+            @"                                                                            ",
+            @"              M O U S E                       K E Y B O A R D                  ",
+            @"                 ___                                                         ",
+            @"    attack/use> /_|_\ <inspect             numpad 1-9  -  move             ",
+            @"               |     |                        or                        ",
+            @"               |     |                     arrow keys                  ",
+            @"                \___/                      shift       -  run           ",
+            @"                                           numpad 0    -  wait        ",
+            @"                                           esc         -  exit           ",
+            @"                                                                       ",
+            @"                                                                       ",
+            @"                                                                       ",
+            @"                      PRESS ANY KEY TO START                                 ",
+            @"                                                                       ",
+       };
+        public const int X = 0;
+        public const int Y = 0;
+    }
 }
