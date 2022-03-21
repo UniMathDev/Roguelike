@@ -9,7 +9,8 @@ namespace Roguelike.Engine.ObjectsOnMap
     {
         public PlayerInventory inventory = new PlayerInventory();
         public float Stamina { get; set; } = GameConfig.PlayerStats.MaxStamina;
-        public Player(int x, int y)
+        public int FOVSize { get; set; }
+        public Player(int x, int y, int fovSize)
         {
             Character = '@';
             ForegroundColor = ConsoleColor.Green;
@@ -17,6 +18,19 @@ namespace Roguelike.Engine.ObjectsOnMap
             Health = GameConfig.PlayerStats.MaxHealth;
             X = x;
             Y = y;
+            FOVSize = fovSize;
+            Seethrough = true;
+            InFOV = true;
+        }
+
+        public UseCallBack TryUse(object useWith)
+        {
+            if(useWith is Bandage && Health < GameConfig.PlayerStats.MaxHealth)
+            {
+                Health = MathF.Min(Health + Bandage.HealAmount, PlayerStats.MaxHealth);
+                return new UseCallBack(true, true);
+            }
+            return new UseCallBack(false, false);
         }
 
         public UseCallBack TryUse(object useWith)

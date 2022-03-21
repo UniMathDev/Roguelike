@@ -8,8 +8,11 @@ namespace Roguelike.Engine.ObjectsOnMap
         ConsoleColor ForegroundColor { get; }
         ConsoleColor BackgroundColor { get; }
         public void Write() {
-            Console.BackgroundColor = BackgroundColor;
-            Console.ForegroundColor = ForegroundColor;
+            if (ForegroundColor != ConsoleColor.White)
+            {
+                Console.BackgroundColor = BackgroundColor;
+                Console.ForegroundColor = ForegroundColor;
+            }
             Console.Write(Character);
             Console.ResetColor();
         }

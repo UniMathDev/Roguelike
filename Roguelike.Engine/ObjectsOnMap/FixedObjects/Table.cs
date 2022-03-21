@@ -1,4 +1,7 @@
-﻿namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
+﻿using Roguelike.Engine.InventoryObjects;
+using System.Collections.Generic;
+
+namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
 {
     abstract class Table : FixedObject
     {
@@ -6,10 +9,15 @@
         {
             Character = character;
             Description = "Table: many important things are stored here. ";
+            Seethrough = true;
         }
     }
-    class CenterOfTable : Table
+    class CenterOfTable : Table, ISearchable
     {
+        public bool WasSearched { get; private set; }
+
+        public List<InventoryObject> Inventory { get; set; } = new();
+
         //can be used to search
         public CenterOfTable() : base('═')
         {

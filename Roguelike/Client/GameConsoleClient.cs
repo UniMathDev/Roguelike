@@ -29,8 +29,8 @@ namespace Roguelike.Client
         public GameConsoleClient()
         {
             Map map = TxtToMapConverter.ConvertToArrayMap(@"..\..\..\..\Maps\Maps.txt", MapSize.Height, MapSize.Width);
-            Player player = new(PlayerInitCoords.X, PlayerInitCoords.Y);
-            map.SetObjWithCoord(PlayerInitCoords.X, PlayerInitCoords.Y, player);
+            Player player = new(PlayerInit.X, PlayerInit.Y, PlayerInit.FOVSize);
+            map.SetObjWithCoord(PlayerInit.X, PlayerInit.Y, player);
             GameLog.Start();
             _game = new(map, player);
             _GUI = new(_game);
@@ -89,6 +89,7 @@ namespace Roguelike.Client
         public void Start()
         {
             _GUI.PrintStartScreen();
+
             interceptNextInput = true;
             InputIntercepted += Console.Clear;
             InputIntercepted += _GUI.PrintGame;

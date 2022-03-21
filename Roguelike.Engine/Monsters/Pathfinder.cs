@@ -37,6 +37,7 @@ namespace Roguelike.Engine.Monsters
             int minPathLength = int.MaxValue;
             Point result = new(0, 0);
             var possibleMoves = new List<Point>();
+            possibleMoves.Add(new Point(0, 0));
 
             int pathLength = 0;
             for (int y = origin.Y - 1; y <= origin.Y + 1; y++)

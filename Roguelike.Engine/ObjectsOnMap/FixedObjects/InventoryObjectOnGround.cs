@@ -14,6 +14,7 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
             Inventory = new();
             Walkable = true;
             MapLayer = Enums.MapLayer.SECONDARY;
+            Seethrough = true;
         }
     }
 }

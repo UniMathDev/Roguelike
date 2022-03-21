@@ -13,6 +13,7 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
             Description = "Lamp: Bright power saving lamp. ";
             MapLayer = Enums.MapLayer.CEILING;
             Walkable = true;
+            Seethrough = true;
         }
         public UseCallBack TryUse(object obj)
         {
