@@ -66,17 +66,23 @@ namespace Roguelike.Engine.Maps
             }
             return true;
         }
-        public bool WithinBounds(int X, int Y)
+
+        public bool WithinBounds(int x, int y)
         {
-            if (X < 0 || Y < 0)
+            if (x < 0 || y < 0)
             {
                 return false;
             }
-            if (X >= Width|| Y >= Height)
+            if (x >= Width|| y >= Height)
             {
                 return false;
             }
             return true;
+        }
+
+        public bool InPlayerFOV(int x, int y)
+        {
+            return WithinBounds(x, y) && GetTopObjWithCoord(x, y).InFOV;
         }
     }
 }
