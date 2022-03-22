@@ -2,13 +2,14 @@
 {
     public struct PlayerInit
     {
-        public const int X = 11;
-        public const int Y = 3;
-        public const int FOVSize = 30;
+        public const int X = 5;
+        public const int Y = 11;
+        public const int FOVSize = 2;
     }
     public struct PlayerStats
     {
         public const int PocketSize = 5;
+        public const int LightSourceVisibilityDistance = 20;
         public const float MaxHealth = 100;
         public const float MaxStamina = 100;
         public const float RunStaminaPenalty = 20;

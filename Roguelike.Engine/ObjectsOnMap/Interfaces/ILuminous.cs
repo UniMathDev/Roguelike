@@ -5,6 +5,6 @@ namespace Roguelike.Engine.ObjectsOnMap
 {
     public interface ILuminous
     {
-        public int LightedAreaRadius { get; set; }
+        public int LightedAreaRadius { get; }
     }
 }

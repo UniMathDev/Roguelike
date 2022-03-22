@@ -7,6 +7,7 @@ namespace Roguelike.Engine.ObjectsOnMap
     {
         public char Character { get; protected set; }
         public ConsoleColor ForegroundColor { get; protected set;} = ConsoleColor.White;
+        public ConsoleColor? CurrentForegroundColor { get; set; } = ConsoleColor.White;
         public ConsoleColor BackgroundColor { get; protected set; } = ConsoleColor.Black;
         public string Description { get; protected set; }
         public MapLayer MapLayer { get; protected set; }
