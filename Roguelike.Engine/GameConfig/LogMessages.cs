@@ -43,5 +43,27 @@ namespace Roguelike.GameConfig
             "I close the door.",
             "The door is now closed.",
         };
+        public static string[] PistolHit =
+        {
+            "I hit it.",
+            "It was a hit.",
+            "The crosshair was straight on that thing, I hit it.",
+            "The thing shrivels in pain, a hit.",
+            "That was a clear hit.",
+        };
+        public static string[] PistolMiss =
+        {
+            "I barely miss it",
+            "Thing suddenly changes direction and I miss",
+            "I missed.",
+            "I missed it.",
+            "No effect, it was a miss.",
+        };
+        public static string[] PistolEmpty =
+        {
+            "A click is all that comes out of my gun",
+            "Click! Gun's empty.",
+            "Click! My weapon is empty",
+        };
     }
 }

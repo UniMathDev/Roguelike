@@ -16,5 +16,6 @@
     {
         public int MaxAmmo;
         public int Ammo;
+        public float HitChance;
     }
 }

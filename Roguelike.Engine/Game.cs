@@ -165,12 +165,12 @@ namespace Roguelike.Engine
             {
                 Monster monster = (obj as Monster);
                 Weapon weapon = player.inventory.ActiveWeapon;
-                if (weapon is MeleeWeapon || weapon == null && player.NextTo(X, Y))
+                if ((weapon is MeleeWeapon || weapon == null) && player.NextTo(X, Y))
                 {
                     HitMonster(monster, weapon as MeleeWeapon);
                     OnPlayerTurnEnded();
                 }
-                else if (monster.InFOV)
+                else if (weapon is MeleeWeapon && monster.InFOV)
                 {
                     ShootMonster(monster, weapon as RangedWeapon);
                     OnPlayerTurnEnded();
@@ -423,17 +423,26 @@ namespace Roguelike.Engine
         private void ShootMonster(Monster monster, RangedWeapon weapon)
         {
             if (weapon.Ammo > 0) {
-                float damageAmount = weapon.AverageDamage - weapon.DamageRange / 2f
-                       + weapon.DamageRange * (float)GameMath.rand.NextDouble();
-
+                bool Hit = weapon.HitChance - GameMath.rand.NextDouble() > 0;
+                if (Hit)
+                {
+                    float damageAmount = weapon.AverageDamage - weapon.DamageRange / 2f
+                           + weapon.DamageRange * (float)GameMath.rand.NextDouble();
+                    monster.Damage(damageAmount);
+                    GameLog.Add(LogMessages.PistolHit);
+                }
+                else
+                {
+                    GameLog.Add(LogMessages.PistolMiss);
+                }
                 weapon.Ammo--;
                 PlayerShotGun.Invoke();
-                monster.Damage(damageAmount);
+                
                 OnPlayerTurnEnded();
             }
             else
             {
-                //click!
+                GameLog.Add(LogMessages.PistolEmpty);
                 OnPlayerTurnEnded();
             }
         }
