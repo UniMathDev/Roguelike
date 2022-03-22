@@ -36,7 +36,7 @@ namespace Roguelike.Client
             _GUI = new(_game);
             _buttonManager = new();
 
-            InputManager.Start();
+
             InputManager.KeyPress += OnKeyPress;
             _keyboardMenu = new Dictionary<ConsoleKey, GameMenuItem>();
             _keyboardMenu.Add(ConsoleKey.Escape, new GameMenuItem(Exit));
@@ -89,6 +89,8 @@ namespace Roguelike.Client
         public void Start()
         {
             _GUI.PrintStartScreen();
+
+            InputManager.Start();
 
             interceptNextInput = true;
             InputIntercepted += Console.Clear;
