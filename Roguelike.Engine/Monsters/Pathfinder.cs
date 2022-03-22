@@ -4,6 +4,7 @@ using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
 using System.Collections.Generic;
 using Roguelike.GameConfig;
+using Roguelike.Engine;
 
 namespace Roguelike.Engine.Monsters
 {
@@ -59,9 +60,9 @@ namespace Roguelike.Engine.Monsters
                 }
             }
 
+
             if (minPathLength == int.MaxValue || 
-                ((Math.Pow(origin.X - destination.X, 2) +
-                Math.Pow(origin.Y - destination.Y, 2) > Math.Pow(MonsterFOV.Value, 2)) &&
+                (!_map.InIlluminatedArea(destination.X, destination.Y, MonsterFOV.Value, origin) &&
                 playerTurnNumber < MonsterFOV.СriticalPlayerTurn))
             {
                 result = possibleMoves[GameMath.rand.Next(0, possibleMoves.Count)];

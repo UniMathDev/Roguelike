@@ -3,7 +3,7 @@
     public struct MonsterFOV
     {
         public const int Value = 5;
-        public const int СriticalPlayerTurn = 70;
+        public const int СriticalPlayerTurn = 100;
     }
     public struct MonsterDamage
     {

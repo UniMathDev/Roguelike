@@ -134,81 +134,6 @@ namespace Roguelike.Engine
             SetColorForIlluminatedArea(new Point(player.X, player.Y), player.FOVSize);
         }
 
-        private void SetColorForIlluminatedArea(Point lightSourceCoords, int lightedAreaRadius)
-        {
-            for (int y = 0; y < map.Height; y++)
-            {
-                for (int x = 0; x < map.Width; x++)
-                {
-                    if (inIlluminatedArea(x, y, lightedAreaRadius, lightSourceCoords))
-                    {
-                        if (!inIlluminatedArea(x, y, PlayerStats.LightSourceVisibilityDistance, new Point(player.X, player.Y)))
-                        {
-                            continue;
-                        }
-
-                        if (!map.GetTopObjWithCoord(x, y).Seethrough &&
-                            (Math.Sign(x - player.X) != Math.Sign(x - lightSourceCoords.X) ||
-                            Math.Sign(y - player.Y) != Math.Sign(y - lightSourceCoords.Y)))
-                        {
-                            continue;
-                        }
-
-                        ObjectOnMap objectOnMap = map.GetTopObjWithCoord(x, y);                        
-
-                        double distanceFromLightSourceSquared =
-                            Math.Pow(x - lightSourceCoords.X, 2) / 4 +
-                            Math.Pow(y - lightSourceCoords.Y, 2);
-                        double lightedAreaRadiusSquared = Math.Pow(lightedAreaRadius, 2);
-                        objectOnMap.InFOV = true;
-
-                        if (distanceFromLightSourceSquared <
-                            lightedAreaRadiusSquared * 0.3)
-                        {
-                            objectOnMap.CurrentForegroundColor = 
-                                ChooseLightedObjColor(objectOnMap.CurrentForegroundColor, ConsoleColor.White);
-                        }
-                        else if (distanceFromLightSourceSquared <
-                            lightedAreaRadiusSquared * 0.6)
-                        {
-                            objectOnMap.CurrentForegroundColor =
-                                ChooseLightedObjColor(objectOnMap.CurrentForegroundColor, ConsoleColor.Gray);
-                        }
-                        else if (distanceFromLightSourceSquared <
-                            lightedAreaRadiusSquared)
-                        {
-                            objectOnMap.CurrentForegroundColor =
-                                ChooseLightedObjColor(objectOnMap.CurrentForegroundColor, ConsoleColor.DarkGray);
-                        }
-                        else
-                        {
-                            objectOnMap.InFOV = false;
-                        }
-                    }
-                }
-            }
-        }
-
-        private ConsoleColor? ChooseLightedObjColor(ConsoleColor? currentColor, ConsoleColor newColor)
-        {
-            if (currentColor == ConsoleColor.White || newColor == ConsoleColor.White)
-            {
-                return ConsoleColor.White;
-            }
-
-            if (currentColor == ConsoleColor.Gray || newColor == ConsoleColor.Gray)
-            {
-                return ConsoleColor.Gray;
-            }
-
-            if (currentColor == ConsoleColor.DarkGray || newColor == ConsoleColor.DarkGray)
-            {
-                return ConsoleColor.DarkGray;
-            }
-
-            return currentColor;
-        }
-
         public void Interact(int X, int Y)
         {
             if (!map.InPlayerFOV(X, Y))
@@ -377,6 +302,7 @@ namespace Roguelike.Engine
                 }
             }
         }
+
         public void UnpocketItem(int index)
         {
             InventoryObject iObj = player.inventory.Pockets[index];
@@ -401,6 +327,7 @@ namespace Roguelike.Engine
         }
 
 
+
         private bool TryMove(Direction direction)
         {
             if (player.CanMove(direction, map))
@@ -411,86 +338,79 @@ namespace Roguelike.Engine
             return false;
         }
 
-        private bool inIlluminatedArea(int x, int y, int fovSize, Point lightSourceCoords)
+        private void SetColorForIlluminatedArea(Point lightSourceCoords, int lightedAreaRadius)
         {
-            if ((Math.Pow(x - lightSourceCoords.X, 2) / 4 +
-                            Math.Pow(y - lightSourceCoords.Y, 2)) < Math.Pow(fovSize, 2))
+            for (int y = 0; y < map.Height; y++)
             {
-                bool inIlluminatedArea = true;
-
-                if (lightSourceCoords.X == x && lightSourceCoords.Y == y)
-                    return true;
-
-                int coordY;
-
-                if (lightSourceCoords.X == x)
+                for (int x = 0; x < map.Width; x++)
                 {
-                    int coordX = x;
-                    int offset = (lightSourceCoords.Y < y ? 1 : -1);
-                    for (coordY = lightSourceCoords.Y + offset; coordY != y; coordY += offset)
+                    if (map.InIlluminatedArea(x, y, lightedAreaRadius, lightSourceCoords))
                     {
-                        if (!map.GetTopObjWithCoord(coordX, coordY).Seethrough)
+                        if (!map.InIlluminatedArea(x, y, PlayerStats.LightSourceVisibilityDistance, new Point(player.X, player.Y)))
                         {
-                            inIlluminatedArea = false;
-                            break;
+                            continue;
+                        }
+
+                        if (!map.GetTopObjWithCoord(x, y).Seethrough &&
+                            (Math.Sign(x - player.X) != Math.Sign(x - lightSourceCoords.X) ||
+                            Math.Sign(y - player.Y) != Math.Sign(y - lightSourceCoords.Y)))
+                        {
+                            continue;
+                        }
+
+                        ObjectOnMap objectOnMap = map.GetTopObjWithCoord(x, y);
+
+                        double distanceFromLightSourceSquared =
+                            Math.Pow(x - lightSourceCoords.X, 2) / 4 +
+                            Math.Pow(y - lightSourceCoords.Y, 2);
+                        double lightedAreaRadiusSquared = Math.Pow(lightedAreaRadius, 2);
+                        objectOnMap.InFOV = true;
+
+                        if (distanceFromLightSourceSquared <
+                            lightedAreaRadiusSquared * 0.3)
+                        {
+                            objectOnMap.CurrentForegroundColor =
+                                ChooseLightedObjColor(objectOnMap.CurrentForegroundColor, ConsoleColor.White);
+                        }
+                        else if (distanceFromLightSourceSquared <
+                            lightedAreaRadiusSquared * 0.6)
+                        {
+                            objectOnMap.CurrentForegroundColor =
+                                ChooseLightedObjColor(objectOnMap.CurrentForegroundColor, ConsoleColor.Gray);
+                        }
+                        else if (distanceFromLightSourceSquared <
+                            lightedAreaRadiusSquared)
+                        {
+                            objectOnMap.CurrentForegroundColor =
+                                ChooseLightedObjColor(objectOnMap.CurrentForegroundColor, ConsoleColor.DarkGray);
+                        }
+                        else
+                        {
+                            objectOnMap.InFOV = false;
                         }
                     }
-
-                    return inIlluminatedArea;
                 }
+            }
+        }
 
-
-                //y = kx + b
-                double k = ((double)lightSourceCoords.Y - y) / ((double)lightSourceCoords.X - x);
-                double b1 = 0;
-                double b2 = 0;
-
-                if (k < 0)
-                {
-                    b1 = (double)y + 0.1 - k * ((double)x + 0.1);
-                    b2 = (double)y + 0.9 - k * ((double)x + 0.9);
-                }
-                else
-                {
-                    b1 = (double)y + 0.9 - k * ((double)x + 0.1);
-                    b2 = (double)y + 0.1 - k * ((double)x + 0.9);
-                }
-
-                double offsetX = (lightSourceCoords.X < x ? 0.05 : -0.05);
-
-                for (double coordX = lightSourceCoords.X + 0.1;
-                    (int)Math.Floor(coordX) != x || (int)Math.Floor(k * coordX + b1) != y; coordX += offsetX)
-                {
-                    coordY = (int)Math.Floor(k * coordX + b1);
-                    if (!map.GetTopObjWithCoord((int)Math.Floor(coordX), coordY)
-                        .Seethrough)
-                    {
-                        inIlluminatedArea = false;
-                        break;
-                    }
-                }
-
-                if (inIlluminatedArea == true)
-                    return inIlluminatedArea;
-
-                inIlluminatedArea = true;
-
-                for (double coordX = lightSourceCoords.X + 0.9;
-                    (int)Math.Floor(coordX) != x || (int)Math.Floor(k * coordX + b2) != y; coordX += offsetX)
-                {
-                    coordY = (int)Math.Floor(k * coordX + b2);
-                    if (!map.GetTopObjWithCoord((int)Math.Floor(coordX), coordY)
-                        .Seethrough)
-                    {
-                        inIlluminatedArea = false;
-                        break;
-                    }
-                }
-
-                return inIlluminatedArea;
+        private ConsoleColor? ChooseLightedObjColor(ConsoleColor? currentColor, ConsoleColor newColor)
+        {
+            if (currentColor == ConsoleColor.White || newColor == ConsoleColor.White)
+            {
+                return ConsoleColor.White;
             }
 
-            return false;
+            if (currentColor == ConsoleColor.Gray || newColor == ConsoleColor.Gray)
+            {
+                return ConsoleColor.Gray;
+            }
+
+            if (currentColor == ConsoleColor.DarkGray || newColor == ConsoleColor.DarkGray)
+            {
+                return ConsoleColor.DarkGray;
+            }
+
+            return currentColor;
         }
 
         private void OnPlayerDeath(LivingObject player)
