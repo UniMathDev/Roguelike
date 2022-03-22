@@ -122,6 +122,10 @@ namespace Roguelike.Engine.Monsters
             Monster monster = m as Monster;
             monsterList.Remove(monster);
             _map.SetObjWithCoordToNull(monster.X, monster.Y, monster.MapLayer);
+            if (_map.GetObjWithCoord(monster.X, monster.Y, new DeadMonster().MapLayer) == null)
+            {
+                _map.SetObjWithCoord(monster.X, monster.Y, new DeadMonster());
+            }
         }
     }
 }

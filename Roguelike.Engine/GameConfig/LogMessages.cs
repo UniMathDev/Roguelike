@@ -46,9 +46,12 @@ namespace Roguelike.GameConfig
         public static string[] PistolHit =
         {
             "I hit it.",
+            "I hit it.",
             "It was a hit.",
-            "The crosshair was straight on that thing, I hit it.",
+            "It was a hit.",
+            "The crosshair was straight on that thing.",
             "The thing shrivels in pain, a hit.",
+            "That was a clear hit.",
             "That was a clear hit.",
         };
         public static string[] PistolMiss =
@@ -64,6 +67,10 @@ namespace Roguelike.GameConfig
             "A click is all that comes out of my gun",
             "Click! Gun's empty.",
             "Click! My weapon is empty",
+        };
+        public static string[] Healed =
+        {
+            "I treat my wounds.",
         };
     }
 }

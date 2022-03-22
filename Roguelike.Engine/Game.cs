@@ -165,14 +165,14 @@ namespace Roguelike.Engine
             {
                 Monster monster = (obj as Monster);
                 Weapon weapon = player.inventory.ActiveWeapon;
-                if ((weapon is MeleeWeapon || weapon == null) && player.NextTo(X, Y))
-                {
-                    HitMonster(monster, weapon as MeleeWeapon);
-                    OnPlayerTurnEnded();
-                }
-                else if (weapon is MeleeWeapon && monster.InFOV)
+                if (weapon is RangedWeapon && monster.InFOV)
                 {
                     ShootMonster(monster, weapon as RangedWeapon);
+                    OnPlayerTurnEnded();
+                }
+                else if (weapon is MeleeWeapon || weapon == null && player.NextTo(X, Y))
+                {
+                    HitMonster(monster, weapon as MeleeWeapon);
                     OnPlayerTurnEnded();
                 }
                 return;
