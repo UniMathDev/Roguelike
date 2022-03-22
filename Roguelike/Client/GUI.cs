@@ -49,6 +49,7 @@ namespace Roguelike.Client
             Console.SetCursorPosition(0, 2);
             Console.Write("Turn number: " + _game.playerTurnNumber + " ");
 
+            Console.CursorVisible = false;
         }
         private void PrintLogBox()
         {
@@ -373,6 +374,19 @@ namespace Roguelike.Client
             int X = handInventoryGUI[1].X + HandPopupMenu.arrowOffestX;
             int Y = handInventoryGUI[1].Y + HandPopupMenu.arrowOffestY;
             PrintGUIElement(PopupMenuDeleter.String, X, Y);
+        }
+
+        internal void EraseLootableItemList(LootableItemListDeleter itemListDeleter)
+        {
+            if (itemListDeleter.PopupDirection == Direction.Down)
+            {
+                PrintGUIElement(itemListDeleter.GetInStringsArray(), itemListDeleter.X, itemListDeleter.Y);
+            }
+            else if(itemListDeleter.PopupDirection == Direction.Up)
+            {
+                PrintGUIElement(itemListDeleter.GetInStringsArray(), itemListDeleter.X,
+                    itemListDeleter.Y - itemListDeleter.ItemCount - 3);
+            }
         }
 
         ///<summary>

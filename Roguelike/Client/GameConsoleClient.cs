@@ -1,13 +1,13 @@
 ﻿using Roguelike.Engine;
 using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
-using Roguelike.GameConfig;
-using Roguelike.Input;
 using Roguelike.Engine.ObjectsOnMap;
+using Roguelike.GameConfig;
+using Roguelike.GameConfig.GUIElements;
+using Roguelike.Input;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using Roguelike.GameConfig.GUIElements;
 
 namespace Roguelike.Client
 {
@@ -77,10 +77,10 @@ namespace Roguelike.Client
                 int Y = CeilingRevealButton.Y;
                 int height = CeilingRevealButton.height;
                 int width = CeilingRevealButton.width;
-                
-                _buttonManager.Add(new Button(X, Y, width,height, leftClickAction, emptyAction));
+
+                _buttonManager.Add(new Button(X, Y, width, height, leftClickAction, emptyAction));
             }
-            
+
             #endregion
 
             InputIntercepted += ClearIntercept;
@@ -112,12 +112,12 @@ namespace Roguelike.Client
 
             if (_directionKeys.ContainsKey(k.key))
             {
-                OnDirectionKeyPress(_directionKeys[k.key],k.altHeld);
+                OnDirectionKeyPress(_directionKeys[k.key], k.altHeld);
             }
 
         }
 
-        private bool drewGroundItemListLastMouseMove = false;
+        private LootableItemListDeleter itemListDeleter = null;
         void OnMouseMove(MOUSE_MOVE_INFO m)
         {
             if (interceptNextInput)
@@ -126,13 +126,19 @@ namespace Roguelike.Client
             }
 
             //try print ground item list
-            if (_GUI.PrintLootableItemList(m.X, m.Y) && !drewGroundItemListLastMouseMove)
+            if (_GUI.PrintLootableItemList(m.X, m.Y) && itemListDeleter == null)
             {
-                drewGroundItemListLastMouseMove = true;
+                Point onMap = _GUI.BufferToMapPos(m.X, m.Y);
+                int itemCount = (_game.map.GetTopObjWithCoord(onMap.X, onMap.Y) as ISearchable).Inventory.Count;
+                Direction directionOfItemList =
+                    ((m.Y - itemCount - 3) > MapDisplayPosition.TopLeftPosY ?
+                    Direction.Up : Direction.Down);
+                itemListDeleter = new(m.X, m.Y, itemCount, directionOfItemList);
             }
-            else if(!_GUI.PrintLootableItemList(m.X, m.Y) && drewGroundItemListLastMouseMove)
+            else if (!_GUI.PrintLootableItemList(m.X, m.Y) && itemListDeleter != null)
             {
-                drewGroundItemListLastMouseMove = false;
+                _GUI.EraseLootableItemList(itemListDeleter);
+                itemListDeleter = null;
                 _GUI.PrintGame();
             }
         }
@@ -164,12 +170,12 @@ namespace Roguelike.Client
                 InputIntercepted.Invoke();
                 return;
             }
-            if (_buttonManager.TryClick(m.X,m.Y, true))
+            if (_buttonManager.TryClick(m.X, m.Y, true))
             {
                 _GUI.PrintGame();
                 return;
             }
-            if (_GUI.BufferPosInsideDisplayArea(m.X,m.Y))
+            if (_GUI.BufferPosInsideDisplayArea(m.X, m.Y))
             {
                 Point OnMap = _GUI.BufferToMapPos(m.X, m.Y);
                 _game.Interact(OnMap.X, OnMap.Y);
@@ -191,7 +197,7 @@ namespace Roguelike.Client
             {
                 return;
             }
-            if (_GUI.BufferPosInsideDisplayArea(m.X,m.Y))
+            if (_GUI.BufferPosInsideDisplayArea(m.X, m.Y))
             {
                 _GUI.PrintCellDescription(m.X, m.Y);
                 interceptNextInput = true;
@@ -305,7 +311,7 @@ namespace Roguelike.Client
         /// Note: Удаляет все функции из списка подписанных после каждого вызова.
         /// </summary>
         private static event Action InputIntercepted;
-        private void ClearIntercept ()
+        private void ClearIntercept()
         {
             if (InputIntercepted != null)
                 foreach (var d in InputIntercepted.GetInvocationList())

@@ -55,6 +55,7 @@ namespace Roguelike.Engine
 
             UpdateFOV();
         }
+
         public void Walk(Direction direction)
         {
             if (TryMove(direction))
@@ -85,6 +86,161 @@ namespace Roguelike.Engine
                 OnPlayerTurnEnded();
             }
         }
+
+        public void UpdateFOV()
+        {
+            for (int y = 0; y < map.Height; y++)
+            {
+                for (int x = 0; x < map.Width; x++)
+                {
+                    map.GetTopObjWithCoord(x, y).InFOV = inPlayerFOV(x, y);
+                }
+            }
+        }
+
+        public void Interact(int X, int Y)
+        {
+            if (!map.InPlayerFOV(X, Y))
+            {
+                return;
+            }
+
+            ObjectOnMap obj = map.GetTopObjWithCoord(X, Y);
+            object useWith = player.inventory.ActiveTool;
+
+            if (player.NextTo(X, Y))
+            {
+                if (obj is IUsable)
+                {
+                    UseCallBack callback = (obj as IUsable).TryUse(useWith);
+                    if (callback.ItemUsedUp)
+                    {
+                        player.inventory.RemoveFromInventory(useWith as InventoryObject);
+                    }
+                    if (!callback.Success)
+                    {
+                        GameLog.Add(LogMessages.UseUnsuccessful);
+                    }
+                    OnPlayerTurnEnded();
+                    player.inventory.SetActiveInventoryToolToNull();
+                    return;
+                }
+
+                player.inventory.SetActiveInventoryToolToNull();
+                if (obj is ISearchable)
+                {
+                    //
+                    //в идеале:
+                    //GUI.displayObjectInventory((obj as ISearchable).Inventory,X,Y);
+                    //по дальнейшему нажатию можно подобрать чтото определенное, но пока так:
+                    //
+
+                    List<InventoryObject> addedItems = new();
+                    List<InventoryObject> itemsOnGround = (obj as ISearchable).Inventory;
+
+                    foreach (InventoryObject item in itemsOnGround)
+                    {
+                        if (player.inventory.TryAddToInventory(item))
+                        {
+                            addedItems.Add(item);
+                        }
+                    }
+
+                    if (addedItems.Count == itemsOnGround.Count)
+                    {
+                        map.SetObjWithCoordToNull(X, Y, new InventoryObjectOnGround().MapLayer);
+                    }
+
+                    foreach (var item in addedItems)
+                    {
+                        (obj as ISearchable).Inventory.Remove(item);
+                    }
+
+                    OnPlayerTurnEnded();
+                    return;
+                }
+
+                if (obj is LivingObject && !(obj is Player))
+                {
+                    Monster monster = (obj as Monster);
+                    Weapon weapon = player.inventory.ActiveWeapon;
+                    if (weapon is MeleeWeapon || weapon == null)
+                        HitMonster(monster, weapon as MeleeWeapon);
+                    else
+                        ShootMonster(monster, weapon as RangedWeapon);
+
+                    OnPlayerTurnEnded();
+                    return;
+                }
+            }
+        }
+
+        public void Wait()
+        {
+            OnPlayerTurnEnded();
+        }
+
+        public void TrySwitchActiveInventoryItem(int handIndex)
+        {
+            InventoryObject iObj = player.inventory.Hands[handIndex];
+            if (!player.inventory.TrySetActiveInventoryItem(iObj, true))
+            {
+                player.inventory.TrySetActiveInventoryItem(iObj, false);
+            }
+        }
+
+        public void DropItem(int index, bool fromHands)
+        {
+            InventoryObject iObj;
+            if (fromHands)
+            {
+                iObj = player.inventory.Hands[index];
+            }
+            else
+            {
+                iObj = player.inventory.Pockets[index];
+            }
+            ObjectOnMap objUnderPlayer =
+                map.GetObjWithCoord(player.X, player.Y, MapLayer.SECONDARY);
+            if (objUnderPlayer == null)
+            {
+                InventoryObjectOnGround newInvObjOnGround = new();
+                (newInvObjOnGround as ISearchable).Inventory.Add(iObj);
+                map.SetObjWithCoord(player.X, player.Y, newInvObjOnGround);
+            }
+            else if (objUnderPlayer is InventoryObjectOnGround)
+            {
+                (objUnderPlayer as ISearchable).Inventory.Add(iObj);
+            }
+            player.inventory.RemoveFromInventory(iObj);
+
+            OnPlayerTurnEnded();
+        }
+
+        public void UnpocketItem(int index)
+        {
+            InventoryObject iObj = player.inventory.Pockets[index];
+            if (player.inventory.TryAddToHands(iObj))
+            {
+                player.inventory.Pockets.RemoveAt(index);
+
+                OnPlayerTurnEnded();
+            }
+        }
+
+        public void PocketItem(int index)
+        {
+            InventoryObject iObj = player.inventory.Hands[index];
+            if (player.inventory.TryAddToPockets(iObj))
+            {
+                player.inventory.Hands[index] = null;
+
+                OnPlayerTurnEnded();
+
+            }
+        }
+
+
         private bool TryMove(Direction direction)
         {
             if (player.CanMove(direction, map))
@@ -96,17 +252,6 @@ namespace Roguelike.Engine
             player.Move(direction, map);
             monsterManager.OnPlayerTurnEnded(playerTurnNumber);
             return false;
-        }
-
-        public void UpdateFOV()
-        {
-            for (int y = 0; y < map.Height; y++)
-            {
-                for (int x = 0; x < map.Width; x++)
-                {
-                    map.GetTopObjWithCoord(x, y).InFOV = inPlayerFOV(x, y);
-                }
-            }
         }
 
         private bool inPlayerFOV(int x, int y)
@@ -191,148 +336,12 @@ namespace Roguelike.Engine
             return false;
         }
 
-        public void Interact(int X, int Y)
-        {
-            if (!map.InPlayerFOV(X, Y))
-            {
-                return;
-            }
-
-            ObjectOnMap obj = map.GetTopObjWithCoord(X, Y);
-            object useWith = player.inventory.ActiveTool;
-
-            if (player.NextTo(X, Y))
-            {
-                if (obj is IUsable)
-                {
-                    UseCallBack callback = (obj as IUsable).TryUse(useWith);
-                    if (callback.ItemUsedUp)
-                    {
-                        player.inventory.RemoveFromInventory(useWith as InventoryObject);
-                    }
-                    if (!callback.Success)
-                    {
-                        GameLog.Add(LogMessages.UseUnsuccessful);
-                    }
-                    OnPlayerTurnEnded();
-                    player.inventory.SetActiveInventoryToolToNull();
-                    return;
-                }
-
-                player.inventory.SetActiveInventoryToolToNull();
-                if (obj is ISearchable)
-                {
-                    //
-                    //в идеале:
-                    //GUI.displayObjectInventory((obj as ISearchable).Inventory,X,Y);
-                    //по дальнейшему нажатию можно подобрать чтото определенное, но пока так:
-                    //
-
-                    List<InventoryObject> addedItems = new();
-                    List<InventoryObject> itemsOnGround = (obj as ISearchable).Inventory;
-
-                    foreach (InventoryObject item in itemsOnGround)
-                    {
-                        if (player.inventory.TryAddToInventory(item))
-                        {
-                            addedItems.Add(item);
-                        }
-                    }
-
-                    if (addedItems.Count == itemsOnGround.Count)
-                    {
-                        map.SetObjWithCoordToNull(X, Y, new InventoryObjectOnGround().MapLayer);
-                    }
-
-                    foreach (var item in addedItems)
-                    {
-                        (obj as ISearchable).Inventory.Remove(item);
-                    }
-
-                    OnPlayerTurnEnded();
-                    return;
-                }
-
-                if (obj is LivingObject && !(obj is Player))
-                {
-                    Monster monster = (obj as Monster);
-                    Weapon weapon = player.inventory.ActiveWeapon;
-                    if (weapon is MeleeWeapon || weapon == null)
-                        HitMonster(monster, weapon as MeleeWeapon);
-                    else
-                        ShootMonster(monster, weapon as RangedWeapon);
-
-                    OnPlayerTurnEnded();
-                    return;
-                }
-            }
-        }
-        public void Wait()
-        {
-            OnPlayerTurnEnded();
-        }
-        public void TrySwitchActiveInventoryItem(int handIndex)
-        {
-            InventoryObject iObj = player.inventory.Hands[handIndex];
-            if (!player.inventory.TrySetActiveInventoryItem(iObj, true))
-            {
-                player.inventory.TrySetActiveInventoryItem(iObj, false);
-            }
-        }
-        public void DropItem(int index, bool fromHands)
-        {
-            InventoryObject iObj;
-            if (fromHands)
-            {
-                iObj = player.inventory.Hands[index];
-            }
-            else
-            {
-                iObj = player.inventory.Pockets[index];
-            }
-            ObjectOnMap objUnderPlayer =
-                map.GetObjWithCoord(player.X, player.Y, MapLayer.SECONDARY);
-            if (objUnderPlayer == null)
-            {
-                InventoryObjectOnGround newInvObjOnGround = new();
-                (newInvObjOnGround as ISearchable).Inventory.Add(iObj);
-                map.SetObjWithCoord(player.X, player.Y, newInvObjOnGround);
-            }
-            else if (objUnderPlayer is InventoryObjectOnGround)
-            {
-                (objUnderPlayer as ISearchable).Inventory.Add(iObj);
-            }
-            player.inventory.RemoveFromInventory(iObj);
-
-            OnPlayerTurnEnded();
-        }
-
-        public void UnpocketItem(int index)
-        {
-            InventoryObject iObj = player.inventory.Pockets[index];
-            if (player.inventory.TryAddToHands(iObj))
-            {
-                player.inventory.Pockets.RemoveAt(index);
-
-                OnPlayerTurnEnded();
-            }
-        }
-        public void PocketItem(int index)
-        {
-            InventoryObject iObj = player.inventory.Hands[index];
-            if (player.inventory.TryAddToPockets(iObj))
-            {
-                player.inventory.Hands[index] = null;
-
-                OnPlayerTurnEnded();
-
-            }
-        }
         private void OnPlayerDeath(LivingObject player)
         {
             Console.Clear();
             Environment.Exit(0);
         }
+
         private void HitMonster(Monster monster, MeleeWeapon weapon)
         {
             float damageAmount = PlayerStats.FistDamage;
@@ -355,15 +364,18 @@ namespace Roguelike.Engine
             }
             monster.Damage(damageAmount);
         }
+
         private void BreakWeapon(MeleeWeapon weapon)
         {
             player.inventory.RemoveFromInventory(weapon);
             weapon = null;
         }
+
         private void ShootMonster(Monster monster, RangedWeapon weapon)
         {
             throw new NotImplementedException();
         }
+
         private void OnPlayerTurnEnded()
         {
             float oldPlayerHealth = player.Health;
