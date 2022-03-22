@@ -40,24 +40,10 @@ namespace Roguelike.GameConfig.GUIElements
     }
     public class CeilingRevealButton : GUIElement
     {
-        /*
-        public static readonly string[] StringEnabled = new string[3]
-        {
-            @"   / ",
-            @"  Ø  ",
-            @" /U  ",
-        };
-        public static readonly string[] StringDisabled = new string[3]
-        {
-            "     ",
-            "  O  ",
-            "  U  ",
-        };
-        */
         public const int width = 5;
         public const int height = 3;
-        public const int X = 45;
-        public const int Y = 4;
+        public const int X = 32;
+        public const int Y = 3;
     }
     public class HandInventoryGUI : GUIElement
     {
@@ -83,8 +69,8 @@ namespace Roguelike.GameConfig.GUIElements
     {
         public LeftHandInventoryGUI()
         {
-            X = 80;
-            Y = 2;
+            X = 102;
+            Y = 10;
             Width = 20;
             Height = 1;
         }
@@ -93,16 +79,16 @@ namespace Roguelike.GameConfig.GUIElements
     {
         public RightHandInventoryGUI()
         {
-            X = 80;
-            Y = 3;
+            X = 102;
+            Y = 11;
             Width = 20;
             Height = 1;
         }
     }
     public class PocketsInventoryBox : GUIElement
     {
-        public const int X = 80;
-        public const int Y = 4;
+        public const int X = 102;
+        public const int Y = 12;
         public const int EntryWidth = 12;
         public const int EntryHeight = 1;
 
@@ -221,37 +207,37 @@ namespace Roguelike.GameConfig.GUIElements
     {
         new public static readonly string[] String = 
         {
-            @"                                                                       ",
-            @"                                                                      ",
+            @"                                                                            ",
+            @"                                                                           ",
             @"                                                                            ",
             @"              M O U S E                       K E Y B O A R D                  ",
             @"                 ___                                                         ",
             @"    attack/use> /_|_\ <inspect             numpad 1-9  -  move                ",
-            @"               |     |                        or                        ",
-            @"               |     |                     arrow keys                    ",
+            @"               |     |                        or                              ",
+            @"               |     |                     arrow keys                          ",
             @"                \___/                      alt         -  run                ",
-            @"                                           numpad 0    -  wait to restore       ",
-            @"                                                          stamina          ",
-            @"                                           esc         -  exit           ",
-            @"                                                                       ",
-            @"                                                                       ",
-            @"                                                                       ",
+            @"                                           numpad 0    -  wait to restore        ",
+            @"                                                          stamina              ",
+            @"                                           esc         -  exit             ",
+            @"                                           R           -  reload          ",
+            @"                                                                         ",
+            @"                                                                          ",
             @"                      PRESS ANY KEY TO START                                 ",
-            @"                                                                       ",
+            @"                                                                          ",
         };
-        public const int X = 0;
-        public const int Y = 0;
+        public const int X = 20;
+        public const int Y = 10;
     }
     public class StatusBars : GUIElement
     {
-        public const int X = 10;
-        public const int Y = 15;
-        public const int Length = 30;
+        public const int X = 32;
+        public const int Y = 30;
+        public const int Length = 61;
     }
     public class LogBox : GUIElement
     {
-        public const int X = 10;
-        public const int Y = 20;
+        public const int X = 38;
+        public const int Y = 2;
         new public static readonly string[] String = new string[3]
         {
             " ___________________________________________ ",

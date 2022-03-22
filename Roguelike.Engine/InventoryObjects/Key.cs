@@ -4,7 +4,8 @@
     {
         public Key()
         {
-
+            Description = "Key: this key might open something. ";
+            Size = 1;
         }
     }
 }

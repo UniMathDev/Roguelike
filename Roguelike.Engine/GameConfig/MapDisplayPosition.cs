@@ -2,7 +2,7 @@
 {
     public struct MapDisplayPosition
     {
-        public const int TopLeftPosX = 10;
-        public const int TopLeftPosY = 3;
+        public const int TopLeftPosX = 32;
+        public const int TopLeftPosY = 10;
     }
 }

@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace Roguelike.Engine.InventoryObjects
 {
-    public class Eat: InventoryObject
+    public class Hamburger: InventoryObject
     {
-        public Eat()
+        public Hamburger()
         {
-
+            Size = 1;
+            Description = "Hamburger: I'm not hungry right now. ";
         }
     }
 }

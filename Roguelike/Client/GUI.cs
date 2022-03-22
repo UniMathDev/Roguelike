@@ -327,7 +327,7 @@ namespace Roguelike.Client
                 windowPosition.X, windowPosition.Y + 1);
 
             List<string> itemNames = new();
-            foreach (var inv in (obj as ISearchable).Inventory)
+            foreach (InventoryObject inv in (obj as ISearchable).Inventory)
             {
                 string name = inv.Description.Split(":")[0];
                 itemNames.Add(name);

@@ -55,10 +55,10 @@ namespace Roguelike.Engine.Maps
             script5.Add(new ItemProbability(new KitchenKnife(), 0.8f));
             script5.Add(new ItemProbability(new KitchenKnife(), 0.8f));
             script5.Add(new ItemProbability(new KitchenKnife(), 0.8f));
-            script5.Add(new ItemProbability(new Eat(), 0.9f));
-            script5.Add(new ItemProbability(new Eat(), 0.9f));
-            script5.Add(new ItemProbability(new Eat(), 0.9f));
-            script5.Add(new ItemProbability(new Eat(), 0.9f));
+            script5.Add(new ItemProbability(new Hamburger(), 0.9f));
+            script5.Add(new ItemProbability(new Hamburger(), 0.9f));
+            script5.Add(new ItemProbability(new Hamburger(), 0.9f));
+            script5.Add(new ItemProbability(new Hamburger(), 0.9f));
             script5.Add(new ItemProbability(new Pen(), 0.2f));
             script5.Add(new ItemProbability(new Pen(), 0.2f));
             _scripts[5] = script5;

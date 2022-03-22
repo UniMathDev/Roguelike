@@ -2,7 +2,7 @@
 {
     public struct WindowSize
     {
-        public const int Width = 110;
-        public const int Height = 30;
+        public const int Width = 130;
+        public const int Height = 40;
     }
 }
