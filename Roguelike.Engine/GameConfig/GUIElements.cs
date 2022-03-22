@@ -1,4 +1,7 @@
-﻿namespace Roguelike.GameConfig.GUIElements
+﻿using Roguelike.Engine.Enums;
+using System.Text;
+
+namespace Roguelike.GameConfig.GUIElements
 {
     public class GUIElement
     {
@@ -158,6 +161,45 @@
             "|        ",
         };
     }
+
+    public class LootableItemListDeleter
+    {
+        public LootableItemListDeleter(int x, int y, int itemCount, Direction direction)
+        {
+            X = x - ItemListBox.boxWidth / 2;
+            Y = y;
+            ItemCount = itemCount;
+            PopupDirection = direction;
+        }
+
+        public int X { get; set; }
+
+        public int Y { get; set; }
+
+        public int ItemCount { get; set; }
+
+        public Direction PopupDirection { get; set; }
+
+        public string[] GetInStringsArray()
+        {
+            var deleter = new string[ItemCount + 4];
+            var space = " ";
+            var str = "";
+
+            for(int i = 0; i < ItemListBox.boxWidth; i++)
+            {
+                str += space;
+            }
+
+            for(int i = 0; i < ItemCount + 4; i++)
+            {
+                deleter[i] = str;
+            }
+
+            return deleter;
+        }
+    }
+
     public class PocketInventoryDeleter : GUIElement
     {
         new public static readonly string[] String = new string[10]

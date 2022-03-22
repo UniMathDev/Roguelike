@@ -7,79 +7,77 @@ using Roguelike.Engine.InventoryObjects;
 
 namespace Roguelike.Engine.Maps
 {
-    
-
     public class Loot
     {
-        List<ItemProbability>[] Scripts;
+        private List<ItemProbability>[] _scripts;
 
         public Loot()
         {
-            Scripts = new List<ItemProbability>[6];
+            _scripts = new List<ItemProbability>[6];
 
-            List <ItemProbability> Script1 = new(); //All weapon
-            Script1.Add(new ItemProbability(new Axe(), 0.4f));
-            Script1.Add(new ItemProbability(new Pen(), 0.2f));
-            Script1.Add(new ItemProbability(new KitchenKnife(), 0.9f));
-            Script1.Add(new ItemProbability(new Gun(), 0.1f));
-            Scripts[1] = Script1;
+            List <ItemProbability> script1 = new(); //All weapon
+            script1.Add(new ItemProbability(new Axe(), 0.4f));
+            script1.Add(new ItemProbability(new Pen(), 0.2f));
+            script1.Add(new ItemProbability(new KitchenKnife(), 0.9f));
+            script1.Add(new ItemProbability(new Gun(), 0.1f));
+            _scripts[1] = script1;
 
-            List<ItemProbability> Script2 = new(); //Work items
-            Script2.Add(new ItemProbability(new Pen(), 0.8f));
-            Script2.Add(new ItemProbability(new Pen(), 0.8f));
-            Script2.Add(new ItemProbability(new Pen(), 0.8f));
-            Script2.Add(new ItemProbability(new Pen(), 0.8f));
-            Script2.Add(new ItemProbability(new Pen(), 0.8f));
-            Script2.Add(new ItemProbability(new KitchenKnife(), 0.2f));
-            Script2.Add(new ItemProbability(new Bandage(), 0.15f));
-            Script2.Add(new ItemProbability(new LightBulb(), 0.2f));
-            Scripts[2] = Script2;
+            List<ItemProbability> script2 = new(); //Work items
+            script2.Add(new ItemProbability(new Pen(), 0.8f));
+            script2.Add(new ItemProbability(new Pen(), 0.8f));
+            script2.Add(new ItemProbability(new Pen(), 0.8f));
+            script2.Add(new ItemProbability(new Pen(), 0.8f));
+            script2.Add(new ItemProbability(new Pen(), 0.8f));
+            script2.Add(new ItemProbability(new KitchenKnife(), 0.2f));
+            script2.Add(new ItemProbability(new Bandage(), 0.15f));
+            script2.Add(new ItemProbability(new LightBulb(), 0.2f));
+            _scripts[2] = script2;
 
-            List<ItemProbability> Script3 = new(); //Safe-Life Collection
-            Script3.Add(new ItemProbability(new Axe(), 0.9f));
-            Script3.Add(new ItemProbability(new Bandage(), 0.9f));
-            Script3.Add(new ItemProbability(new KitchenKnife(), 1f));
-            Script3.Add(new ItemProbability(new LightBulb(), 0.9f));
-            Script3.Add(new ItemProbability(new Gun(), 0.2f));
-            Scripts[3] = Script3;
+            List<ItemProbability> script3 = new(); //Safe-Life Collection
+            script3.Add(new ItemProbability(new Axe(), 0.9f));
+            script3.Add(new ItemProbability(new Bandage(), 0.9f));
+            script3.Add(new ItemProbability(new KitchenKnife(), 1f));
+            script3.Add(new ItemProbability(new LightBulb(), 0.9f));
+            script3.Add(new ItemProbability(new Gun(), 0.2f));
+            _scripts[3] = script3;
 
-            List<ItemProbability> Script4 = new(); //Full Random strange thing (for body...) 
-            Script4.Add(new ItemProbability(new Axe(), 0.1f));
-            Script4.Add(new ItemProbability(new Bandage(), 0.5f));
-            Script4.Add(new ItemProbability(new KitchenKnife(), 0.5f));
-            Script4.Add(new ItemProbability(new LightBulb(), 0.7f));
-            Script4.Add(new ItemProbability(new Gun(), 0.05f));
-            Script4.Add(new ItemProbability(new Pen(), 0.5f));
-            Script4.Add(new ItemProbability(new Pen(), 0.5f));
-            Scripts[4] = Script4;
+            List<ItemProbability> script4 = new(); //Full Random strange thing (for body...) 
+            script4.Add(new ItemProbability(new Axe(), 0.1f));
+            script4.Add(new ItemProbability(new Bandage(), 0.5f));
+            script4.Add(new ItemProbability(new KitchenKnife(), 0.5f));
+            script4.Add(new ItemProbability(new LightBulb(), 0.7f));
+            script4.Add(new ItemProbability(new Gun(), 0.05f));
+            script4.Add(new ItemProbability(new Pen(), 0.5f));
+            script4.Add(new ItemProbability(new Pen(), 0.5f));
+            _scripts[4] = script4;
 
-            List<ItemProbability> Script5 = new(); //Smt for kitchen 
-            Script5.Add(new ItemProbability(new KitchenKnife(), 0.8f));
-            Script5.Add(new ItemProbability(new KitchenKnife(), 0.8f));
-            Script5.Add(new ItemProbability(new KitchenKnife(), 0.8f));
-            Script5.Add(new ItemProbability(new Eat(), 0.9f));
-            Script5.Add(new ItemProbability(new Eat(), 0.9f));
-            Script5.Add(new ItemProbability(new Eat(), 0.9f));
-            Script5.Add(new ItemProbability(new Eat(), 0.9f));
-            Script5.Add(new ItemProbability(new Pen(), 0.2f));
-            Script5.Add(new ItemProbability(new Pen(), 0.2f));
-            Scripts[5] = Script5;
+            List<ItemProbability> script5 = new(); //Smt for kitchen 
+            script5.Add(new ItemProbability(new KitchenKnife(), 0.8f));
+            script5.Add(new ItemProbability(new KitchenKnife(), 0.8f));
+            script5.Add(new ItemProbability(new KitchenKnife(), 0.8f));
+            script5.Add(new ItemProbability(new Eat(), 0.9f));
+            script5.Add(new ItemProbability(new Eat(), 0.9f));
+            script5.Add(new ItemProbability(new Eat(), 0.9f));
+            script5.Add(new ItemProbability(new Eat(), 0.9f));
+            script5.Add(new ItemProbability(new Pen(), 0.2f));
+            script5.Add(new ItemProbability(new Pen(), 0.2f));
+            _scripts[5] = script5;
         }
 
         public List<InventoryObject> CreateLoot (int numberOfScript)
         {
-            List<InventoryObject> ObjectInventory = new();
+            List<InventoryObject> objectInventory = new();
             
-            foreach (ItemProbability i in Scripts[numberOfScript])
+            foreach (ItemProbability i in _scripts[numberOfScript])
             {
-                bool IsDropped = i.Chance - (float)GameMath.rand.NextDouble() >= 0f;
-                if (IsDropped)
+                bool isDropped = i.Chance - (float)GameMath.rand.NextDouble() >= 0f;
+                if (isDropped)
                 {
-                    ObjectInventory.Add(i.obj);
+                    objectInventory.Add(i.obj);
                 }
             }
 
-            return ObjectInventory;
+            return objectInventory;
         }
 
     }

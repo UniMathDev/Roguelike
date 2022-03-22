@@ -31,8 +31,6 @@ namespace Roguelike.Engine
             monsterManager = new(map, player);
             playerTurnNumber = 1;
 
-            UpdateFOV();
-
             //TESTING GROUND ITEMS
             Wardrobe obj = new Wardrobe();
             map.SetObjWithCoord(18, 2, obj);
@@ -56,10 +54,11 @@ namespace Roguelike.Engine
             //TESTING LAMPS ITEMS
             Lamp lamp = new();
             this.map.SetObjWithCoord(13, 5, lamp);
-
-
             //
+
+            UpdateFOV();
         }
+
         public void Walk(Direction direction)
         {
             if (TryMove(direction))
@@ -90,18 +89,6 @@ namespace Roguelike.Engine
                 OnPlayerTurnEnded();
             }
         }
-        private bool TryMove(Direction direction)
-        {
-            if (player.CanMove(direction, map))
-            {
-                player.Move(direction, map);
-                return true;
-            }
-
-            player.Move(direction, map);
-            monsterManager.OnPlayerTurnEnded(playerTurnNumber);
-            return false;
-        }
 
         public void UpdateFOV()
         {
@@ -109,57 +96,14 @@ namespace Roguelike.Engine
             {
                 for (int x = 0; x < map.Width; x++)
                 {
-                    map.GetTopObjWithCoord(x, y).InFOV = false;
-                    if ((Math.Pow(x - player.X, 2) / 4 +
-                            Math.Pow(y - player.Y, 2)) < Math.Pow(player.FOVSize, 2))
-                    {
-                        map.GetTopObjWithCoord(x, y).InFOV = true;
-
-                        if (player.X == x && player.Y == y)
-                            continue;
-
-                        if (player.X == x)
-                        {
-                            int i = x;
-                            int offset = (player.Y < y ? 1 : -1);
-                            for (int j = player.Y + offset; j != y; j += offset)
-                            {
-                                if (!map.GetTopObjWithCoord(i, j).Seethrough)
-                                {
-                                    map.GetTopObjWithCoord(x, y).InFOV = false;
-                                    break;
-                                }
-                            }
-
-                            continue;
-                        }
-
-                        //y = kx + b
-                        double k = ((double)player.Y - y) / ((double)player.X - x);
-                        double b = (double)y + 0.5 - k * ((double)x + 0.5);
-
-                        int j1;
-                        double offsetX = (player.X < x ? 0.05 : -0.05);
-                        for (double i = player.X + 0.5;
-                            (int)Math.Floor(i) != x || (int)Math.Floor(k * i + b) != y; i += offsetX)
-                        {
-                            j1 = (int)Math.Floor(k * i + b);
-                            j1 = (j1 < 0 ? 0 : j1);
-                            j1 = (j1 >= map.Height ? map.Height - 1 : j1);
-                            if (!map.GetTopObjWithCoord((int)Math.Floor(i), j1).Seethrough)
-                            {
-                                map.GetTopObjWithCoord(x, y).InFOV = false;
-                                break;
-                            }
-                        }
-                    }
+                    map.GetTopObjWithCoord(x, y).InFOV = inPlayerFOV(x, y);
                 }
             }
         }
 
         public void Interact(int X, int Y)
         {
-            if (!map.WithinBounds(X, Y))
+            if (!map.InPlayerFOV(X, Y))
             {
                 return;
             }
@@ -238,6 +182,7 @@ namespace Roguelike.Engine
         {
             OnPlayerTurnEnded();
         }
+
         public void TrySwitchActiveInventoryItem(int handIndex)
         {
             InventoryObject iObj = player.inventory.Hands[handIndex];
@@ -246,6 +191,7 @@ namespace Roguelike.Engine
                 player.inventory.TrySetActiveInventoryItem(iObj, false);
             }
         }
+
         public void DropItem(int index, bool fromHands)
         {
             InventoryObject iObj;
@@ -333,6 +279,7 @@ namespace Roguelike.Engine
                 OnPlayerTurnEnded();
             }
         }
+
         public void PocketItem(int index)
         {
             InventoryObject iObj = player.inventory.Hands[index];
@@ -344,11 +291,109 @@ namespace Roguelike.Engine
 
             }
         }
+
+
+        private bool TryMove(Direction direction)
+        {
+            if (player.CanMove(direction, map))
+            {
+                player.Move(direction, map);
+                return true;
+            }
+
+            player.Move(direction, map);
+            monsterManager.OnPlayerTurnEnded(playerTurnNumber);
+            return false;
+        }
+
+        private bool inPlayerFOV(int x, int y)
+        {
+            if ((Math.Pow(x - player.X, 2) / 4 +
+                            Math.Pow(y - player.Y, 2)) < Math.Pow(player.FOVSize, 2))
+            {
+                bool inFOV = true;
+
+                if (player.X == x && player.Y == y)
+                    return true;
+
+                int coordY;
+
+                if (player.X == x)
+                {
+                    int coordX = x;
+                    int offset = (player.Y < y ? 1 : -1);
+                    for (coordY = player.Y + offset; coordY != y; coordY += offset)
+                    {
+                        if (!map.GetTopObjWithCoord(coordX, coordY).Seethrough)
+                        {
+                            inFOV = false;
+                            break;
+                        }
+                    }
+
+                    return inFOV;
+                }
+
+
+                //y = kx + b
+                double k = ((double)player.Y - y) / ((double)player.X - x);
+                double b1 = 0;
+                double b2 = 0;
+
+                if (k < 0)
+                {
+                    b1 = (double)y + 0.1 - k * ((double)x + 0.1);
+                    b2 = (double)y + 0.9 - k * ((double)x + 0.9);
+                }
+                else
+                {
+                    b1 = (double)y + 0.9 - k * ((double)x + 0.1);
+                    b2 = (double)y + 0.1 - k * ((double)x + 0.9);
+                }
+
+                double offsetX = (player.X < x ? 0.05 : -0.05);
+
+                for (double coordX = player.X + 0.1;
+                    (int)Math.Floor(coordX) != x || (int)Math.Floor(k * coordX + b1) != y; coordX += offsetX)
+                {
+                    coordY = (int)Math.Floor(k * coordX + b1);
+                    if (!map.GetTopObjWithCoord((int)Math.Floor(coordX), coordY)
+                        .Seethrough)
+                    {
+                        inFOV = false;
+                        break;
+                    }
+                }
+
+                if (inFOV == true)
+                    return inFOV;
+
+                inFOV = true;
+
+                for (double coordX = player.X + 0.9;
+                    (int)Math.Floor(coordX) != x || (int)Math.Floor(k * coordX + b2) != y; coordX += offsetX)
+                {
+                    coordY = (int)Math.Floor(k * coordX + b2);
+                    if (!map.GetTopObjWithCoord((int)Math.Floor(coordX), coordY)
+                        .Seethrough)
+                    {
+                        inFOV = false;
+                        break;
+                    }
+                }
+
+                return inFOV;
+            }
+
+            return false;
+        }
+
         private void OnPlayerDeath(LivingObject player)
         {
             Console.Clear();
             Environment.Exit(0);
         }
+
         private void HitMonster(Monster monster, MeleeWeapon weapon)
         {
             float damageAmount = PlayerStats.FistDamage;
@@ -371,11 +416,13 @@ namespace Roguelike.Engine
             }
             monster.Damage(damageAmount);
         }
+
         private void BreakWeapon(MeleeWeapon weapon)
         {
             player.inventory.RemoveFromInventory(weapon);
             weapon = null;
         }
+
         private void ShootMonster(Monster monster, RangedWeapon weapon)
         {
             if (weapon.Ammo > 0) {
@@ -393,12 +440,12 @@ namespace Roguelike.Engine
                 OnPlayerTurnEnded();
             }
         }
+
         private void OnPlayerTurnEnded()
         {
             float oldPlayerHealth = player.Health;
             playerTurnNumber++;
 
-            UpdateFOV();
             player.Stamina = MathF.Min(player.Stamina + PlayerStats.EndOfTurnStaminaGain,
                                        PlayerStats.MaxStamina);
             monsterManager.OnPlayerTurnEnded(playerTurnNumber);
@@ -406,6 +453,8 @@ namespace Roguelike.Engine
             {
                 PlayerTookDamage.Invoke();
             }
+
+            UpdateFOV();
         }
     }
 }

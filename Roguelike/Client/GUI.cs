@@ -1,14 +1,14 @@
-﻿using System;
-using Roguelike.Engine;
+﻿using Roguelike.Engine;
+using Roguelike.Engine.Enums;
+using Roguelike.Engine.InventoryObjects;
 using Roguelike.Engine.ObjectsOnMap;
+using Roguelike.Engine.ObjectsOnMap.FixedObjects;
 using Roguelike.GameConfig;
 using Roguelike.GameConfig.GUIElements;
-using Roguelike.Engine.ObjectsOnMap.FixedObjects;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
-using System.Collections.Generic;
-using Roguelike.Engine.InventoryObjects;
-using Roguelike.Engine.Enums;
 
 namespace Roguelike.Client
 {
@@ -49,6 +49,7 @@ namespace Roguelike.Client
             Console.SetCursorPosition(0, 2);
             Console.Write("Turn number: " + _game.playerTurnNumber + " ");
 
+            Console.CursorVisible = false;
         }
         private void PrintLogBox()
         {
@@ -83,7 +84,7 @@ namespace Roguelike.Client
                 builder.Append(' ');
             }
             builder.Append('.');
-            Console.SetCursorPosition(X,Y);
+            Console.SetCursorPosition(X, Y);
             Console.ForegroundColor = FGcolour;
             Console.Write(builder.ToString());
             Console.ResetColor();
@@ -186,7 +187,7 @@ namespace Roguelike.Client
 
                         if (objectOnMap.InFOV)
                         {
-                            double distanceFromPlayerSquared = 
+                            double distanceFromPlayerSquared =
                                 Math.Pow(mapCoord.X - _game.player.X, 2) / 4 +
                                 Math.Pow(mapCoord.Y - _game.player.Y, 2);
                             if (distanceFromPlayerSquared <
@@ -212,7 +213,7 @@ namespace Roguelike.Client
                             Console.Write(" ");
                         }
 
-                        
+
                     }
                 }
             }
@@ -243,10 +244,10 @@ namespace Roguelike.Client
             Point absolutePoint = BufferToMapPos(X, Y);
             string description;
 
-            if (_game.map.WithinBounds(absolutePoint.X, absolutePoint.Y))
+            if (_game.map.InPlayerFOV(absolutePoint.X, absolutePoint.Y))
             {
-                description = 
-                    _game.map.GetTopObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;   
+                description =
+                    _game.map.GetTopObjWithCoord(absolutePoint.X, absolutePoint.Y).Description;
                 PrintDescriptionBox(description);
             }
         }
@@ -268,14 +269,20 @@ namespace Roguelike.Client
             PrintGUIElement(SnippedDesc, DescriptionBoxX + DescriptionBox.textStartOffsetX,
                 DescriptionBoxY + DescriptionBox.textStartOffsetY);
         }
-        public bool PrintLootableItemList(int X, int Y)
+        public bool PrintLootableItemList(int x, int y)
         {
-            if (!BufferPosInsideDisplayArea(X, Y))
+            if (!BufferPosInsideDisplayArea(x, y))
             {
                 return false;
             }
 
-            Point onMap = BufferToMapPos(X, Y);
+            Point onMap = BufferToMapPos(x, y);
+
+            if (!_game.map.InPlayerFOV(onMap.X, onMap.Y))
+            {
+                return false;
+            }
+
             ObjectOnMap obj = _game.map.GetTopObjWithCoord(onMap.X, onMap.Y);
 
             if ((!(obj is ISearchable)) || ((obj as ISearchable).Inventory.Count == 0))
@@ -294,25 +301,25 @@ namespace Roguelike.Client
             itemsWindow.Add(ItemListBox.String[2]);
 
             Direction directionOfItemList =
-                (Y - itemsWindow.Count - 1 > MapDisplayPosition.TopLeftPosY ?
+                (y - itemsWindow.Count - 1 > MapDisplayPosition.TopLeftPosY ?
                 Direction.Up : Direction.Down);
 
-            
+
             Point windowPosition = new(0, 0);
             if (directionOfItemList == Direction.Up)
             {
-                PrintGUIElement(new string[] { "V" }, X, Y - 1);
-                windowPosition = new Point(Math.Max(0, X - ItemListBox.boxWidth / 2),
-                                             Math.Max(0, Y - 3 - itemCount));
-            }  
+                PrintGUIElement(new string[] { "V" }, x, y - 1);
+                windowPosition = new Point(Math.Max(0, x - ItemListBox.boxWidth / 2),
+                                             Math.Max(0, y - 3 - itemCount));
+            }
             else if (directionOfItemList == Direction.Down)
             {
-                PrintGUIElement(new string[] { "Ʌ" }, X, Y + 1);
-                windowPosition = new Point(Math.Max(0, X - ItemListBox.boxWidth / 2),
-                                             Math.Max(0, Y + 2));
+                PrintGUIElement(new string[] { "Ʌ" }, x, y + 1);
+                windowPosition = new Point(Math.Max(0, x - ItemListBox.boxWidth / 2),
+                                             Math.Max(0, y + 2));
             }
 
-            PrintGUIElement(new string[]{ itemsWindow[0] }, windowPosition.X, windowPosition.Y);
+            PrintGUIElement(new string[] { itemsWindow[0] }, windowPosition.X, windowPosition.Y);
 
             Console.ForegroundColor = ConsoleColor.Black;
             Console.BackgroundColor = ConsoleColor.Gray;
@@ -333,7 +340,7 @@ namespace Roguelike.Client
         }
         public void PrintHandPopupMenu(int handIndex)
         {
-           
+
             HandInventoryGUI[] handInventoryGUI = { new RightHandInventoryGUI(),
                                                     new LeftHandInventoryGUI() };
             int X = handInventoryGUI[handIndex].X + HandPopupMenu.arrowOffestX;
@@ -341,7 +348,7 @@ namespace Roguelike.Client
             PrintGUIElement(HandPopupMenu.String, X, Y);
             X += HandPopupMenu.optionStartOffsetX;
             Y += HandPopupMenu.optionStartOffsetY;
-            Console.SetCursorPosition(X,Y);
+            Console.SetCursorPosition(X, Y);
             Console.Write("USE");
             Console.SetCursorPosition(X, ++Y);
             Console.Write("DROP");
@@ -369,13 +376,26 @@ namespace Roguelike.Client
             PrintGUIElement(PopupMenuDeleter.String, X, Y);
         }
 
+        internal void EraseLootableItemList(LootableItemListDeleter itemListDeleter)
+        {
+            if (itemListDeleter.PopupDirection == Direction.Down)
+            {
+                PrintGUIElement(itemListDeleter.GetInStringsArray(), itemListDeleter.X, itemListDeleter.Y);
+            }
+            else if(itemListDeleter.PopupDirection == Direction.Up)
+            {
+                PrintGUIElement(itemListDeleter.GetInStringsArray(), itemListDeleter.X,
+                    itemListDeleter.Y - itemListDeleter.ItemCount - 3);
+            }
+        }
+
         ///<summary>
         ///Переводит координаты относительно буфера в абсолютные координаты карты.
         ///</summary>
         public Point BufferToMapPos(int X, int Y)
         {
             Point output = new Point();
-            output = BufferToCameraPos(X,Y);
+            output = BufferToCameraPos(X, Y);
             output.X += GetCameraPos().X;
             output.Y += GetCameraPos().Y;
             return output;
@@ -411,10 +431,10 @@ namespace Roguelike.Client
         {
             Point cameraPos = new();
             cameraPos.X = _game.player.X - MapDisplaySize.Width / 2;
-            cameraPos.Y  = _game.player.Y - MapDisplaySize.Height / 2;
+            cameraPos.Y = _game.player.Y - MapDisplaySize.Height / 2;
 
             cameraPos.X = Math.Max(0, cameraPos.X);
-            cameraPos.Y = Math.Max(0, cameraPos.Y); 
+            cameraPos.Y = Math.Max(0, cameraPos.Y);
 
             cameraPos.X = Math.Min(MapSize.Width - MapDisplaySize.Width, cameraPos.X);
             cameraPos.Y = Math.Min(MapSize.Height - MapDisplaySize.Height, cameraPos.Y);
@@ -440,7 +460,7 @@ namespace Roguelike.Client
             int offset = 0;
             foreach (string row in stringArray)
             {
-                Console.SetCursorPosition(X,Y + offset);
+                Console.SetCursorPosition(X, Y + offset);
                 Console.Write(row);
                 offset++;
             }

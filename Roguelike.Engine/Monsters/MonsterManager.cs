@@ -28,7 +28,7 @@ namespace Roguelike.Engine.Monsters
             monsterList = new List<Monster>();
             _pathfinder = new Pathfinder(map);
             eggList = FindEggs(map);
-            _playerTurnNumber = 0;
+            _playerTurnNumber = 1;
         }
 
         public void OnPlayerTurnEnded(int moveNumber)

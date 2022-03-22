@@ -30,12 +30,14 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
                 GameLog.Add(LogMessages.DoorClosed);
                 Character = closedChar;
                 Walkable = false;
+                Seethrough = false;
             }
             else
             {
                 GameLog.Add(LogMessages.DoorOpened);
                 Character = openedChar;
                 Walkable = true;
+                Seethrough = true;
             }
 
             return new UseCallBack(true, false); ;

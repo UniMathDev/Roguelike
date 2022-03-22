@@ -15,7 +15,7 @@ namespace Roguelike.Engine.Maps
         {
             MapCell[,] mapCells = CreateMapToArray(pathToFileWithMap, height, width);
 
-            CreateLootMapToArray(mapCells, height, width);
+            CreateLootMapInArray(mapCells, height, width);
 
             Map map = new(height, width, mapCells);
             return map;
@@ -59,25 +59,25 @@ namespace Roguelike.Engine.Maps
             return mapCells;
         }
 
-        public static void CreateLootMapToArray(MapCell[,] mapCells, int height, int width)
+        public static void CreateLootMapInArray(MapCell[,] mapCells, int height, int width)
         {
             using var sr = new StreamReader(@"..\..\..\..\Maps\LootMap.txt", Encoding.UTF8);
-            int[,] LootMap = new int[height, width];
+            int[,] lootMap = new int[height, width];
 
-            var ElementToSripts = new Loot();
+            var elementToSripts = new Loot();
 
             string[] lootMapInStrings = sr.ReadToEnd().Split('\n');
             for (int y = 0; y < height; y++)
             {
-                char[] NumbersOfScript = lootMapInStrings[y].ToCharArray();
+                char[] numbersOfScript = lootMapInStrings[y].ToCharArray();
                 for (int x = 0; x < width; x++)
                 {
                     int numberOfScript;
                     try
                     {
                         //нельзя char --> int, только из string
-                        numberOfScript = Convert.ToInt32(NumbersOfScript[x].ToString()); 
-                        LootMap[y, x] = numberOfScript;
+                        numberOfScript = Convert.ToInt32(numbersOfScript[x].ToString()); 
+                        lootMap[y, x] = numberOfScript;
                     }
                     catch
                     {
@@ -86,8 +86,8 @@ namespace Roguelike.Engine.Maps
 
                     if (numberOfScript != 0)
                     {
-                        List<InventoryObject> FinalItems = ElementToSripts.CreateLoot(numberOfScript);
-                        foreach (var i in FinalItems)
+                        List<InventoryObject> finalItems = elementToSripts.CreateLoot(numberOfScript);
+                        foreach (var i in finalItems)
                         {
                             (mapCells[y, x].Layers[(int)MapLayer.MAIN] as ISearchable).Inventory.Add(i);
                         }
