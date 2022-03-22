@@ -2,9 +2,10 @@
 
 namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
 {
-    public class Lamp : FixedObject, IUsable
+    public class Lamp : FixedObject, ILuminous
     {
         protected bool HasBulb;
+        public int LightedAreaRadius { get; private set; }
 
         public Lamp() : base()
         {
@@ -14,11 +15,9 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
             MapLayer = Enums.MapLayer.CEILING;
             Walkable = true;
             Seethrough = true;
+            HasBulb = true;
+            LightedAreaRadius = 3;
         }
-        public UseCallBack TryUse(object obj)
-        {
-            //if a lamp was given then put HasBulb to true;
-            return new UseCallBack();
-        }
+
     }
 }
