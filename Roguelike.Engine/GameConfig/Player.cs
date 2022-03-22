@@ -4,7 +4,7 @@
     {
         public const int X = 9;
         public const int Y = 12;
-        public const int FOVSize = 2;
+        public const int FOVSize = 3;
     }
     public struct PlayerStats
     {

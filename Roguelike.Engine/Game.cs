@@ -147,6 +147,13 @@ namespace Roguelike.Engine
                             continue;
                         }
 
+                        if (!map.GetTopObjWithCoord(x, y).Seethrough &&
+                            (Math.Sign(x - player.X) != Math.Sign(x - lightSourceCoords.X) ||
+                            Math.Sign(y - player.Y) != Math.Sign(y - lightSourceCoords.Y)))
+                        {
+                            continue;
+                        }
+
                         ObjectOnMap objectOnMap = map.GetTopObjWithCoord(x, y);                        
 
                         double distanceFromLightSourceSquared =
@@ -156,13 +163,13 @@ namespace Roguelike.Engine
                         objectOnMap.InFOV = true;
 
                         if (distanceFromLightSourceSquared <
-                            lightedAreaRadiusSquared * 0.4)
+                            lightedAreaRadiusSquared * 0.3)
                         {
                             objectOnMap.CurrentForegroundColor = 
                                 ChooseLightedObjColor(objectOnMap.CurrentForegroundColor, ConsoleColor.White);
                         }
                         else if (distanceFromLightSourceSquared <
-                            lightedAreaRadiusSquared * 0.7)
+                            lightedAreaRadiusSquared * 0.6)
                         {
                             objectOnMap.CurrentForegroundColor =
                                 ChooseLightedObjColor(objectOnMap.CurrentForegroundColor, ConsoleColor.Gray);
