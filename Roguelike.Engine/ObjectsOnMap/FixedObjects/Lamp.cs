@@ -21,7 +21,7 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
             Seethrough = true;
             HasBulb = true;
             LightedAreaRadius = 10;
-            Enabled = false;
+            Enabled = true;
         }
 
         public UseCallBack TryUse(object input)
