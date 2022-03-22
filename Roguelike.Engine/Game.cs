@@ -22,7 +22,7 @@ namespace Roguelike.Engine
         public int playerTurnNumber { get; private set; }
 
         public Action PlayerTookDamage;
-
+        public Action PlayerShotGun;
         public Game(Map map, Player player)
         {
             this.map = map;
@@ -40,7 +40,10 @@ namespace Roguelike.Engine
 
             InventoryObjectOnGround obj2 = new InventoryObjectOnGround();
             map.SetObjWithCoord(15, 4, obj2);
-            obj2.Inventory.Add(new Pen());
+            obj2.Inventory.Add(new Gun());
+            obj2.Inventory.Add(new Magazine(7));
+            obj2.Inventory.Add(new Magazine(4));
+            obj2.Inventory.Add(new Magazine(10));
 
             InventoryObjectOnGround obj3 = new InventoryObjectOnGround();
             map.SetObjWithCoord(15, 7, obj3);
@@ -163,71 +166,72 @@ namespace Roguelike.Engine
 
             ObjectOnMap obj = map.GetTopObjWithCoord(X, Y);
             object useWith = player.inventory.ActiveTool;
+            bool playerNextToObject = player.NextTo(X, Y);
 
-            if (player.NextTo(X, Y)) 
+            if (obj is IUsable && player.NextTo(X, Y))
             {
-                if (obj is IUsable)
+                UseCallBack callback = (obj as IUsable).TryUse(useWith);
+                if (callback.ItemUsedUp)
                 {
-                    UseCallBack callback = (obj as IUsable).TryUse(useWith);
-                    if (callback.ItemUsedUp) 
-                    {
-                        player.inventory.RemoveFromInventory(useWith as InventoryObject); 
-                    }
-                    if (!callback.Success)
-                    {
-                        GameLog.Add(LogMessages.UseUnsuccessful);
-                    }
-                    OnPlayerTurnEnded();
-                    player.inventory.SetActiveInventoryToolToNull();
-                    return;
+                    player.inventory.RemoveFromInventory(useWith as InventoryObject);
                 }
-
+                if (!callback.Success)
+                {
+                    GameLog.Add(LogMessages.UseUnsuccessful);
+                }
+                OnPlayerTurnEnded();
                 player.inventory.SetActiveInventoryToolToNull();
-                if (obj is ISearchable)
+                return;
+            }
+            player.inventory.SetActiveInventoryToolToNull();
+            if (obj is ISearchable && player.NextTo(X, Y))
+            {
+                //
+                //в идеале:
+                //GUI.displayObjectInventory((obj as ISearchable).Inventory,X,Y);
+                //по дальнейшему нажатию можно подобрать чтото определенное, но пока так:
+                //
+
+                List<InventoryObject> addedItems = new();
+                List<InventoryObject> itemsOnGround = (obj as ISearchable).Inventory;
+
+                foreach (InventoryObject item in itemsOnGround)
                 {
-                    //
-                    //в идеале:
-                    //GUI.displayObjectInventory((obj as ISearchable).Inventory,X,Y);
-                    //по дальнейшему нажатию можно подобрать чтото определенное, но пока так:
-                    //
-
-                    List<InventoryObject> addedItems = new();
-                    List<InventoryObject> itemsOnGround = (obj as ISearchable).Inventory;
-
-                    foreach (InventoryObject item in itemsOnGround)
+                    if (player.inventory.TryAddToInventory(item))
                     {
-                        if (player.inventory.TryAddToInventory(item))
-                        {
-                            addedItems.Add(item);
-                        }
+                        addedItems.Add(item);
                     }
-
-                    if (addedItems.Count == itemsOnGround.Count)
-                    {
-                        map.SetObjWithCoordToNull(X, Y, new InventoryObjectOnGround().MapLayer);
-                    }
-
-                    foreach (var item in addedItems)
-                    {
-                        (obj as ISearchable).Inventory.Remove(item);
-                    }
-
-                    OnPlayerTurnEnded();
-                    return;
                 }
 
-                if (obj is LivingObject && !(obj is Player))
+                if (addedItems.Count == itemsOnGround.Count)
                 {
-                    Monster monster = (obj as Monster);
-                    Weapon weapon = player.inventory.ActiveWeapon;
-                    if (weapon is MeleeWeapon || weapon == null)
-                        HitMonster(monster, weapon as MeleeWeapon);
-                    else
-                        ShootMonster(monster, weapon as RangedWeapon);
-
-                    OnPlayerTurnEnded();
-                    return;
+                    map.SetObjWithCoordToNull(X, Y, new InventoryObjectOnGround().MapLayer);
                 }
+
+                foreach (var item in addedItems)
+                {
+                    (obj as ISearchable).Inventory.Remove(item);
+                }
+
+                OnPlayerTurnEnded();
+                return;
+            }
+
+            if (obj is LivingObject && !(obj is Player))
+            {
+                Monster monster = (obj as Monster);
+                Weapon weapon = player.inventory.ActiveWeapon;
+                if (weapon is MeleeWeapon || weapon == null && player.NextTo(X, Y))
+                {
+                    HitMonster(monster, weapon as MeleeWeapon);
+                    OnPlayerTurnEnded();
+                }
+                else if (monster.InFOV)
+                {
+                    ShootMonster(monster, weapon as RangedWeapon);
+                    OnPlayerTurnEnded();
+                }
+                return;
             }
         }
         public void Wait()
@@ -269,7 +273,56 @@ namespace Roguelike.Engine
 
             OnPlayerTurnEnded();
         }
+        public void ReloadGun()
+        {
+            PlayerInventory inventory = player.inventory;
+            Magazine bestMagazine = null;
+            int bestAmmoCount = 0;
+            Gun playerGun = null;
+            bool playerHasGunInHands = false;
+            for (int handIndex = 0; handIndex < 2; handIndex++)
+            {
+                if (inventory.Hands[handIndex] is Gun)
+                {
+                    playerGun = inventory.Hands[handIndex] as Gun;
+                    playerHasGunInHands = true;
+                }
+            }
+            if (!playerHasGunInHands)
+            {
+                return;
+            }
 
+            for (int handIndex = 0; handIndex < 2; handIndex++)
+            {
+                AssignIfBestMag(inventory.Hands[handIndex]);
+            }
+            for (int i = 0; i < inventory.Pockets.Count; i++)
+            {
+                AssignIfBestMag(inventory.Pockets[i]);
+            }
+            if (bestMagazine != null)
+            {
+                int buffer;
+                buffer = playerGun.Ammo;
+                playerGun.Ammo = bestMagazine.Ammo;
+                bestMagazine.Ammo = buffer;
+                if(bestMagazine.Ammo == 0)
+                {
+                    inventory.RemoveFromInventory(bestMagazine);
+                }
+                OnPlayerTurnEnded();
+            }
+            void AssignIfBestMag(InventoryObject item)
+            {
+                if (item is Magazine &&
+                   (item as Magazine).Ammo > bestAmmoCount)
+                {
+                    bestMagazine = (item as Magazine);
+                    bestAmmoCount = (item as Magazine).Ammo;
+                }
+            }
+        }
         public void UnpocketItem(int index)
         {
             InventoryObject iObj = player.inventory.Pockets[index];
@@ -325,7 +378,20 @@ namespace Roguelike.Engine
         }
         private void ShootMonster(Monster monster, RangedWeapon weapon)
         {
-            throw new NotImplementedException();
+            if (weapon.Ammo > 0) {
+                float damageAmount = weapon.AverageDamage - weapon.DamageRange / 2f
+                       + weapon.DamageRange * (float)GameMath.rand.NextDouble();
+
+                weapon.Ammo--;
+                PlayerShotGun.Invoke();
+                monster.Damage(damageAmount);
+                OnPlayerTurnEnded();
+            }
+            else
+            {
+                //click!
+                OnPlayerTurnEnded();
+            }
         }
         private void OnPlayerTurnEnded()
         {

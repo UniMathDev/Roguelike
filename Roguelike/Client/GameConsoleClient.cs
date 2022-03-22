@@ -42,6 +42,7 @@ namespace Roguelike.Client
             _keyboardMenu.Add(ConsoleKey.Escape, new GameMenuItem(Exit));
             _keyboardMenu.Add(ConsoleKey.NumPad0, new GameMenuItem(OnWaitButtonPress));
             _keyboardMenu.Add(ConsoleKey.D0, new GameMenuItem(OnWaitButtonPress));
+            _keyboardMenu.Add(ConsoleKey.R, new GameMenuItem(OnReloadButtonPress));
 
             #region _directionKeys assignment
             _directionKeys = new Dictionary<ConsoleKey, Direction>();
@@ -66,6 +67,7 @@ namespace Roguelike.Client
 
             _game.player.inventory.InventoryUpdated += OnInventoryUpdate;
             _game.PlayerTookDamage += OnPlayerDamage;
+            _game.PlayerShotGun += OnGunShot;
             #region static UI buttons creation
             //ceiling reveal button
             {
@@ -134,9 +136,9 @@ namespace Roguelike.Client
                 _GUI.PrintGame();
             }
         }
-        private void OnDirectionKeyPress(Direction direction, bool shiftHeld)
+        private void OnDirectionKeyPress(Direction direction, bool altHeld)
         {
-            if (shiftHeld)
+            if (altHeld)
             {
                 _game.Run(direction);
             }
@@ -144,6 +146,12 @@ namespace Roguelike.Client
             {
                 _game.Walk(direction);
             }
+            _GUI.PrintGame();
+        }
+
+        private void OnReloadButtonPress()
+        {
+            _game.ReloadGun();
             _GUI.PrintGame();
         }
 
@@ -299,6 +307,11 @@ namespace Roguelike.Client
             _GUI.PrintGame();
         }
 
+        private void OnGunShot()
+        {
+            _GUI.PrintFlash(ConsoleColor.White);
+            _GUI.PrintGame();
+        }
         /// <summary>
         /// Note: Удаляет все функции из списка подписанных после каждого вызова.
         /// </summary>

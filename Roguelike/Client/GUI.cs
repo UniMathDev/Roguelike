@@ -232,7 +232,7 @@ namespace Roguelike.Client
             Console.ForegroundColor = color;
             PrintGUIElement(final,MapDisplayPosition.TopLeftPosX, MapDisplayPosition.TopLeftPosY);
             Console.ResetColor();
-            System.Threading.Thread.Sleep(50);
+            System.Threading.Thread.Sleep(100);
             PrintGame();
         }
         ///<summary>
@@ -252,7 +252,7 @@ namespace Roguelike.Client
         }
         public void PrintInventoryItemDescription(InventoryObject iObject)
         {
-            PrintDescriptionBox(iObject.Description);
+            PrintDescriptionBox(iObject.Description + " Size: " + iObject.Size);
         }
         private void PrintDescriptionBox(string description)
         {

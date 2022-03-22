@@ -2,7 +2,10 @@
 {
     public interface IUsable : IChangeAble
     {
-        public UseCallBack TryUse(object useWith);
+        public UseCallBack TryUse(object useWith)
+        {
+            return new UseCallBack(false, false);
+        }
     }
     public struct UseCallBack
     {

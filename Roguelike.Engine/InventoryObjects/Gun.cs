@@ -10,11 +10,12 @@ namespace Roguelike.Engine.InventoryObjects
     {
         public Gun()
         {
+            Description = "Pistol: A deadly black pistol. It's heavy. I think it's intuitive enough for me to use. ";
             AverageDamage = 110f;
             DamageRange = 0f;
             Size = 2;
-            MaxAmmo = 10;
-            Ammo = 10;
+            MaxAmmo = Magazine.maxAmmo;
+            Ammo = Magazine.maxAmmo;
         }
     }
 }
