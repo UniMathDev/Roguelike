@@ -16,7 +16,7 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
             Walkable = true;
             Seethrough = true;
             HasBulb = true;
-            LightedAreaRadius = 3;
+            LightedAreaRadius = 10;
         }
 
     }

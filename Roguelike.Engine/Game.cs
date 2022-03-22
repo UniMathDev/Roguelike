@@ -52,8 +52,19 @@ namespace Roguelike.Engine
             obj4.Inventory.Add(new LightBulb());
 
             //TESTING LAMPS ITEMS
-            Lamp lamp = new();
-            this.map.SetObjWithCoord(13, 5, lamp);
+            Lamp lamp1 = new();
+            this.map.SetObjWithCoord(13, 5, lamp1);
+            Lamp lamp2 = new();
+            this.map.SetObjWithCoord(28, 8, lamp2);
+            Lamp lamp3 = new();
+            this.map.SetObjWithCoord(40, 8, lamp3);
+            Lamp lamp4 = new();
+            this.map.SetObjWithCoord(52, 8, lamp4);
+            Lamp lamp5 = new();
+            this.map.SetObjWithCoord(64, 8, lamp5);
+            Lamp lamp6 = new();
+            this.map.SetObjWithCoord(76, 12, lamp6);
+
             //
 
             UpdateFOV();
