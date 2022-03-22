@@ -52,7 +52,8 @@ namespace Roguelike.Engine
             obj4.Inventory.Add(new LightBulb());
 
             //TESTING LAMPS ITEMS
-            Lamp lamp1 = new();
+            Lamp lamp1 = new(false,ConsoleColor.White);
+
             this.map.SetObjWithCoord(13, 5, lamp1);
             Lamp lamp2 = new();
             this.map.SetObjWithCoord(28, 8, lamp2);

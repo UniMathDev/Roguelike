@@ -2,8 +2,8 @@
 {
     public struct PlayerInit
     {
-        public const int X = 5;
-        public const int Y = 11;
+        public const int X = 9;
+        public const int Y = 12;
         public const int FOVSize = 2;
     }
     public struct PlayerStats

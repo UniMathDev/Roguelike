@@ -12,7 +12,7 @@
             Character = 'o';
             ForegroundColor = System.ConsoleColor.DarkMagenta;
             Description = "Egg: I think it's pulsating a little. ";
-            Timer = GameMath.rand.Next(7,11);
+            Timer = GameMath.rand.Next(40,45);
             Seethrough = true;
         }
     }

@@ -11,33 +11,27 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
 
         public bool Enabled { get; private set; }
 
-        public Lamp() : base()
+        public Lamp(bool Enabled = true, ConsoleColor FG = ConsoleColor.Yellow) : base()
         {
             Character = 'o';
-            ForegroundColor = ConsoleColor.White;
+            this.ForegroundColor = FG;
             Description = "Lamp: Bright power saving lamp. ";
             MapLayer = Enums.MapLayer.CEILING;
             Walkable = true;
             Seethrough = true;
             HasBulb = true;
             LightedAreaRadius = 10;
-            Enabled = true;
+            this.Enabled = Enabled;
         }
 
         public UseCallBack TryUse(object input)
         {
-            if (input != null)
+            if (!(input is InventoryObjects.LightBulb))
             {
                 return new UseCallBack(false, false);
             }
 
-            if (Enabled)
-            {
-                GameLog.Add(LogMessages.LampDisabled);
-                ForegroundColor = ConsoleColor.White;
-                Enabled = false;
-            }
-            else
+            if (!Enabled)
             {
                 GameLog.Add(LogMessages.LampEnabled);
                 ForegroundColor = ConsoleColor.Yellow;
