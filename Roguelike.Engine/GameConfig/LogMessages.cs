@@ -43,6 +43,14 @@ namespace Roguelike.GameConfig
             "I close the door.",
             "The door is now closed.",
         };
+        public static string[] LampEnabled =
+        {
+            "Lamp enabled."
+        };
+        public static string[] LampDisabled =
+        {
+            "Lamp disabled."
+        };
         public static string[] PistolHit =
         {
             "I hit it.",
