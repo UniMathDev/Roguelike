@@ -118,12 +118,12 @@ namespace Roguelike.Engine
                 {
                     ObjectOnMap obj = map.GetTopObjWithCoord(x, y);
                     ObjectOnMap ceilObj = map.GetObjWithCoord(x, y, MapLayer.CEILING);
-                    if (obj is ILuminous)
+                    if ((obj is ILuminous) && (obj as ILuminous).Enabled)
                     {
                         SetColorForIlluminatedArea(new Point(x, y), (obj as ILuminous).LightedAreaRadius);
                     }
 
-                    if (ceilObj is ILuminous)
+                    if ((ceilObj is ILuminous) && (ceilObj as ILuminous).Enabled)
                     {
                         SetColorForIlluminatedArea(new Point(x, y), (ceilObj as ILuminous).LightedAreaRadius);
                     }

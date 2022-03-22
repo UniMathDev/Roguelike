@@ -74,6 +74,7 @@ namespace Roguelike.Client
                 Action leftClickAction = () =>
                 {
                     _game.map.ShowCeiling = !_game.map.ShowCeiling;
+                    _game.UpdateFOV();
                 };
                 int X = CeilingRevealButton.X;
                 int Y = CeilingRevealButton.Y;

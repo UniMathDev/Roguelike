@@ -6,5 +6,6 @@ namespace Roguelike.Engine.ObjectsOnMap
     public interface ILuminous
     {
         public int LightedAreaRadius { get; }
+        public bool Enabled { get; }
     }
 }
