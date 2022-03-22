@@ -300,9 +300,6 @@ namespace Roguelike.Engine
                 player.Move(direction, map);
                 return true;
             }
-
-            player.Move(direction, map);
-            monsterManager.OnPlayerTurnEnded(playerTurnNumber);
             return false;
         }
 
