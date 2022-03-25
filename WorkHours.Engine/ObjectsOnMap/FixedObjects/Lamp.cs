@@ -38,7 +38,7 @@ namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
                 Enabled = true;
             }
 
-            return new UseCallBack(true, false); ;
+            return new UseCallBack(true, true);
         }
     }
 }

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Roguelike.Engine\Roguelike.Engine.csproj" />
+    <ProjectReference Include="..\WorkHours.Engine\WorkHours.Engine.csproj" />
   </ItemGroup>
 
 </Project>

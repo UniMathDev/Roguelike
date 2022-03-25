@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31702.278
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roguelike", "Roguelike\Roguelike.csproj", "{28F50FE8-3AE8-4444-87DA-D9316189A157}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkHours", "WorkHours\WorkHours.csproj", "{28F50FE8-3AE8-4444-87DA-D9316189A157}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roguelike.Engine", "Roguelike.Engine\Roguelike.Engine.csproj", "{80A5C792-63BF-4CC0-BD8A-9089BB4E9EB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkHours.Engine", "WorkHours.Engine\WorkHours.Engine.csproj", "{80A5C792-63BF-4CC0-BD8A-9089BB4E9EB4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
