@@ -1,43 +1,28 @@
 ﻿using System.Collections.Generic;
 using System;
 using Roguelike.Engine.InventoryObjects;
-using Roguelike.GameConfig;
 
 namespace Roguelike.Engine.ObjectsOnMap
 {
-    public class Player : LivingObject, IUsable
+    public class Player : LivingObject
     {
         public PlayerInventory inventory = new PlayerInventory();
-        public float Stamina { get; set; } = PlayerStats.MaxStamina;
-        public int FOVSize { get; set; }
-        public Player(int x, int y, int fovSize)
+        public float Stamina { get; set; } = GameConfig.PlayerStats.MaxStamina;
+        public Player(int x, int y)
         {
             Character = '@';
             ForegroundColor = ConsoleColor.Green;
             Description = "Me: this is me. ";
-            Health = PlayerStats.MaxHealth;
+            Health = GameConfig.PlayerStats.MaxHealth;
             X = x;
             Y = y;
-            FOVSize = fovSize;
-            Seethrough = true;
-            InFOV = true;
-        }
-
-        public UseCallBack TryUse(object useWith)
-        {
-            if(useWith is Bandage && Health < PlayerStats.MaxHealth)
-            {
-                Health = MathF.Min(Health + Bandage.HealAmount, PlayerStats.MaxHealth);
-                return new UseCallBack(true, true);
-            }
-            return new UseCallBack(false, false);
         }
     }
     public class PlayerInventory
     {
         public Action InventoryUpdated;
         public List<InventoryObject> Pockets { get; private set; } = new List<InventoryObject>();
-        private int RemainingPocketSpace = PlayerStats.PocketSize;
+        private int RemainingPocketSpace = GameConfig.PlayerStats.PocketSize;
         public InventoryObject[] Hands { get; private set; } = new InventoryObject[2];
         public Weapon ActiveWeapon { get; private set; }
         public InventoryObject ActiveTool { get; private set; }

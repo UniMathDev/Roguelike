@@ -1,13 +1,13 @@
 ﻿using Roguelike.Engine;
 using Roguelike.Engine.Enums;
 using Roguelike.Engine.Maps;
-using Roguelike.Engine.ObjectsOnMap;
 using Roguelike.GameConfig;
-using Roguelike.GameConfig.GUIElements;
 using Roguelike.Input;
+using Roguelike.Engine.ObjectsOnMap;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using Roguelike.GameConfig.GUIElements;
 
 namespace Roguelike.Client
 {
@@ -29,20 +29,18 @@ namespace Roguelike.Client
         public GameConsoleClient()
         {
             Map map = TxtToMapConverter.ConvertToArrayMap(@"..\..\..\..\Maps\Maps.txt", MapSize.Height, MapSize.Width);
-            Player player = new(PlayerInit.X, PlayerInit.Y, PlayerInit.FOVSize);
-            map.SetObjWithCoord(PlayerInit.X, PlayerInit.Y, player);
-            GameLog.Start();
+            Player player = new(PlayerInitCoords.X, PlayerInitCoords.Y);
+            map.SetObjWithCoord(PlayerInitCoords.X, PlayerInitCoords.Y, player);
             _game = new(map, player);
             _GUI = new(_game);
             _buttonManager = new();
 
-
+            InputManager.Start();
             InputManager.KeyPress += OnKeyPress;
             _keyboardMenu = new Dictionary<ConsoleKey, GameMenuItem>();
             _keyboardMenu.Add(ConsoleKey.Escape, new GameMenuItem(Exit));
             _keyboardMenu.Add(ConsoleKey.NumPad0, new GameMenuItem(OnWaitButtonPress));
             _keyboardMenu.Add(ConsoleKey.D0, new GameMenuItem(OnWaitButtonPress));
-            _keyboardMenu.Add(ConsoleKey.R, new GameMenuItem(OnReloadButtonPress));
 
             #region _directionKeys assignment
             _directionKeys = new Dictionary<ConsoleKey, Direction>();
@@ -66,24 +64,22 @@ namespace Roguelike.Client
             InputManager.MouseMoved += OnMouseMove;
 
             _game.player.inventory.InventoryUpdated += OnInventoryUpdate;
-            _game.PlayerTookDamage += OnPlayerDamage;
-            _game.PlayerShotGun += OnGunShot;
+
             #region static UI buttons creation
             //ceiling reveal button
             {
                 Action leftClickAction = () =>
                 {
                     _game.map.ShowCeiling = !_game.map.ShowCeiling;
-                    _game.UpdateFOV();
                 };
                 int X = CeilingRevealButton.X;
                 int Y = CeilingRevealButton.Y;
                 int height = CeilingRevealButton.height;
                 int width = CeilingRevealButton.width;
-
-                _buttonManager.Add(new Button(X, Y, width, height, leftClickAction, emptyAction));
+                
+                _buttonManager.Add(new Button(X, Y, width,height, leftClickAction, emptyAction));
             }
-
+            
             #endregion
 
             InputIntercepted += ClearIntercept;
@@ -92,9 +88,6 @@ namespace Roguelike.Client
         public void Start()
         {
             _GUI.PrintStartScreen();
-
-            InputManager.Start();
-
             interceptNextInput = true;
             InputIntercepted += Console.Clear;
             InputIntercepted += _GUI.PrintGame;
@@ -115,12 +108,12 @@ namespace Roguelike.Client
 
             if (_directionKeys.ContainsKey(k.key))
             {
-                OnDirectionKeyPress(_directionKeys[k.key], k.altHeld);
+                OnDirectionKeyPress(_directionKeys[k.key],k.altHeld);
             }
 
         }
 
-        private LootableItemListDeleter itemListDeleter = null;
+        private bool drewGroundItemListLastMouseMove = false;
         void OnMouseMove(MOUSE_MOVE_INFO m)
         {
             if (interceptNextInput)
@@ -129,25 +122,19 @@ namespace Roguelike.Client
             }
 
             //try print ground item list
-            if (_GUI.PrintLootableItemList(m.X, m.Y) && itemListDeleter == null)
+            if (_GUI.PrintGroundItemList(m.X, m.Y) && !drewGroundItemListLastMouseMove)
             {
-                Point onMap = _GUI.BufferToMapPos(m.X, m.Y);
-                int itemCount = (_game.map.GetTopObjWithCoord(onMap.X, onMap.Y) as ISearchable).Inventory.Count;
-                Direction directionOfItemList =
-                    ((m.Y - itemCount - 3) > MapDisplayPosition.TopLeftPosY ?
-                    Direction.Up : Direction.Down);
-                itemListDeleter = new(m.X, m.Y, itemCount, directionOfItemList);
+                drewGroundItemListLastMouseMove = true;
             }
-            else if (!_GUI.PrintLootableItemList(m.X, m.Y) && itemListDeleter != null)
+            else if(!_GUI.PrintGroundItemList(m.X, m.Y) && drewGroundItemListLastMouseMove)
             {
-                _GUI.EraseLootableItemList(itemListDeleter);
-                itemListDeleter = null;
+                drewGroundItemListLastMouseMove = false;
                 _GUI.PrintGame();
             }
         }
-        private void OnDirectionKeyPress(Direction direction, bool altHeld)
+        private void OnDirectionKeyPress(Direction direction, bool shiftHeld)
         {
-            if (altHeld)
+            if (shiftHeld)
             {
                 _game.Run(direction);
             }
@@ -155,12 +142,6 @@ namespace Roguelike.Client
             {
                 _game.Walk(direction);
             }
-            _GUI.PrintGame();
-        }
-
-        private void OnReloadButtonPress()
-        {
-            _game.ReloadGun();
             _GUI.PrintGame();
         }
 
@@ -179,12 +160,12 @@ namespace Roguelike.Client
                 InputIntercepted.Invoke();
                 return;
             }
-            if (_buttonManager.TryClick(m.X, m.Y, true))
+            if (_buttonManager.TryClick(m.X,m.Y, true))
             {
                 _GUI.PrintGame();
                 return;
             }
-            if (_GUI.BufferPosInsideDisplayArea(m.X, m.Y))
+            if (_GUI.BufferPosInsideDisplayArea(m.X,m.Y))
             {
                 Point OnMap = _GUI.BufferToMapPos(m.X, m.Y);
                 _game.Interact(OnMap.X, OnMap.Y);
@@ -206,7 +187,7 @@ namespace Roguelike.Client
             {
                 return;
             }
-            if (_GUI.BufferPosInsideDisplayArea(m.X, m.Y))
+            if (_GUI.BufferPosInsideDisplayArea(m.X,m.Y))
             {
                 _GUI.PrintCellDescription(m.X, m.Y);
                 interceptNextInput = true;
@@ -310,22 +291,11 @@ namespace Roguelike.Client
 
         }
 
-        private void OnPlayerDamage()
-        {
-            _GUI.PrintFlash(ConsoleColor.DarkRed);
-            _GUI.PrintGame();
-        }
-
-        private void OnGunShot()
-        {
-            _GUI.PrintFlash(ConsoleColor.White);
-            _GUI.PrintGame();
-        }
         /// <summary>
         /// Note: Удаляет все функции из списка подписанных после каждого вызова.
         /// </summary>
         private static event Action InputIntercepted;
-        private void ClearIntercept()
+        private void ClearIntercept ()
         {
             if (InputIntercepted != null)
                 foreach (var d in InputIntercepted.GetInvocationList())
