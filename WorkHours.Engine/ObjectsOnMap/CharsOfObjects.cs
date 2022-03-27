@@ -5,7 +5,7 @@ namespace Roguelike.Engine.ObjectsOnMap
 {
     class CharsOfObjects
     {
-        private FixedObjectFactory _ObjFactory;
+        private ObjectOnMapFactory _ObjFactory;
         private Dictionary<char, Factory> _availableCharsOfObjs;
 
         public CharsOfObjects()

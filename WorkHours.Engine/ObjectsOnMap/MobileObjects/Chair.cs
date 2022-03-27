@@ -1,6 +1,6 @@
-﻿namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
+﻿namespace Roguelike.Engine.ObjectsOnMap.MobileObjects
 {
-    class Chair : FixedObject
+    class Chair : MobileObject
     {
         public Chair() : base()
         {
