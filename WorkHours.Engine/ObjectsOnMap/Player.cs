@@ -9,8 +9,9 @@ namespace Roguelike.Engine.ObjectsOnMap
     {
         public PlayerInventory inventory = new PlayerInventory();
         public float Stamina { get; set; } = PlayerStats.MaxStamina;
-        public int FOVSize { get; set; }
-        public Player(int x, int y, int fovSize)
+        public MobileObject DraggedObject { get; set; }
+
+        public Player(int x, int y)
         {
             Character = '@';
             ForegroundColor = ConsoleColor.Green;
@@ -18,7 +19,6 @@ namespace Roguelike.Engine.ObjectsOnMap
             Health = PlayerStats.MaxHealth;
             X = x;
             Y = y;
-            FOVSize = fovSize;
             Seethrough = true;
             InFOV = true;
         }

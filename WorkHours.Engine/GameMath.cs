@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Collections.Generic;
 using System.Text;
 using System;
+using Roguelike.Engine.ObjectsOnMap;
 
 namespace Roguelike.Engine
 {
@@ -64,10 +65,27 @@ namespace Roguelike.Engine
                 default: throw new Exception("size has to be bigger than zero.");
             }
         }
+        public static Direction[] allDirections =
+        {
+            Direction.LeftUp,
+            Direction.Up,
+            Direction.RightUp,
+            Direction.Left,
+            Direction.Right,
+            Direction.LeftDown,
+            Direction.Down,
+            Direction.RightDown,
+        };
     }
-    public class IntWrapper
+    public struct ObjectDirection
     {
-        public int Value { get; set; }
-        public IntWrapper(int value) { Value = value; }
+        public ObjectOnMap obj;
+        public Direction dir;
+
+        public ObjectDirection(ObjectOnMap obj, Direction dir)
+        {
+            this.obj = obj;
+            this.dir = dir;
+        }
     }
 }

@@ -8,7 +8,7 @@ namespace Roguelike.Engine.ObjectsOnMap
     {
         public int X { get; protected set; }
         public int Y { get; protected set; }
-        public Point coordinates
+        public Point Position
         {
             get
             {
@@ -20,6 +20,7 @@ namespace Roguelike.Engine.ObjectsOnMap
                 Y = value.Y;
             }
         }
+        public bool Draggable = false;
         public MobileObject()
         {
             MapLayer = MapLayer.MAIN;

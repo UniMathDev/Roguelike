@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
-using Roguelike.Engine.ObjectsOnMap.MobileObjects;
+using Roguelike.Engine.ObjectsOnMap.DraggableObjects;
 
 namespace Roguelike.Engine.ObjectsOnMap.FixedObjects
 {

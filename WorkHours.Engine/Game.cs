@@ -3,6 +3,7 @@ using Roguelike.Engine.InventoryObjects;
 using Roguelike.Engine.Maps;
 using Roguelike.Engine.Monsters;
 using Roguelike.Engine.ObjectsOnMap;
+using Roguelike.Engine.ObjectsOnMap.DraggableObjects;
 using Roguelike.Engine.ObjectsOnMap.FixedObjects;
 using Roguelike.GameConfig;
 using System;
@@ -23,6 +24,9 @@ namespace Roguelike.Engine
 
         public Action PlayerTookDamage;
         public Action PlayerShotGun;
+        public Action<Direction[]> DragWasUncertain;
+
+        public delegate Direction[] OnDragUncertainDelegate();
         public Game(Map map, Player player)
         {
             this.map = map;
@@ -51,6 +55,25 @@ namespace Roguelike.Engine
             map.SetObjWithCoord(16, 8, obj4);
             obj4.Inventory.Add(new LightBulb());
 
+            Chair obj5 = new Chair(13 - 5,13);
+            map.SetObjWithCoord(13-5, 13, obj5);
+            Chair obj6 = new Chair(14 - 5, 13);
+            map.SetObjWithCoord(14-5, 13, obj6);
+            Chair obj7 = new Chair(15 - 5, 13);
+            map.SetObjWithCoord(15-5, 13, obj7);
+
+            Chair obj8 = new Chair(13 - 5, 11);
+            map.SetObjWithCoord(13 - 5, 11, obj8);
+            Chair obj9 = new Chair(14 - 5, 11);
+            map.SetObjWithCoord(14 - 5, 11, obj9);
+            Chair obj10 = new Chair(15 - 5, 11);
+            map.SetObjWithCoord(15 - 5, 11, obj10);
+
+            Chair obj11 = new Chair(13 - 5, 12);
+            map.SetObjWithCoord(13 - 5, 12, obj11);
+            Chair obj12 = new Chair(15 - 5, 12);
+            map.SetObjWithCoord(15 - 5, 12, obj12);
+
             //TESTING LAMPS ITEMS
             Lamp lamp1 = new(false,ConsoleColor.White);
 
@@ -73,7 +96,33 @@ namespace Roguelike.Engine
 
         public void Walk(Direction direction)
         {
-            if (TryMove(direction))
+            if (player.DraggedObject != null)
+            {
+                if (TryMove(direction))
+                {
+                    player.DraggedObject.Move(direction, map);
+                    OnMoveSuccess();
+                    return;
+                }
+                else if(player.DraggedObject.CanMove(direction, map))
+                {
+                    player.DraggedObject.Move(direction, map);
+                    TryMove(direction);
+                    OnMoveSuccess();
+                    return;
+                }
+                if (!player.NextTo(player.DraggedObject.Position))
+                {
+                    player.DraggedObject = null;
+                }
+                void OnMoveSuccess()
+                {
+                    player.Stamina -= PlayerStats.WalkStaminaPenalty;
+                    player.Stamina -= PlayerStats.DragStaminaPenalty;
+                    OnPlayerTurnEnded();
+                }
+            }
+            else if (TryMove(direction))
             {
                 player.Stamina -= PlayerStats.WalkStaminaPenalty;
                 OnPlayerTurnEnded();
@@ -82,7 +131,7 @@ namespace Roguelike.Engine
 
         public void Run(Direction direction)
         {
-            if (player.Stamina - PlayerStats.RunStaminaPenalty < 0)
+            if (player.Stamina - PlayerStats.RunStaminaPenalty < 0 || player.DraggedObject != null)
             {
                 Walk(direction);
                 return;
@@ -101,7 +150,40 @@ namespace Roguelike.Engine
                 OnPlayerTurnEnded();
             }
         }
+        public void Drag()
+        {
+            if(player.DraggedObject != null)
+            {
+                player.DraggedObject = null;
+                return;
+            }
+            else
+            {
+                List<ObjectOnMap> draggableObjects = new();
+                List<Direction> draggableObjectDirections = new();
 
+                foreach (Direction direction in GameMath.allDirections)
+                {
+                    ObjectOnMap obj = GetObjectNextToPlayer(direction);
+                    bool objDraggable = (obj is MobileObject) && (obj as MobileObject).Draggable;
+                    if (objDraggable)
+                    {
+                        draggableObjects.Add(obj);
+                        draggableObjectDirections.Add(direction);
+                    }
+                }
+                switch (draggableObjects.Count)
+                {
+                    case >= 1: DragWasUncertain.Invoke(draggableObjectDirections.ToArray()); return;
+                    case 0: return;
+                }
+            }
+        }
+        public void Drag(Direction direction)
+        {
+            ObjectOnMap obj = GetObjectNextToPlayer(direction);
+            player.DraggedObject = obj as MobileObject;
+        }
         public void UpdateFOV()
         {
             for (int y = 0; y < map.Height; y++)
@@ -131,7 +213,7 @@ namespace Roguelike.Engine
                 }
             }
 
-            SetColorForIlluminatedArea(new Point(player.X, player.Y), player.FOVSize);
+            SetColorForIlluminatedArea(player.Position, PlayerInit.FOVSize);
         }
 
         public void Interact(int X, int Y)
@@ -203,7 +285,7 @@ namespace Roguelike.Engine
                     ShootMonster(monster, weapon as RangedWeapon);
                     OnPlayerTurnEnded();
                 }
-                else if (weapon is MeleeWeapon || weapon == null && player.NextTo(X, Y))
+                else if ((weapon is MeleeWeapon || weapon == null) && player.NextTo(X, Y))
                 {
                     HitMonster(monster, weapon as MeleeWeapon);
                     OnPlayerTurnEnded();
@@ -325,9 +407,6 @@ namespace Roguelike.Engine
 
             }
         }
-
-
-
         private bool TryMove(Direction direction)
         {
             if (player.CanMove(direction, map))
@@ -473,6 +552,13 @@ namespace Roguelike.Engine
                 GameLog.Add(LogMessages.PistolEmpty);
                 OnPlayerTurnEnded();
             }
+        }
+        private ObjectOnMap GetObjectNextToPlayer(Direction direction)
+        {
+            Point coordDiff = GameMath.DirectionToCoordDiff(direction);
+            Point cellPos = new(player.X + coordDiff.X, player.Y + coordDiff.Y);
+            ObjectOnMap obj = map.GetTopObjWithCoord(cellPos.X, cellPos.Y);
+            return obj;
         }
 
         private void OnPlayerTurnEnded()

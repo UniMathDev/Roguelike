@@ -109,8 +109,8 @@ namespace Roguelike.Engine.Monsters
 
         private void MoveTowardPlayer(Monster monster)
         {
-            Direction moveDirection = _pathfinder.FindWay(monster.coordinates,
-                _player.coordinates, _playerTurnNumber);
+            Direction moveDirection = _pathfinder.FindWay(monster.Position,
+                _player.Position, _playerTurnNumber);
             if (monster.CanMove(moveDirection, _map))
             {
                 monster.Move(moveDirection, _map);

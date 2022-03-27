@@ -8,6 +8,7 @@ using Roguelike.Input;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using WorkHours.Engine;
 
 namespace Roguelike.Client
 {
@@ -19,6 +20,7 @@ namespace Roguelike.Client
         private readonly Game _game;
         private readonly GUI _GUI;
         private ClickInfo lastClick;
+        private KEY_PRESS_INFO lastKeyPress;
 
         private bool interceptNextInput;
 
@@ -29,7 +31,7 @@ namespace Roguelike.Client
         public GameConsoleClient()
         {
             Map map = TxtToMapConverter.ConvertToArrayMap(@"..\..\..\..\Maps\Maps.txt", MapSize.Height, MapSize.Width);
-            Player player = new(PlayerInit.X, PlayerInit.Y, PlayerInit.FOVSize);
+            Player player = new(PlayerInit.X, PlayerInit.Y);
             map.SetObjWithCoord(PlayerInit.X, PlayerInit.Y, player);
             GameLog.Start();
             _game = new(map, player);
@@ -43,6 +45,7 @@ namespace Roguelike.Client
             _keyboardMenu.Add(ConsoleKey.NumPad0, new GameMenuItem(OnWaitButtonPress));
             _keyboardMenu.Add(ConsoleKey.D0, new GameMenuItem(OnWaitButtonPress));
             _keyboardMenu.Add(ConsoleKey.R, new GameMenuItem(OnReloadButtonPress));
+            _keyboardMenu.Add(ConsoleKey.Spacebar, new GameMenuItem(OnDragButtonPress));
 
             #region _directionKeys assignment
             _directionKeys = new Dictionary<ConsoleKey, Direction>();
@@ -68,6 +71,7 @@ namespace Roguelike.Client
             _game.player.inventory.InventoryUpdated += OnInventoryUpdate;
             _game.PlayerTookDamage += OnPlayerDamage;
             _game.PlayerShotGun += OnGunShot;
+            _game.DragWasUncertain += OnDragUncertain;
             #region static UI buttons creation
             //ceiling reveal button
             {
@@ -101,6 +105,7 @@ namespace Roguelike.Client
         }
         void OnKeyPress(KEY_PRESS_INFO k)
         {
+            lastKeyPress = k;
             if (interceptNextInput)
             {
                 interceptNextInput = false;
@@ -214,7 +219,29 @@ namespace Roguelike.Client
                 return;
             }
         }
-
+        private void OnDragButtonPress()
+        {
+            _game.Drag();
+        }
+        private void OnDragUncertain(Direction[] possibleDragDirections)
+        {
+            foreach (Direction direction in possibleDragDirections)
+            {
+                interceptNextInput = true;
+                lastKeyPress = new(ConsoleKey.F24,false);
+                _GUI.DrawGrabDirectionArrow(direction);
+                DirectionWrapper directionWrapper = new(direction);
+                InputIntercepted += () => 
+                {
+                    if (_directionKeys.ContainsKey(lastKeyPress.key) &&
+                    _directionKeys[lastKeyPress.key] == directionWrapper.Value)
+                    {
+                        _game.Drag(directionWrapper.Value);
+                    }
+                    _GUI.PrintGame();
+                };
+            }
+        }
         private void OnInventoryUpdate()
         {
             _buttonManager.RemoveInventoryButtons();

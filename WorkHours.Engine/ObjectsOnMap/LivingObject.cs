@@ -1,5 +1,6 @@
 ﻿using Roguelike.Engine.ObjectsOnMap;
 using System;
+using System.Drawing;
 
 namespace Roguelike.Engine
 {
@@ -32,7 +33,12 @@ namespace Roguelike.Engine
             }
             return false;
         }
-        public void Damage(float amount)
+        public bool NextTo(Point position)
+        {
+            return NextTo(position.X, position.Y);
+        }
+
+            public void Damage(float amount)
         {
             Health -= amount;
         }

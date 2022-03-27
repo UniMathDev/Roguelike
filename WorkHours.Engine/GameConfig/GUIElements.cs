@@ -221,7 +221,7 @@ namespace Roguelike.GameConfig.GUIElements
             @"                                           esc         -  exit             ",
             @"                                           R           -  reload          ",
             @"                                                                         ",
-            @"                                                                          ",
+            @"                      PRESS F1 TO SHOW THIS AGAIN               ",
             @"                      PRESS ANY KEY TO START                                 ",
             @"                                                                          ",
         };
@@ -245,4 +245,26 @@ namespace Roguelike.GameConfig.GUIElements
             "|___________________________________________|",
         };
     }
+    public class DirectionArrows : GUIElement
+    {
+        public static readonly char[] chars = new char[8]
+        {
+            '8',
+            '9',
+            '6',
+            '3',
+            '2',
+            '1',
+            '4',
+            '7',
+        };
+    }
+    /*
+
+            '∑',
+            '̥',
+            '2',
+            '→',
+            '.',
+    */
 }

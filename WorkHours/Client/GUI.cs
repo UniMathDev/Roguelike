@@ -217,6 +217,20 @@ namespace Roguelike.Client
             System.Threading.Thread.Sleep(100);
             PrintGame();
         }
+
+        public void DrawGrabDirectionArrow(Direction direction)
+        {
+            Point playerBufferPos = MapToBufferPos(_game.player.X,_game.player.Y);
+            Point coordDiff = GameMath.DirectionToCoordDiff(direction);
+            int X = playerBufferPos.X + coordDiff.X * 2;
+            int Y = playerBufferPos.Y + coordDiff.Y * 2;
+            char arrow = DirectionArrows.chars[(int)direction];
+            Console.SetCursorPosition(X, Y);
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write(arrow);
+        }
+
         ///<summary>
         ///принимает координаты относительно буфера
         ///</summary>

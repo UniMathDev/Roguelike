@@ -115,6 +115,11 @@ namespace Roguelike.Input
     {
         public ConsoleKey key;
         public bool altHeld;
+        public KEY_PRESS_INFO(ConsoleKey key, bool altHeld)
+        {
+            this.key = key;
+            this.altHeld = altHeld;
+        }
     }
     public struct MOUSE_MOVE_INFO
     {
