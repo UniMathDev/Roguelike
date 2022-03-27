@@ -1,4 +1,5 @@
 ﻿using Roguelike.Engine.Enums;
+using Roguelike.GameConfig;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Text;
@@ -51,6 +52,17 @@ namespace Roguelike.Engine
                 list.Add(builder.ToString(i, Math.Min(input.Length - i - 1, chunkSize)));
             }
             return list.ToArray();
+        }
+        public static string SizeDescription(int size)
+        {
+            switch (size)
+            {
+                case > PlayerStats.PocketSize: return "very big";
+                case >=3: return "big";
+                case 2: return "medium";
+                case 1: return "small";
+                default: throw new Exception("size has to be bigger than zero.");
+            }
         }
     }
     public class IntWrapper

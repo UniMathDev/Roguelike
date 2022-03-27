@@ -309,7 +309,6 @@ namespace Roguelike.Client
             }
 
         }
-
         private void OnPlayerDamage()
         {
             _GUI.PrintFlash(ConsoleColor.DarkRed);

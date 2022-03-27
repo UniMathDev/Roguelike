@@ -234,7 +234,8 @@ namespace Roguelike.Client
         }
         public void PrintInventoryItemDescription(InventoryObject iObject)
         {
-            PrintDescriptionBox(iObject.Description + " Size: " + iObject.Size);
+            PrintDescriptionBox(iObject.Description
+                + " Size: " + GameMath.SizeDescription(iObject.Size) + " ");
         }
         private void PrintDescriptionBox(string description)
         {
