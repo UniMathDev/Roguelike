@@ -46,6 +46,7 @@ namespace Roguelike.Client
             _keyboardMenu.Add(ConsoleKey.D0, new GameMenuItem(OnWaitButtonPress));
             _keyboardMenu.Add(ConsoleKey.R, new GameMenuItem(OnReloadButtonPress));
             _keyboardMenu.Add(ConsoleKey.Spacebar, new GameMenuItem(OnDragButtonPress));
+            _keyboardMenu.Add(ConsoleKey.F1, new GameMenuItem(OnHelpButtonPress));
 
             #region _directionKeys assignment
             _directionKeys = new Dictionary<ConsoleKey, Direction>();
@@ -241,6 +242,13 @@ namespace Roguelike.Client
                     _GUI.PrintGame();
                 };
             }
+        }
+        private void OnHelpButtonPress()
+        {
+            interceptNextInput = true;
+            InputIntercepted += Console.Clear;
+            InputIntercepted += _GUI.PrintGame;
+            _GUI.PrintStartScreen();
         }
         private void OnInventoryUpdate()
         {
